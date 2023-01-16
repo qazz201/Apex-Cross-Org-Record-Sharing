@@ -1,4 +1,4 @@
-public with sharing class CalloutClient {
+public with sharing class CalloutClient implements ICalloutClient{
     private HttpRequest request = new HttpRequest();
     private Map<String, String> headers = new Map<String, String>();
     private String endpoint;
