@@ -6,7 +6,7 @@ public with sharing class QueryApiService extends Api {
     private final String DEFAULT_QUERY_OBJECT_BY_NAME = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
     private Integer DEFAULT_QUERY_LIMIT = 200;
 
-    public QueryApiService(ICalloutClient calloutClient, String endpointDomain) {
+    public QueryApiService(ICallout calloutClient, String endpointDomain) {
         super(calloutClient, endpointDomain);
     }
 

@@ -6,7 +6,7 @@ public with sharing class ToolingApiService extends Api {
     // Default query
     private final String QUERY_CUSTOM_OBJECT_NAMES = 'SELECT+DeveloperName+from+CustomObject';
 
-    public ToolingApiService(ICalloutClient calloutClient, String endpointDomain) {
+    public ToolingApiService(ICallout calloutClient, String endpointDomain) {
         super(calloutClient, endpointDomain);
     }
 
@@ -25,7 +25,7 @@ public with sharing class ToolingApiService extends Api {
 
         if (response.getStatusCode() != 200 || response.getBody() == null) return names;
 
-        for (Records record : this.parseCustomObjectQueryResponse(response.getBody()).records) {
+        for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
             names.add(record.DeveloperName + '__c');
         }
 

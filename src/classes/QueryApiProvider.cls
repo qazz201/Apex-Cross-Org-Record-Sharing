@@ -1,7 +1,7 @@
-public with sharing class QueryApi implements IQueryApi {
+public with sharing class QueryApiProvider implements IQueryApi {
     private QueryApiService queryApiService;
     
-    public QueryApi(ICalloutClient calloutClient, String endpointDomain) {
+    public QueryApiProvider(ICallout calloutClient, String endpointDomain) {
         this.queryApiService = new QueryApiService(calloutClient, endpointDomain);
     }
 

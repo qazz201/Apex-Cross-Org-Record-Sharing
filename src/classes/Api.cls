@@ -1,8 +1,8 @@
 public abstract with sharing class Api {
-    protected ICalloutClient calloutClient;
+    protected ICallout calloutClient;
     protected String ROOT_PATH;
 
-    public Api(ICalloutClient calloutClient, String endpointDomain) {
+    public Api(ICallout calloutClient, String endpointDomain) {
         this.calloutClient = calloutClient;
         this.ROOT_PATH = endpointDomain + this.getApiPath();
     }
