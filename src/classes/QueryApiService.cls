@@ -1,8 +1,5 @@
-public with sharing class QueryApiService {
-    private ICalloutClient calloutClient ;
-
-    // Paths
-    private final String ROOT_PATH;
+public with sharing class QueryApiService extends Api {
+    // Path
     private final String QUERY_API_PATH = '/services/data/v56.0/query/?q=';
 
     // Default query
@@ -10,17 +7,12 @@ public with sharing class QueryApiService {
     private Integer DEFAULT_QUERY_LIMIT = 200;
 
     public QueryApiService(ICalloutClient calloutClient, String endpointDomain) {
-        if (calloutClient == null) this.calloutClient = new CalloutClient();
-        this.calloutClient = calloutClient;
-        this.ROOT_PATH = endpointDomain + this.QUERY_API_PATH;
+        super(calloutClient, endpointDomain);
     }
 
-//    public QueryApiService setQueryLimit(Integer DEFAULT_QUERY_LIMIT) {
-//        if (DEFAULT_QUERY_LIMIT != 0 || DEFAULT_QUERY_LIMIT != null) {
-//            this.DEFAULT_QUERY_LIMIT = DEFAULT_QUERY_LIMIT;
-//        }
-//        return this;
-//    }
+    protected override String getApiPath() {
+        return this.QUERY_API_PATH;
+    }
 
     /**
      * @description 
@@ -53,15 +45,20 @@ public with sharing class QueryApiService {
             Map<String, Object> objValueToFieldName = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(record));
 
             for (String fieldName : objValueToFieldName.keySet()) {
-                setSObjectFieldValue(dynamicSObject, objectFieldToName.get(fieldName), fieldName, objValueToFieldName.get(fieldName));
+                this.setSObjectFieldValue(
+                        dynamicSObject,
+                        objectFieldToName.get(fieldName),
+                        fieldName,
+                        objValueToFieldName.get(fieldName)
+                );
             }
             result.add(dynamicSObject);
         }
-            System.debug('++++'+result);
+
         return result;
     }
 
-    private static void setSObjectFieldValue(
+    private void setSObjectFieldValue(
             SObject sObjectToFill,
             Schema.SObjectField objectField,
             String fieldName,
@@ -76,30 +73,5 @@ public with sharing class QueryApiService {
         }
 
         sObjectToFill.put(fieldName, fieldValue);
-
-//        //TODO: DELETE
-//        if (fieldValue == 'Pavlova') {
-//            sObjectToFill.put(fieldName, 'Pavlova##2');
-//        }
     }
-
-
-    private HttpResponse executeCallout(String resourceEndpoint) {
-        HttpResponse response;
-        try {
-            calloutClient.setEndpoint(resourceEndpoint);
-            response = calloutClient.get();
-        } catch (Exception ex) {
-            System.debug(ex);
-            return response;
-        }
-
-        return response;
-    }
-
-    private String getEndpointPath(String resource) {
-        return this.ROOT_PATH + resource;
-    }
-
-
 }

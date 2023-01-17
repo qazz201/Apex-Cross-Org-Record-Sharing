@@ -1,8 +1,5 @@
-public with sharing class ToolingApiService {
-    private ICalloutClient calloutClient ;
-
+public with sharing class ToolingApiService extends Api {
     // Paths
-    private final String ROOT_PATH;
     private final String TOOLING_API_PATH = '/services/data/v56.0/tooling/';
     private final String QUERY_PATH = 'query/?q=';
 
@@ -10,9 +7,11 @@ public with sharing class ToolingApiService {
     private final String QUERY_CUSTOM_OBJECT_NAMES = 'SELECT+DeveloperName+from+CustomObject';
 
     public ToolingApiService(ICalloutClient calloutClient, String endpointDomain) {
-        if (calloutClient == null) this.calloutClient = new CalloutClient();
-        this.calloutClient = calloutClient;
-        this.ROOT_PATH = endpointDomain + this.TOOLING_API_PATH;
+        super(calloutClient, endpointDomain);
+    }
+
+    protected override String getApiPath() {
+        return this.TOOLING_API_PATH;
     }
 
     /**
@@ -20,35 +19,20 @@ public with sharing class ToolingApiService {
     */
     public List<String> getCustomObjectNames() {
         List<String> names = new List<String>();
-        HttpResponse response = this.executeCallout(getEndpointPath(this.QUERY_PATH + this.QUERY_CUSTOM_OBJECT_NAMES));
-        
+        HttpResponse response = this.executeCallout(
+                this.getEndpointPath(this.QUERY_PATH + this.QUERY_CUSTOM_OBJECT_NAMES)
+        );
+
         if (response.getStatusCode() != 200 || response.getBody() == null) return names;
 
-        for (Records record : parseCustomObjectQueryResponse(response.getBody()).records) {
+        for (Records record : this.parseCustomObjectQueryResponse(response.getBody()).records) {
             names.add(record.DeveloperName + '__c');
         }
 
-        System.debug(names);
         return names;
     }
 
-    private HttpResponse executeCallout(String resourceEndpoint) {
-        HttpResponse response;
-        try {
-            calloutClient.setEndpoint(resourceEndpoint);
-            response = calloutClient.get();
-        } catch (Exception ex) {
-            return response;
-        }
-
-        return response;
-    }
-
-    private String getEndpointPath(String resource) {
-        return this.ROOT_PATH + resource;
-    }
-
-    public static ToolingQueryResponse parseCustomObjectQueryResponse(String body) {
+    public ToolingQueryResponse parseCustomObjectQueryResponse(String body) {
         return (ToolingQueryResponse) JSON.deserialize(body, ToolingQueryResponse.class);
     }
 
