@@ -1,4 +1,4 @@
-public with sharing class MasterOrgApi {
+public with sharing class SourceOrgApi {
     private static final String ROOT_PATH = 'callout:CrossOrgDataTransferNamedCredential';
     private static RestApiManager restApiManager = new RestApiManager(ROOT_PATH);
     
