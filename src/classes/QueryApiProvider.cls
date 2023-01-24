@@ -6,7 +6,7 @@ public with sharing class QueryApiProvider implements IQueryApi {
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-        return this.queryApiService.getRecordsByObjectNameAndDefaultQuery(objectName, limitCount);
+        return this.queryApiService.getRecordsByObjectName(objectName, limitCount);
     }
 
     public List<SObject> getRecordsByObjectNameAndQuery(String objectName, String customQuery) {

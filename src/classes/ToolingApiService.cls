@@ -1,4 +1,6 @@
 public with sharing class ToolingApiService extends Api {
+    private final String CUSTOM_FIELD_POSTFIX = '__c';
+    
     // Paths
     private final String TOOLING_API_PATH = '/services/data/v56.0/tooling/';
     private final String QUERY_PATH = 'query/?q=';
@@ -26,7 +28,7 @@ public with sharing class ToolingApiService extends Api {
         if (response.getStatusCode() != 200 || response.getBody() == null) return names;
 
         for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
-            names.add(record.DeveloperName + '__c');
+            names.add(record.DeveloperName + CUSTOM_FIELD_POSTFIX);
         }
 
         return names;

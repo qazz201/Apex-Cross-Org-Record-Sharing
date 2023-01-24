@@ -17,7 +17,7 @@ public with sharing class QueryApiService extends Api {
     /**
      * @description 
     */
-    public List<SObject> getRecordsByObjectNameAndDefaultQuery(String objectName, Integer limitCount) {
+    public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
         if (String.isBlank(objectName)) return new List<SObject>();
         if (limitCount == 0 || limitCount == null) {
             limitCount = this.DEFAULT_QUERY_LIMIT;
@@ -65,6 +65,7 @@ public with sharing class QueryApiService extends Api {
             Object fieldValueObj) {
 
         String fieldValue = String.valueOf(fieldValueObj);
+        if(String.isBlank(fieldValue)) return; // TODO: remove for record update??
 
         if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) return;
         if (Dates.isDate(fieldValue)) {

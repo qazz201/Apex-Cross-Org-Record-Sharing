@@ -31,6 +31,14 @@ public with sharing class CalloutClient implements ICallout {
         return this.execute('GET', null);
     }
 
+    public HttpResponse post() {
+        return this.post(null);
+    }
+    
+    public HTTPResponse post(Object body) {
+        return this.execute('POST', body);
+    }
+
     private HTTPResponse execute(String method, Object body) {
         this.request.setEndpoint(endpoint);
         this.request.setMethod(method);
