@@ -2,6 +2,7 @@ import {LightningElement, api} from 'lwc';
 import {isEmptyString, isEmptyArray} from "c/commons";
 
 const AUTH_CODE = 'code';
+const AUTHORIZE_EVENT = 'authorize';
 
 export default class Authorization extends LightningElement {
     @api authUrl = 'https://login.salesforce.com/services/oauth2/authorize?client_id=3MVG9vvlaB0y1YsLh_esB2JsdW3kCVkDIysPgrk0VxVRnEXx2YP2afWYeLwAyax21ZXpnuDSja78PyoY6zcHx&response_type=code&redirect_uri=https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/Share_records';
@@ -9,10 +10,11 @@ export default class Authorization extends LightningElement {
 
     authWindow;
     intervalIds = [];
+    defaultAuthorizationEventDetail = {success: false}
 
     disconnectedCallback() {
         if (isEmptyArray(this.intervalIds)) return;
-        this.handleAuthWindowClose();
+        this.clearIntervals();
     }
 
     openAuthWindow() {
@@ -21,25 +23,39 @@ export default class Authorization extends LightningElement {
         this.trackWindowClose();
     }
 
-    handleAuthWindowClose = () => {
+    clearIntervals() {
         this.intervalIds.forEach(interval => clearInterval(interval));
         this.intervalIds = [];
+    }
 
+    handleAuthWindowClose = () => {
+        this.clearIntervals();
+
+        if (isEmptyString(this.authCode)) {
+            this.dispatchAuthorizationEvent(this.defaultAuthorizationEventDetail);
+            return;
+        }
+
+        this.dispatchAuthorizationEvent({...this.defaultAuthorizationEventDetail, success: true});
     }
 
     handleChangeWindowLocation(urlSearchParams = '') {
         this.authWindow.close();
-        this.handleAuthWindowClose();
         this.getAuthCodeFromUrl(urlSearchParams);
+        this.handleAuthWindowClose();
         console.log(this.authCode, 'AUTH CODE')
     }
 
     getAuthCodeFromUrl(searchLink = '') {
         const searchParams = new URLSearchParams(searchLink);
         if (!searchParams.has(AUTH_CODE)) return;
-      
+
         this.authCode = searchParams.get(AUTH_CODE);
         return this.authCode;
+    }
+
+    dispatchAuthorizationEvent(detail = {}) {
+        this.dispatchEvent(new CustomEvent(AUTHORIZE_EVENT, {detail}));
     }
 
     trackWindowLocationChange() {
