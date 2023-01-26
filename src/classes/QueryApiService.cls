@@ -1,17 +1,17 @@
 public with sharing class QueryApiService extends Api {
     // Path
-    private final String QUERY_API_PATH = '/services/data/v56.0/query/?q=';
+    private final String QUERY_API_ROOT_PATH = '/services/data/v56.0/query/?q=';
 
     // Default query
-    private final String DEFAULT_QUERY_OBJECT_BY_NAME = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
+    private final String SELECT_OBJECT_BY_NAME = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
     private Integer DEFAULT_QUERY_LIMIT = 200;
 
-    public QueryApiService(ICallout calloutClient, String endpointDomain) {
-        super(calloutClient, endpointDomain);
+    public QueryApiService(ICallout calloutClient) {
+        super(calloutClient);
     }
 
     protected override String getApiPath() {
-        return this.QUERY_API_PATH;
+        return this.QUERY_API_ROOT_PATH;
     }
 
     /**
@@ -25,7 +25,7 @@ public with sharing class QueryApiService extends Api {
 
         HttpResponse response = this.executeCallout(
                 this.getEndpointPath(
-                        String.format(this.DEFAULT_QUERY_OBJECT_BY_NAME, new List<Object>{
+                        String.format(this.SELECT_OBJECT_BY_NAME, new List<Object>{
                                 objectName, limitCount
                         })
                 )
@@ -65,7 +65,7 @@ public with sharing class QueryApiService extends Api {
             Object fieldValueObj) {
 
         String fieldValue = String.valueOf(fieldValueObj);
-        if(String.isBlank(fieldValue)) return; // TODO: remove for record update??
+        if (String.isBlank(fieldValue)) return; // TODO: remove for record update??
 
         if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) return;
         if (Dates.isDate(fieldValue)) {

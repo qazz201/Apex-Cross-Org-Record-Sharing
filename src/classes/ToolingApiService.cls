@@ -1,19 +1,19 @@
 public with sharing class ToolingApiService extends Api {
     private final String CUSTOM_FIELD_POSTFIX = '__c';
-    
+
     // Paths
-    private final String TOOLING_API_PATH = '/services/data/v56.0/tooling/';
+    private final String TOOLING_API_ROOT_PATH = '/services/data/v56.0/tooling/';
     private final String QUERY_PATH = 'query/?q=';
 
     // Default query
     private final String QUERY_CUSTOM_OBJECT_NAMES = 'SELECT+DeveloperName+from+CustomObject';
 
-    public ToolingApiService(ICallout calloutClient, String endpointDomain) {
-        super(calloutClient, endpointDomain);
+    public ToolingApiService(ICallout calloutClient) {
+        super(calloutClient);
     }
 
     protected override String getApiPath() {
-        return this.TOOLING_API_PATH;
+        return this.TOOLING_API_ROOT_PATH;
     }
 
     /**

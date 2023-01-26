@@ -1,12 +1,18 @@
 public with sharing class SourceOrgApi {
-    private static final String ROOT_PATH = 'callout:CrossOrgDataTransferNamedCredential';
-    private static RestApiManager restApiManager = new RestApiManager(ROOT_PATH);
-    
-    public static List<String> getCustomObjectNames() {
+//    private static final String ROOT_PATH = 'callout:CrossOrgDataTransferNamedCredential';
+//    private static RestApiManager restApiManager = new RestApiManager(new CalloutClient(), ROOT_PATH);
+    private RestApiManager restApiManager;
+
+
+    public SourceOrgApi(ICallout calloutClient) {
+        this.restApiManager = new RestApiManager(calloutClient);
+    }
+
+    public List<String> getCustomObjectNames() {
         return restApiManager.toolingApi().getObjectNames();
     }
 
-    public static List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
+    public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
         return restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount);
     }
 }

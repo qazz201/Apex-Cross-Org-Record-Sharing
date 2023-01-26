@@ -29,6 +29,7 @@ export default class Authorization extends LightningElement {
     }
 
     handleAuthWindowClose = () => {
+        console.log(this.authCode, 'AUTH CODE')
         this.clearIntervals();
 
         if (isEmptyString(this.authCode)) {
@@ -43,7 +44,6 @@ export default class Authorization extends LightningElement {
         this.authWindow.close();
         this.getAuthCodeFromUrl(urlSearchParams);
         this.handleAuthWindowClose();
-        console.log(this.authCode, 'AUTH CODE')
     }
 
     getAuthCodeFromUrl(searchLink = '') {

@@ -1,8 +1,8 @@
 public with sharing class QueryApiProvider implements IQueryApi {
     private QueryApiService queryApiService;
     
-    public QueryApiProvider(ICallout calloutClient, String endpointDomain) {
-        this.queryApiService = new QueryApiService(calloutClient, endpointDomain);
+    public QueryApiProvider(ICallout calloutClient) {
+        this.queryApiService = new QueryApiService(calloutClient);
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {

@@ -1,10 +1,10 @@
 public abstract with sharing class Api {
     protected ICallout calloutClient;
-    protected String ROOT_PATH;
+    protected String endpointApiUrl;
 
-    public Api(ICallout calloutClient, String endpointDomain) {
+    public Api(ICallout calloutClient) {
         this.calloutClient = calloutClient;
-        this.ROOT_PATH = endpointDomain + this.getApiPath();
+        this.endpointApiUrl = this.calloutClient.getEndpoint() + this.getApiPath();
     }
 
     protected abstract String getApiPath();
@@ -21,7 +21,7 @@ public abstract with sharing class Api {
         return response;
     }
 
-    protected virtual String getEndpointPath(String resource) {
-        return this.ROOT_PATH + resource;
+    protected virtual String getEndpointPath(String apiResource) {
+        return this.endpointApiUrl + apiResource;
     }
 } 

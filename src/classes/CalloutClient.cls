@@ -10,8 +10,17 @@ public with sharing class CalloutClient implements ICallout {
         this.endpoint = endpoint;
     }
 
+    public String getEndpoint() {
+        return this.endpoint;
+    }
+
     public CalloutClient setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+        return this;
+    }
+
+    public CalloutClient clearAllHeaders() {
+        this.headers.clear();
         return this;
     }
 
@@ -34,7 +43,7 @@ public with sharing class CalloutClient implements ICallout {
     public HttpResponse post() {
         return this.post(null);
     }
-    
+
     public HTTPResponse post(Object body) {
         return this.execute('POST', body);
     }
