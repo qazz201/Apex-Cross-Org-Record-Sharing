@@ -1,11 +1,12 @@
 public with sharing class AuthorizationManager {
     //private ICallout calloutClient = new CalloutClient();
 
+// check if authorization success( sf no means tat user needs to reauthorize)
     public void sfAuthorization() {
         try {
             ICallout calloutClient = new CalloutClient();
             SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(
-                    RecordTransferCustomSettingService.getOrgDefaultCustomSetting().AuthorizationCode__c,
+                    RecordTransferCustomSettingService.getOrgDefaultSetting().AuthorizationCode__c,
                     calloutClient
             );
 
@@ -15,11 +16,11 @@ public with sharing class AuthorizationManager {
                 return;
             }
 
-            calloutClient.setEndpoint(authProvider.getInstanceUrl());
-            calloutClient.setHeader('Authorization', 'Bearer ' + authProvider.getAccessToken());
-
-            System.debug(new SourceOrgApi(calloutClient).getCustomObjectNames());
-            RecordTransferCustomSettingService.setOrgDefaultCustomSetting('AccessToken__c', authProvider.getAccessToken());
+//            calloutClient.setEndpoint(authProvider.getInstanceUrl());
+//            calloutClient.setHeader('Authorization', 'Bearer ' + authProvider.getAccessToken());
+//
+//            System.debug(new SourceOrgApi(calloutClient).getCustomObjectNames());
+//            RecordTransferCustomSettingService.setOrgDefaultSetting('AccessToken__c', authProvider.getAccessToken());
 
             System.debug(calloutClient);
         } catch (SfWebFlowAuthProvider.SfWebFlowAuthProviderException ex) {

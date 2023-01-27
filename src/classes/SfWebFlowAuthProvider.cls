@@ -15,17 +15,17 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
 
     public String getAccessToken() {
         String currentAccessToken = this.accessTokenResponse.access_token;
-        return String.isNotBlank(currentAccessToken) ? currentAccessToken : RecordTransferCustomSettingService.getOrgDefaultCustomSetting()?.AccessToken__c;
+        return String.isNotBlank(currentAccessToken) ? currentAccessToken : RecordTransferCustomSettingService.getOrgDefaultSetting()?.AccessToken__c;
     }
 
     public String getRefreshToken() {
         String currentRefreshToken = this.accessTokenResponse.refresh_token;
-        return String.isNotBlank(currentRefreshToken) ? currentRefreshToken : RecordTransferCustomSettingService.getOrgDefaultCustomSetting()?.Refresh_Token__c;
+        return String.isNotBlank(currentRefreshToken) ? currentRefreshToken : RecordTransferCustomSettingService.getOrgDefaultSetting()?.Refresh_Token__c;
     }
 
     public String getInstanceUrl() {
         String currentInstanceUrl = this.accessTokenResponse.instance_url;
-        return String.isNotBlank(currentInstanceUrl) ? currentInstanceUrl : RecordTransferCustomSettingService.getOrgDefaultCustomSetting()?.Instance_Url__c;
+        return String.isNotBlank(currentInstanceUrl) ? currentInstanceUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.Instance_Url__c;
     }
 
     public void authenticate() {
@@ -37,7 +37,7 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
 
         if (response.getStatusCode() >= 400) {
             System.debug('Reauthorization...');
-            this.reAuthorize();
+            this.refreshAuthentication();
             return;
         }
 
@@ -45,7 +45,7 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
         System.debug(this.accessTokenResponse);
     }
 
-    private void reAuthorize() {
+    private void refreshAuthentication() {
         try {
             this.calloutClient.clearAllHeaders();
             this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
@@ -72,7 +72,7 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
     }
 
     private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
-        RecordTransferSettings__c transferSetting = RecordTransferCustomSettingService.getOrgDefaultCustomSetting();
+        RecordTransferSettings__c transferSetting = RecordTransferCustomSettingService.getOrgDefaultSetting();
 
         Map<String, String> tokenUrlParams = new Map<String, String>{
                 '?client_id=' => transferSetting.Client_Id__c,
