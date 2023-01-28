@@ -1,4 +1,15 @@
 <!-- Authorization -->
 <template>
-    <c-authorization onauthorize={handleAuthorization}></c-authorization>
+    <div class="slds-box slds-color__background_gray-1">
+        <c-authorization></c-authorization>
+
+        <button class="slds-button slds-button_brand"
+                onclick={runAuthorization}>
+            Authorize or Change Authorization Data
+        </button>
+
+        <c-modal-window>
+            <lightning-flow flow-api-name='RecordTransferAuthorizationFlow'></lightning-flow>
+        </c-modal-window>
+    </div>
 </template>

@@ -2,6 +2,21 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>54.0</apiVersion>
     <description>Authorization</description>
-    <isExposed>false</isExposed>
+    <isExposed>true</isExposed>
     <masterLabel>Authorization</masterLabel>
+
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="clientId" type="String" role="inputOnly"/>
+            <property name="clientSecret" type="String" role="inputOnly"/>
+            <property name="callbackUrl" type="String" role="inputOnly"/>
+            <property name="environmentUrl" type="String" role="inputOnly"/>
+            
+            <!--            <property name="autoLaunchAuthorization" type="Boolean" role="inputOnly"/>-->
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

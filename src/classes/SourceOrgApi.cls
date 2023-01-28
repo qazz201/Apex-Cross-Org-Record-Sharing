@@ -9,11 +9,11 @@ public with sharing class SourceOrgApi {
     }
 
     public List<String> getCustomObjectNames() {
-        return restApiManager.toolingApi().getObjectNames();
+        return restApiManager.toolingApi().getObjectNames(); //todo make api as variable ar make singleton!
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-        return restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount);
+        return restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount); //todo make api as variable!
     }
 }
 

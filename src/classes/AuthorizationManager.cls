@@ -18,7 +18,7 @@ public with sharing class AuthorizationManager {
 
 //            calloutClient.setEndpoint(authProvider.getInstanceUrl());
 //            calloutClient.setHeader('Authorization', 'Bearer ' + authProvider.getAccessToken());
-//
+// 
 //            System.debug(new SourceOrgApi(calloutClient).getCustomObjectNames());
 //            RecordTransferCustomSettingService.setOrgDefaultSetting('AccessToken__c', authProvider.getAccessToken());
 

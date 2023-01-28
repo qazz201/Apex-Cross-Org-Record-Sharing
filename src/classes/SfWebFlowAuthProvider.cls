@@ -42,6 +42,12 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
         }
 
         this.accessTokenResponse = this.parseTokenResponse(response.getBody());
+        RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
+                RecordTransferSettings__c.AccessToken__c => this.accessTokenResponse.access_token,
+                RecordTransferSettings__c.Refresh_Token__c => this.accessTokenResponse.refresh_token,
+                RecordTransferSettings__c.Instance_Url__c => this.accessTokenResponse.instance_url
+        });
+
         System.debug(this.accessTokenResponse);
     }
 
@@ -60,6 +66,8 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
             if (String.isBlank(newAccessToken)) return;
 
             this.accessTokenResponse.access_token = newAccessToken;
+            RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, newAccessToken);
+
             System.debug('____ ' + this.accessTokenResponse);
         } catch (Exception ex) {
             System.debug('SfWebFlowAuthProvider.reAuthorize() ERROR: ' + ex.getStackTraceString());

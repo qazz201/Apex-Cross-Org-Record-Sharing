@@ -1,4 +1,6 @@
 public with sharing class ToolingApiService extends Api {
+    private static ToolingApiService instance;
+
     private final String CUSTOM_FIELD_POSTFIX = '__c';
 
     // Paths
@@ -16,6 +18,13 @@ public with sharing class ToolingApiService extends Api {
         return this.TOOLING_API_ROOT_PATH;
     }
 
+    public static ToolingApiService getInstance(ICallout calloutClient) {
+        if (instance == null) {
+            instance = new ToolingApiService(calloutClient);
+        }
+        return instance;
+    }
+
     /**
     * @description 
     */
@@ -25,7 +34,7 @@ public with sharing class ToolingApiService extends Api {
                 this.getEndpointPath(this.QUERY_PATH + this.QUERY_CUSTOM_OBJECT_NAMES)
         );
 
-        if (response.getStatusCode() != 200 || response.getBody() == null) return names;
+        if (response == null || response.getStatusCode() != 200 || response.getBody() == null) return names;
 
         for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
             names.add(record.DeveloperName + CUSTOM_FIELD_POSTFIX);
