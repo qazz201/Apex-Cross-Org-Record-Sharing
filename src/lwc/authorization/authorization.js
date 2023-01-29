@@ -6,7 +6,7 @@ import {isEmptyString, isEmptyArray} from 'c/commons';
 import {fireEvent} from 'c/pubsub';
 
 //Apex
-import saveConnectedAppAuthParams from '@salesforce/apex/AuthorizationController.saveConnectedAppAuthParams';
+import tryToAuthenticate from '@salesforce/apex/AuthorizationController.tryToAuthenticate';
 
 const AUTH_CODE = 'code';
 const AUTHORIZE_EVENT = 'authorize';
@@ -15,7 +15,7 @@ const AUTHORIZATION_PATH = 'services/oauth2/authorize';
 export default class Authorization extends LightningElement {
     @wire(CurrentPageReference) pageRef; // Required by pubsub
     //authUrl = 'https://login.salesforce.com/services/oauth2/authorize?client_id=3MVG9vvlaB0y1YsLh_esB2JsdW0GXbrlIkGLkYDI51JVZ8s2zdsSOjnhh3ubBeI0qLO1La.MJiwD6uj88vUeX&response_type=code&redirect_uri=https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/TransferRecordsFromAnotherOrg';
-    @api clientId = '3MVG9vvlaB0y1YsLh_esB2JsdW0GXbrlIkGLkYDI51JVZ8s2zdsSOjnhh3ubBeI0qLO1La.MJiwD6uj88vUeX';
+    @api clientId = '';
     @api clientSecret = '';
     @api callbackUrl = 'https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/TransferRecordsFromAnotherOrg';
     @api environmentUrl = 'https://login.salesforce.com'; // production or sandbox
@@ -66,7 +66,7 @@ export default class Authorization extends LightningElement {
     }
 
     handleSuccessfulAuthorization() {
-        saveConnectedAppAuthParams({
+        tryToAuthenticate({
             authCode: this.authCode,
             clientId: this.clientId,
             clientSecret: this.clientSecret,
@@ -78,6 +78,10 @@ export default class Authorization extends LightningElement {
             fireEvent(this.pageRef, AUTHORIZE_EVENT, eventParams);
             this.dispatchAuthorizationEvent(eventParams);
             this.showToastNotification('Authorization is successful', '', 'success');
+        }).catch(exception => {
+            console.log('ERROR__ ', exception);
+            console.log('ERROR__ msg ', exception?.body?.message);
+            this.showToastNotification('Error', exception?.body?.message, 'error');
         })
     }
 

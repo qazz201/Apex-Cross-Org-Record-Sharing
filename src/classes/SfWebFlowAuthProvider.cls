@@ -1,34 +1,21 @@
-public with sharing class SfWebFlowAuthProvider implements IAuth {
-    private ICallout calloutClient;
-    private String authorizationCode;
-    private AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
-
+public with sharing class SfWebFlowAuthProvider extends Auth {
     // private final String AUTHORIZATION_ENDPOINT = 'https://login.salesforce.com/services/oauth2/authorize';
     private final String TOKEN_ROOT_ENDPOINT = 'https://login.salesforce.com/services/oauth2/token';
     private final String GRANT_TYPE_AUTH_CODE = 'authorization_code';
     private final String GRANT_TYPE_REFRESH_TOKEN = 'refresh_token';
 
     public SfWebFlowAuthProvider(String authorizationCode, ICallout calloutClient) {
-        this.authorizationCode = authorizationCode;
-        this.calloutClient = calloutClient;
+        super(authorizationCode, calloutClient);
     }
 
-    public String getAccessToken() {
-        String currentAccessToken = this.accessTokenResponse.access_token;
-        return String.isNotBlank(currentAccessToken) ? currentAccessToken : RecordTransferCustomSettingService.getOrgDefaultSetting()?.AccessToken__c;
+    public SfWebFlowAuthProvider(AuthorizationParams authorizationParams, ICallout calloutClient) {
+        super(authorizationParams, calloutClient);
     }
 
-    public String getRefreshToken() {
-        String currentRefreshToken = this.accessTokenResponse.refresh_token;
-        return String.isNotBlank(currentRefreshToken) ? currentRefreshToken : RecordTransferCustomSettingService.getOrgDefaultSetting()?.Refresh_Token__c;
-    }
-
-    public String getInstanceUrl() {
-        String currentInstanceUrl = this.accessTokenResponse.instance_url;
-        return String.isNotBlank(currentInstanceUrl) ? currentInstanceUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.Instance_Url__c;
-    }
-
-    public void authenticate() {
+    /**
+    *  @description authenticate via params from custom settings or passed auth params
+    */
+    public override void authenticate() {
         this.calloutClient.clearAllHeaders();
         calloutClient.setEndpoint(this.getAccessTokenEndpoint());
         HttpResponse response = calloutClient.post();
@@ -42,11 +29,7 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
         }
 
         this.accessTokenResponse = this.parseTokenResponse(response.getBody());
-        RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
-                RecordTransferSettings__c.AccessToken__c => this.accessTokenResponse.access_token,
-                RecordTransferSettings__c.Refresh_Token__c => this.accessTokenResponse.refresh_token,
-                RecordTransferSettings__c.Instance_Url__c => this.accessTokenResponse.instance_url
-        });
+        this.saveAuthParamsInCustomSetting();
 
         System.debug(this.accessTokenResponse);
     }
@@ -75,20 +58,30 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
         }
     }
 
+    private void saveAuthParamsInCustomSetting() {
+        RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
+                RecordTransferSettings__c.AuthorizationCode__c => this.getAuthorizationCode(),
+                RecordTransferSettings__c.Client_Id__c => this.getClientId(),
+                RecordTransferSettings__c.ClientSecret__c => this.getClientSecret(),
+                RecordTransferSettings__c.RedirectUri__c => this.getCallbackUrl(),
+                RecordTransferSettings__c.AccessToken__c => this.getAccessToken(),
+                RecordTransferSettings__c.Refresh_Token__c => this.getRefreshToken(),
+                RecordTransferSettings__c.Instance_Url__c => this.getInstanceUrl()
+        });
+    }
+
     private AccessTokenResponse parseTokenResponse(String responseBody) {
         return (AccessTokenResponse) JSON.deserialize(responseBody, AccessTokenResponse.class);
     }
 
     private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
-        RecordTransferSettings__c transferSetting = RecordTransferCustomSettingService.getOrgDefaultSetting();
-
-        Map<String, String> tokenUrlParams = new Map<String, String>{
-                '?client_id=' => transferSetting.Client_Id__c,
-                '&client_secret=' => transferSetting.ClientSecret__c,
-                '&redirect_uri=' => transferSetting.RedirectUri__c
+        Map<String, String> defaultTokenUrlParams = new Map<String, String>{
+                '?client_id=' => this.getClientId(),
+                '&client_secret=' => this.getClientSecret(),
+                '&redirect_uri=' => this.getCallbackUrl()
         };
-        tokenUrlParams.putAll(specificUrlParams);
-        return tokenUrlParams;
+        defaultTokenUrlParams.putAll(specificUrlParams);
+        return defaultTokenUrlParams;
     }
 
     private String getAccessTokenEndpoint() {
@@ -96,7 +89,7 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
                 this.getTokenUrlParams(
                         new Map<String, String>{
                                 '&grant_type=' => this.GRANT_TYPE_AUTH_CODE,
-                                '&code=' => this.authorizationCode
+                                '&code=' => this.getAuthorizationCode()//this.authorizationCode
                         }
                 )
         );
@@ -121,12 +114,6 @@ public with sharing class SfWebFlowAuthProvider implements IAuth {
             combinedUrlParams += urlKey + urlParams.get(urlKey);
         }
         return this.TOKEN_ROOT_ENDPOINT + combinedUrlParams;
-    }
-
-    class AccessTokenResponse {
-        public String access_token;
-        public String refresh_token;
-        public String instance_url;
     }
 
     public class SfWebFlowAuthProviderException extends Exception {

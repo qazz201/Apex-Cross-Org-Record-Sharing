@@ -23,6 +23,10 @@ export default class RecordTransferContainer extends LightningElement {
         const {success} = params;
         console.log('AUTHORIZE_SUCCESS??_ ', success);
         console.log('PUBSUB CATCH EVENT??_ ', JSON.stringify(params));
+
+        if (success === true) {
+            this.$modalWindow?.closeModal();
+        }
     }
 
     runAuthorization() {
