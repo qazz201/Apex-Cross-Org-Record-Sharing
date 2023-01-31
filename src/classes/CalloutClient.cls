@@ -59,18 +59,17 @@ public with sharing class CalloutClient implements ICallout {
         try {
             HttpResponse response = new Http().send(request);
             if (response.getStatusCode() != 200) {
-                String errorMessage = '### Unexpected Error while call external resource '
+                String errorMessage = '### Unexpected Error while call external resource: '
                         + 'Status ' + response.getStatus() + ' and Status Code ' + response.getStatusCode();
 
                 System.debug(errorMessage + response.getBody());
             }
 
             return response;
-        } catch (System.Exception e) {
+        } catch (Exception e) {
             System.debug('#### Exception Executed ' + e.getStackTraceString() + '  ' + e.getMessage());
+            throw e;
         }
-
-        return null;
     }
 
     private void setHeaders() {

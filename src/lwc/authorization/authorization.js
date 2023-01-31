@@ -23,7 +23,7 @@ export default class Authorization extends LightningElement {
     // @api autoLaunchAuthorization = false;
     /**
      * @description To silently get new auth code(if needed) and also check if user already authorized
-     */
+     */ 
     @api silentAuthorization = false;
 
     authCode = ''; //extracted from url

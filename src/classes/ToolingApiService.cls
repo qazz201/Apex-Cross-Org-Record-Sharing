@@ -34,7 +34,11 @@ public with sharing class ToolingApiService extends Api {
                 this.getEndpointPath(this.QUERY_PATH + this.QUERY_CUSTOM_OBJECT_NAMES)
         );
 
-        if (response == null || response.getStatusCode() != 200 || response.getBody() == null) return names;
+        if (response != null && response.getStatusCode() != 200) {
+            throw new ApiException(String.valueOf(response.getStatusCode()));
+        }
+
+        if (response == null || response.getBody() == null) return names;
 
         for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
             names.add(record.DeveloperName + CUSTOM_FIELD_POSTFIX);

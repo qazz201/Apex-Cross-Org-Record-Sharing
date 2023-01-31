@@ -3,13 +3,12 @@
     <div class="slds-box slds-color__background_gray-1">
         <c-authorization></c-authorization>
 
-        <button class="slds-button slds-button_brand"
-                onclick={runAuthorization}>
-            Authorize or Change Authorization Data
-        </button>
+        <c-authorization-container></c-authorization-container>
 
-        <c-modal-window>
-            <lightning-flow flow-api-name='RecordTransferAuthorizationFlow'></lightning-flow>
-        </c-modal-window>
+
+        <div class="slds-p-top_large">
+            <c-source-org-data-container></c-source-org-data-container>
+        </div>
     </div>
+
 </template>

@@ -1,0 +1,11 @@
+<template>
+    <span class="authorizationFlow">
+        <button class="slds-button slds-button_brand"
+                onclick={runAuthorizationFlow}>
+            Authorize or Change Authorization Data
+        </button>
+        <c-modal-window>
+            <lightning-flow flow-api-name='RecordTransferAuthorizationFlow'></lightning-flow>
+        </c-modal-window>
+    </span>
+</template>

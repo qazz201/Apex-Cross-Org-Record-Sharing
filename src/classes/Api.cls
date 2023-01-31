@@ -24,4 +24,20 @@ public abstract with sharing class Api {
     protected virtual String getEndpointPath(String apiResource) {
         return this.endpointApiUrl + apiResource;
     }
+
+    public class ApiException extends Exception {
+    }
+//    public class ApiException extends Exception {
+//        public Integer statusCode;
+//        public String message;
+//
+//        public ApiException(Integer statusCode, String message) {
+//            this.statusCode = statusCode;
+//            this.message = message;
+//        }
+//
+//        public override String getMessage() {
+//            return this.message;
+//        }
+//    }
 } 

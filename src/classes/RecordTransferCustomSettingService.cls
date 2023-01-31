@@ -1,6 +1,5 @@
 public with sharing class RecordTransferCustomSettingService {
-
-
+    
     public static void setOrgDefaultSetting(Map<SObjectField, String> fieldValueToType) {
         Map<String, String> fieldNameToValue = new Map<String, String>();
 
@@ -38,5 +37,9 @@ public with sharing class RecordTransferCustomSettingService {
 
     public static RecordTransferSettings__c getOrgDefaultSetting() {
         return RecordTransferSettings__c.getOrgDefaults();
+    }
+    
+    public static String getOrgDefaultSettingValueByName(SObjectField fieldName) {
+        return (String) RecordTransferSettings__c.getOrgDefaults().get(fieldName.getDescribe().getName());
     }
 }

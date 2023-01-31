@@ -3,7 +3,7 @@ public with sharing class AuthorizationController {
     @AuraEnabled
     public static void tryToAuthenticate(String authCode, String clientId, String clientSecret, String callbackUrl) {
         try {
-            AuthManager.sfAuthenticate(new Auth.AuthorizationParams(authCode, clientId, clientSecret, callbackUrl));
+            AuthManager.sfWebFlowAuthenticate(new Auth.AuthorizationParams(authCode, clientId, clientSecret, callbackUrl));
 
             System.debug(authCode);
             System.debug(clientId);

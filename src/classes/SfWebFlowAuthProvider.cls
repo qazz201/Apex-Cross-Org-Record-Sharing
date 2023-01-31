@@ -12,6 +12,10 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         super(authorizationParams, calloutClient);
     }
 
+    public SfWebFlowAuthProvider(ICallout calloutClient) {
+        super(calloutClient);
+    }
+
     /**
     *  @description authenticate via params from custom settings or passed auth params
     */
@@ -21,6 +25,7 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         HttpResponse response = calloutClient.post();
 
         System.debug(response.getBody());
+        System.debug('AUTH Response code___ ' + response.getStatusCode());
 
         if (response.getStatusCode() >= 400) {
             System.debug('Reauthorization...');
@@ -28,35 +33,35 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
             return;
         }
 
-        this.accessTokenResponse = this.parseTokenResponse(response.getBody());
+        this.accessTokenResponse = this.parseAccessTokenResponse(response.getBody());
         this.saveAuthParamsInCustomSetting();
 
         System.debug(this.accessTokenResponse);
     }
 
-    private void refreshAuthentication() {
-        try {
-            this.calloutClient.clearAllHeaders();
-            this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
-            HttpResponse response = calloutClient.post();
-
-            System.debug('AAAA-- ' + response.getBody());
-            if (response.getStatusCode() != 200) {
-                throw new SfWebFlowAuthProviderException('Reauthorization Error: ' + response.getBody());
-            }
-
-            String newAccessToken = this.parseTokenResponse(response.getBody())?.access_token;
-            if (String.isBlank(newAccessToken)) return;
-
-            this.accessTokenResponse.access_token = newAccessToken;
-            RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, newAccessToken);
-
-            System.debug('____ ' + this.accessTokenResponse);
-        } catch (Exception ex) {
-            System.debug('SfWebFlowAuthProvider.reAuthorize() ERROR: ' + ex.getStackTraceString());
-            throw ex;
-        }
-    }
+//    public void refreshAuthentication() {
+//        try {
+//            this.calloutClient.clearAllHeaders();
+//            this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
+//            HttpResponse response = calloutClient.post();
+//
+//            System.debug('AAAA-- ' + response.getBody());
+//            if (response.getStatusCode() != 200) {
+//                throw new SfWebFlowAuthProviderException('Reauthorization Error: ' + response.getBody());
+//            }
+//
+//            String newAccessToken = this.parseTokenResponse(response.getBody())?.access_token;
+//            if (String.isBlank(newAccessToken)) return;
+//
+//            this.accessTokenResponse.access_token = newAccessToken;
+//            RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, newAccessToken);
+//
+//            System.debug('____ ' + this.accessTokenResponse);
+//        } catch (Exception ex) {
+//            System.debug('SfWebFlowAuthProvider.reAuthorize() ERROR: ' + ex.getStackTraceString());
+//            throw ex;
+//        }
+//    }
 
     private void saveAuthParamsInCustomSetting() {
         RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
@@ -70,9 +75,9 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         });
     }
 
-    private AccessTokenResponse parseTokenResponse(String responseBody) {
-        return (AccessTokenResponse) JSON.deserialize(responseBody, AccessTokenResponse.class);
-    }
+//    private AccessTokenResponse parseTokenResponse(String responseBody) {
+//        return (AccessTokenResponse) JSON.deserialize(responseBody, AccessTokenResponse.class);
+//    }
 
     private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
         Map<String, String> defaultTokenUrlParams = new Map<String, String>{
@@ -95,7 +100,7 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         );
     }
 
-    private String getRefreshTokenEndpoint() {
+    protected override String getRefreshTokenEndpoint() {
         return this.getResultEndpointUrl(
                 this.getTokenUrlParams(
                         new Map<String, String>{

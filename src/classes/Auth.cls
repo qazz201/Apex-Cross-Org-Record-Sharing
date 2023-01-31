@@ -13,9 +13,38 @@ public abstract with sharing class Auth {
         this.authorizationParams = authorizationParams;
         this.calloutClient = calloutClient;
     }
-    
-    protected virtual void authenticate() {
+
+    public Auth(ICallout calloutClient) {
+        this.calloutClient = calloutClient;
     }
+
+    public abstract void authenticate();
+    protected abstract String getRefreshTokenEndpoint();
+
+    protected virtual void refreshAuthentication() {
+        RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
+        this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
+        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
+
+        System.debug('____ ' + this.accessTokenResponse);
+    }
+
+    public virtual RefreshTokenResponse getNewAccessToken() {
+        this.calloutClient.clearAllHeaders();
+        this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
+        HttpResponse response = calloutClient.post();
+
+        System.debug('AAAA-- _' + response.getBody());
+        if (response.getStatusCode() != 200) {
+            throw new AuthException('Reauthorization Error: ' + response.getBody());
+        }
+
+//        String newAccessToken = this.parseTokenResponse(response.getBody())?.access_token;
+//        if (String.isBlank(newAccessToken)) return null;
+
+        return this.parseRefreshTokenResponse(response.getBody());
+    }
+
 
     public virtual String getAccessToken() {
         String currentAccessToken = this.accessTokenResponse?.access_token;
@@ -36,7 +65,7 @@ public abstract with sharing class Auth {
         String currentAuthorizationCode = this.authorizationParams?.authorizationCode;
         return String.isNotBlank(currentAuthorizationCode) ? currentAuthorizationCode : RecordTransferCustomSettingService.getOrgDefaultSetting()?.AuthorizationCode__c;
     }
-    
+
     public virtual String getClientId() {
         String currentClientId = this.authorizationParams?.clientId;
         return String.isNotBlank(currentClientId) ? currentClientId : RecordTransferCustomSettingService.getOrgDefaultSetting()?.Client_Id__c;
@@ -52,10 +81,29 @@ public abstract with sharing class Auth {
         return String.isNotBlank(currentCallbackUrl) ? currentCallbackUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.RedirectUri__c;
     }
 
+    protected AccessTokenResponse parseAccessTokenResponse(String responseBody) {
+        return (AccessTokenResponse) JSON.deserialize(responseBody, AccessTokenResponse.class);
+    }
+
+    protected RefreshTokenResponse parseRefreshTokenResponse(String responseBody) {
+        return (RefreshTokenResponse) JSON.deserialize(responseBody, RefreshTokenResponse.class);
+    }
+
+    public class RefreshTokenResponse {
+        public String access_token;
+        public String instance_url;
+    }
+
     public class AccessTokenResponse {
         public String access_token;
         public String refresh_token;
         public String instance_url;
+
+//        public AccessTokenResponse(String accessToken, String refreshToken, String instanceUrl) {
+//            this.access_token = accessToken;
+//            this.refresh_token = refreshToken;
+//            this.instance_url = instanceUrl;
+//        }
     }
 
     public class AuthorizationParams {
@@ -73,5 +121,8 @@ public abstract with sharing class Auth {
             this.clientSecret = clientSecret;
             this.callbackUrl = callbackUrl;
         }
+    }
+
+    public class AuthException extends Exception {
     }
 }
