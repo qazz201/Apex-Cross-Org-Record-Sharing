@@ -1,9 +1,11 @@
 <template>
     <template if:true={showContainer}>
-        <c-object-names-list options={options}></c-object-names-list>
+        <c-object-names-list options={options} onchange={handleSelectObjectName}></c-object-names-list>
     </template>
 
     <template if:false={showContainer}>
         <h2 class="slds-text-align_center"> Please authorize!</h2>
     </template>
+    
+    <p> SELECTED NAME: {selectedObjectName}</p>
 </template>

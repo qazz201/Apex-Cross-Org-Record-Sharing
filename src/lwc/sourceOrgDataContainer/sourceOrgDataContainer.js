@@ -14,7 +14,9 @@ const AUTHORIZE_EVENT = 'authorize';
 
 export default class SourceOrgDataContainer extends LightningElement {
     @api showContainer = false;
+
     _options = [];
+    selectedObjectName = '';
 
     @wire(CurrentPageReference) pageRef; // Required by pubsub
 
@@ -35,6 +37,7 @@ export default class SourceOrgDataContainer extends LightningElement {
             this.handleAuthorizationEvent,
             this
         );
+
         console.log('GET DATA___')
         getSourceOrgCustomObjectNames().then((data) => {
             this.options = data;
@@ -68,6 +71,12 @@ export default class SourceOrgDataContainer extends LightningElement {
     handleAuthorizationEvent(params = {}) {
         const {success} = params;
         if (success) this.showContainer = true;
+    }
+
+    handleSelectObjectName(event) {
+        const {value} = event?.detail;
+        this.selectedObjectName = value;
+        console.log(value)
     }
 
     showToastNotification(title = '', message = '', variant = 'info') {
