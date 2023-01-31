@@ -39,9 +39,9 @@ export default class SourceOrgDataContainer extends LightningElement {
         getSourceOrgCustomObjectNames().then((data) => {
             this.options = data;
             this.showContainer = true;
-        }).catch(err => {
-            console.error(err);
-            return this.showToastNotification('Error', error?.message, 'error');
+        }).catch(error => {
+            console.error('Err_- ', error);
+            return this.showToastNotification('Error', error?.body?.message, 'error');
         })
     }
 

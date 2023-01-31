@@ -6,71 +6,36 @@ public with sharing class SourceOrgDataContainerController {
         return hadUserAlreadyAuthorized();
     }
 
-    @AuraEnabled() //cacheable=true
+    @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
         if (!hadUserAlreadyAuthorized()) {
             throw new AuraHandledException('Authorization required!');
         }
+
         List<String> customObjectNames = new List<String>();
 
         try {
-            customObjectNames = restGetCustomObjectNames(new CalloutParams(
+            SourceOrgApi sourceOrgApi = getSourceOrgApi(new CalloutParams(
                     getAuthDefaultSetting(RecordTransferSettings__c.Instance_Url__c),
                     getAuthDefaultSetting(RecordTransferSettings__c.AccessToken__c))
             );
+
+            customObjectNames = sourceOrgApi.getCustomObjectNames();
         } catch (Exception ex) {
-            if (ex instanceof Api.ApiException) {
-                //400 "expired access/refresh token"
-                if (ex.getMessage() == '401') {
-                    customObjectNames = restReauthorizeAndGetCustomObjectNames();
-                } else if (ex.getMessage() == '400') {
-                    // aura error to update auth code
-                    System.debug('need autc code new');
-                }
-
-                System.debug(ex.getMessage());
-            } else {
-                System.debug('errr__' + ex.getMessage());
-                throw new AuraHandledException(ex.getMessage());
-            }
-        }
-
-        return customObjectNames;
-    }
-
-    private static List<String> restGetCustomObjectNames(CalloutParams calloutParams) {
-        calloutClient.setEndpoint(calloutParams.endpoint);
-        calloutClient.clearAllHeaders();
-        calloutClient.setHeader('Authorization', 'Bearer ' + calloutParams.accessToken);
-
-        System.debug('aaaa-- ' + calloutClient.getEndpoint());
-        return new SourceOrgApi(calloutClient).getCustomObjectNames();
-    }
-
-    //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
-    private static List<String> restReauthorizeAndGetCustomObjectNames() {
-        calloutClient.clearAllHeaders();
-        List<String> customObjectNames = new List<String>();
-        try {
-            SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(calloutClient);
-            Auth.RefreshTokenResponse refreshTokenResponse = authProvider.getNewAccessToken();
-
-            customObjectNames = restGetCustomObjectNames(
-                    new CalloutParams(refreshTokenResponse.instance_url, refreshTokenResponse.access_token)
-            );
-
-            //update access_token after callout
-            RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse.access_token);
-
-            System.debug('NEW TOKEN: ' + refreshTokenResponse);
-        } catch (Exception ex) {
-            System.debug(ex);
             throw new AuraHandledException(ex.getMessage());
         }
 
         return customObjectNames;
     }
 
+    private static SourceOrgApi getSourceOrgApi(CalloutParams calloutParams) {
+        calloutClient.setEndpoint(calloutParams.endpoint);
+        calloutClient.clearAllHeaders();
+        calloutClient.setHeader('Authorization', 'Bearer ' + calloutParams.accessToken);
+
+        System.debug('aaaa--_ ' + calloutClient.getEndpoint());
+        return new SourceOrgApi(calloutClient);
+    }
 
     private static Boolean hadUserAlreadyAuthorized() {
         return String.isNotBlank(getAuthDefaultSetting(RecordTransferSettings__c.AuthorizationCode__c))
