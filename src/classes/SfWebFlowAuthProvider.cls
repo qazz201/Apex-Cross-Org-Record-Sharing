@@ -15,53 +15,8 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
     public SfWebFlowAuthProvider(ICallout calloutClient) {
         super(calloutClient);
     }
-
-    /**
-    *  @description authenticate via params from custom settings or passed auth params
-    */
-    public override void authenticate() {
-        this.calloutClient.clearAllHeaders();
-        calloutClient.setEndpoint(this.getAccessTokenEndpoint());
-        HttpResponse response = calloutClient.post();
-
-        System.debug(response.getBody());
-        System.debug('AUTH Response code___ ' + response.getStatusCode());
-
-        if (response.getStatusCode() >= 400) {
-            System.debug('Reauthorization...');
-            this.refreshAuthentication();
-            return;
-        }
-
-        this.accessTokenResponse = this.parseAccessTokenResponse(response.getBody());
-        this.saveAuthParamsInCustomSetting();
-
-        System.debug(this.accessTokenResponse);
-    }
-
-    private void saveAuthParamsInCustomSetting() {
-        RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
-                RecordTransferSettings__c.AuthorizationCode__c => this.getAuthorizationCode(),
-                RecordTransferSettings__c.Client_Id__c => this.getClientId(),
-                RecordTransferSettings__c.ClientSecret__c => this.getClientSecret(),
-                RecordTransferSettings__c.RedirectUri__c => this.getCallbackUrl(),
-                RecordTransferSettings__c.AccessToken__c => this.getAccessToken(),
-                RecordTransferSettings__c.Refresh_Token__c => this.getRefreshToken(),
-                RecordTransferSettings__c.Instance_Url__c => this.getInstanceUrl()
-        });
-    }
-
-    private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
-        Map<String, String> defaultTokenUrlParams = new Map<String, String>{
-                '?client_id=' => this.getClientId(),
-                '&client_secret=' => this.getClientSecret(),
-                '&redirect_uri=' => this.getCallbackUrl()
-        };
-        defaultTokenUrlParams.putAll(specificUrlParams);
-        return defaultTokenUrlParams;
-    }
-
-    private String getAccessTokenEndpoint() {
+    
+    protected override String getAccessTokenEndpoint() {
         return this.getResultEndpointUrl(
                 this.getTokenUrlParams(
                         new Map<String, String>{
@@ -81,6 +36,16 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
                         }
                 )
         );
+    }
+
+    private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
+        Map<String, String> defaultTokenUrlParams = new Map<String, String>{
+                '?client_id=' => this.getClientId(),
+                '&client_secret=' => this.getClientSecret(),
+                '&redirect_uri=' => this.getCallbackUrl()
+        };
+        defaultTokenUrlParams.putAll(specificUrlParams);
+        return defaultTokenUrlParams;
     }
 
     private String getResultEndpointUrl(Map<String, String> urlParams) {

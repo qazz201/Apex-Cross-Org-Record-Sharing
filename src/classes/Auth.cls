@@ -18,17 +18,36 @@ public abstract with sharing class Auth {
         this.calloutClient = calloutClient;
     }
 
-    public abstract void authenticate();
+//    public abstract void authenticate();
+    protected abstract String getAccessTokenEndpoint();
     protected abstract String getRefreshTokenEndpoint();
 
-    protected virtual void refreshAuthentication() {
-        RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
-        this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
-        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
+    /**
+   *  @description authenticate via params from custom settings or passed auth params
+   */
+    public virtual void authenticate() {
+        this.calloutClient.clearAllHeaders();
+        calloutClient.setEndpoint(this.getAccessTokenEndpoint());
+        HttpResponse response = calloutClient.post();
 
-        System.debug('____ ' + this.accessTokenResponse);
+        System.debug(response.getBody());
+        System.debug('AUTH Response code___ ' + response.getStatusCode());
+
+        if (response.getStatusCode() >= 400) {
+            System.debug('Reauthorization...');
+            this.refreshAuthentication();
+            return;
+        }
+
+        this.accessTokenResponse = this.parseAccessTokenResponse(response.getBody());
+        this.saveAuthParamsInCustomSetting();
+
+        System.debug(this.accessTokenResponse);
     }
 
+    /**
+    * @description 
+    */
     public virtual RefreshTokenResponse getNewAccessToken() {
         this.calloutClient.clearAllHeaders();
         this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
@@ -41,7 +60,6 @@ public abstract with sharing class Auth {
 
         return this.parseRefreshTokenResponse(response.getBody());
     }
-
 
     public virtual String getAccessToken() {
         String currentAccessToken = this.accessTokenResponse?.access_token;
@@ -76,6 +94,26 @@ public abstract with sharing class Auth {
     public virtual String getCallbackUrl() {
         String currentCallbackUrl = this.authorizationParams?.callbackUrl;
         return String.isNotBlank(currentCallbackUrl) ? currentCallbackUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.RedirectUri__c;
+    }
+
+    protected virtual void refreshAuthentication() {
+        RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
+        this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
+        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
+
+        System.debug('____ ' + this.accessTokenResponse);
+    }
+    
+    protected virtual void saveAuthParamsInCustomSetting() {
+        RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
+                RecordTransferSettings__c.AuthorizationCode__c => this.getAuthorizationCode(),
+                RecordTransferSettings__c.Client_Id__c => this.getClientId(),
+                RecordTransferSettings__c.ClientSecret__c => this.getClientSecret(),
+                RecordTransferSettings__c.RedirectUri__c => this.getCallbackUrl(),
+                RecordTransferSettings__c.AccessToken__c => this.getAccessToken(),
+                RecordTransferSettings__c.Refresh_Token__c => this.getRefreshToken(),
+                RecordTransferSettings__c.Instance_Url__c => this.getInstanceUrl()
+        });
     }
 
     protected AccessTokenResponse parseAccessTokenResponse(String responseBody) {
