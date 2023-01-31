@@ -1,14 +1,6 @@
 <template>
     <template if:true={showContainer}>
-        <lightning-combobox
-                name="progress"
-                label="Status"
-                value={value}
-                placeholder="Select Progress"
-                options={options}
-                onchange={handleChange}></lightning-combobox>
-
-        <p>Selected value is: {value}</p>
+        <c-object-names-list options={options}></c-object-names-list>
     </template>
 
     <template if:false={showContainer}>

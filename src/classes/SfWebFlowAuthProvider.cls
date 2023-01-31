@@ -39,30 +39,6 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         System.debug(this.accessTokenResponse);
     }
 
-//    public void refreshAuthentication() {
-//        try {
-//            this.calloutClient.clearAllHeaders();
-//            this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
-//            HttpResponse response = calloutClient.post();
-//
-//            System.debug('AAAA-- ' + response.getBody());
-//            if (response.getStatusCode() != 200) {
-//                throw new SfWebFlowAuthProviderException('Reauthorization Error: ' + response.getBody());
-//            }
-//
-//            String newAccessToken = this.parseTokenResponse(response.getBody())?.access_token;
-//            if (String.isBlank(newAccessToken)) return;
-//
-//            this.accessTokenResponse.access_token = newAccessToken;
-//            RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, newAccessToken);
-//
-//            System.debug('____ ' + this.accessTokenResponse);
-//        } catch (Exception ex) {
-//            System.debug('SfWebFlowAuthProvider.reAuthorize() ERROR: ' + ex.getStackTraceString());
-//            throw ex;
-//        }
-//    }
-
     private void saveAuthParamsInCustomSetting() {
         RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
                 RecordTransferSettings__c.AuthorizationCode__c => this.getAuthorizationCode(),
@@ -74,10 +50,6 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
                 RecordTransferSettings__c.Instance_Url__c => this.getInstanceUrl()
         });
     }
-
-//    private AccessTokenResponse parseTokenResponse(String responseBody) {
-//        return (AccessTokenResponse) JSON.deserialize(responseBody, AccessTokenResponse.class);
-//    }
 
     private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
         Map<String, String> defaultTokenUrlParams = new Map<String, String>{

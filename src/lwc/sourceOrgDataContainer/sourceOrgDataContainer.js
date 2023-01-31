@@ -1,16 +1,33 @@
 import {LightningElement, api, wire} from 'lwc';
 import {CurrentPageReference} from 'lightning/navigation';
-import {registerListener, unregisterListener} from 'c/pubsub';
 
+import {registerListener, unregisterListener} from 'c/pubsub';
+import {ShowToastEvent} from 'lightning/platformShowToastEvent';
+import {isEmptyArray} from 'c/commons';
 //Apex
-import checkAuthorization from '@salesforce/apex/SourceOrgDataContainerController.checkAuthorization';
+// import checkAuthorization from '@salesforce/apex/SourceOrgDataContainerController.checkAuthorization';
+import getSourceOrgCustomObjectNames
+    from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
+
 
 const AUTHORIZE_EVENT = 'authorize';
 
 export default class SourceOrgDataContainer extends LightningElement {
     @api showContainer = false;
+    _options = [];
 
     @wire(CurrentPageReference) pageRef; // Required by pubsub
+
+    // @wire(getSourceOrgCustomObjectNames)
+    // getCustomObjectNamesList({error, data}) {
+    //     if (error) {
+    //         console.log('err__- ', error)
+    //         return this.showToastNotification('Error', error?.message, 'error');
+    //     } else if (data) {
+    //         this.showContainer = true;
+    //         this.options = data;
+    //     }
+    // };
 
     connectedCallback() {
         registerListener(
@@ -18,16 +35,34 @@ export default class SourceOrgDataContainer extends LightningElement {
             this.handleAuthorizationEvent,
             this
         );
+        console.log('GET DATA___')
+        getSourceOrgCustomObjectNames().then((data) => {
+            this.options = data;
+            this.showContainer = true;
+        }).catch(err => {
+            console.error(err);
+            return this.showToastNotification('Error', error?.message, 'error');
+        })
+    }
 
-        if (this.showContainer === true) {
-            return;
-        }
+    // createListOptionsFromObjectNames(objectNames = []) {
+    //     if (isEmptyArray(objectNames)) return;
+    //     this.options = objectNames.map(objectName => {
+    //         return {label: objectName, value: objectName};
+    //     })
+    // }
 
-        checkAuthorization().then((resp) => {
-            if (resp === true) {
-                this.showContainer = true;
-            }
-        }).catch(err => console.error(err))
+    @api
+    set options(values) {
+        console.log("NAMES__", values)
+        if (isEmptyArray(values)) return;
+        this._options = values.map(objectName => {
+            return {label: objectName, value: objectName};
+        })
+    }
+
+    get options() {
+        return this._options;
     }
 
     handleAuthorizationEvent(params = {}) {
@@ -35,11 +70,12 @@ export default class SourceOrgDataContainer extends LightningElement {
         if (success) this.showContainer = true;
     }
 
-    get options() {
-        return [
-            {label: 'New', value: 'new'},
-            {label: 'In Progress', value: 'inProgress'},
-            {label: 'Finished', value: 'finished'},
-        ];
+    showToastNotification(title = '', message = '', variant = 'info') {
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: title,
+                message: message,
+                variant: variant,
+            }));
     }
 }

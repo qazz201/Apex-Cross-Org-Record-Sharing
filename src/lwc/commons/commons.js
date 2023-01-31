@@ -5,7 +5,7 @@ export function isEmptyString(value) {
     return isString(value) && !value.trim();
 }
 
-export function isEmptyArray(arr) {
+export function isEmptyArray(arr) { 
     return !(Array.isArray(arr) && arr.length);
 }
 

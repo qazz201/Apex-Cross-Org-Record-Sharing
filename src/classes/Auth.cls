@@ -39,9 +39,6 @@ public abstract with sharing class Auth {
             throw new AuthException('Reauthorization Error: ' + response.getBody());
         }
 
-//        String newAccessToken = this.parseTokenResponse(response.getBody())?.access_token;
-//        if (String.isBlank(newAccessToken)) return null;
-
         return this.parseRefreshTokenResponse(response.getBody());
     }
 
@@ -98,12 +95,6 @@ public abstract with sharing class Auth {
         public String access_token;
         public String refresh_token;
         public String instance_url;
-
-//        public AccessTokenResponse(String accessToken, String refreshToken, String instanceUrl) {
-//            this.access_token = accessToken;
-//            this.refresh_token = refreshToken;
-//            this.instance_url = instanceUrl;
-//        }
     }
 
     public class AuthorizationParams {

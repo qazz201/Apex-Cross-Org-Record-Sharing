@@ -6,7 +6,7 @@ public with sharing class SourceOrgDataContainerController {
         return hadUserAlreadyAuthorized();
     }
 
-    @AuraEnabled
+    @AuraEnabled() //cacheable=true
     public static List<String> getSourceOrgCustomObjectNames() {
         if (!hadUserAlreadyAuthorized()) {
             throw new AuraHandledException('Authorization required!');
@@ -20,19 +20,18 @@ public with sharing class SourceOrgDataContainerController {
             );
         } catch (Exception ex) {
             if (ex instanceof Api.ApiException) {
-                calloutClient.clearAllHeaders();
                 //400 "expired access/refresh token"
-                //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
-
                 if (ex.getMessage() == '401') {
                     customObjectNames = restReauthorizeAndGetCustomObjectNames();
                 } else if (ex.getMessage() == '400') {
                     // aura error to update auth code
+                    System.debug('need autc code new');
                 }
 
                 System.debug(ex.getMessage());
             } else {
-                throw ex;
+                System.debug('errr__' + ex.getMessage());
+                throw new AuraHandledException(ex.getMessage());
             }
         }
 
@@ -44,11 +43,13 @@ public with sharing class SourceOrgDataContainerController {
         calloutClient.clearAllHeaders();
         calloutClient.setHeader('Authorization', 'Bearer ' + calloutParams.accessToken);
 
-        System.debug(calloutClient.getEndpoint());
+        System.debug('aaaa-- ' + calloutClient.getEndpoint());
         return new SourceOrgApi(calloutClient).getCustomObjectNames();
     }
 
+    //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
     private static List<String> restReauthorizeAndGetCustomObjectNames() {
+        calloutClient.clearAllHeaders();
         List<String> customObjectNames = new List<String>();
         try {
             SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(calloutClient);
