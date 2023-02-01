@@ -10,6 +10,10 @@ public with sharing class QueryApiService extends Api {
         super(calloutClient);
     }
 
+    public QueryApiService(Auth authProvider) {
+        super(authProvider);
+    }
+
     protected override String getApiPath() {
         return this.QUERY_API_ROOT_PATH;
     }
@@ -17,13 +21,13 @@ public with sharing class QueryApiService extends Api {
     /**
      * @description 
     */
-    public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
+    public override List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
         if (String.isBlank(objectName)) return new List<SObject>();
         if (limitCount == 0 || limitCount == null) {
             limitCount = this.DEFAULT_QUERY_LIMIT;
         }
 
-        HttpResponse response = this.executeCallout(
+        HttpResponse response = this.executeGetCallout(
                 this.getEndpointPath(
                         String.format(this.SELECT_OBJECT_BY_NAME, new List<Object>{
                                 objectName, limitCount

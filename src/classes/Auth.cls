@@ -18,7 +18,9 @@ public abstract with sharing class Auth {
         this.calloutClient = calloutClient;
     }
 
-//    public abstract void authenticate();
+    public Auth() {
+    }
+
     protected abstract String getAccessTokenEndpoint();
     protected abstract String getRefreshTokenEndpoint();
 
@@ -46,7 +48,7 @@ public abstract with sharing class Auth {
     }
 
     /**
-    * @description 
+    * @description get refreshed access token params (if expired)
     */
     public virtual RefreshTokenResponse getNewAccessToken() {
         this.calloutClient.clearAllHeaders();
@@ -59,6 +61,14 @@ public abstract with sharing class Auth {
         }
 
         return this.parseRefreshTokenResponse(response.getBody());
+    }
+
+    public virtual void setCalloutClient(ICallout calloutClient) {
+        this.calloutClient = calloutClient;
+    }
+    
+    public virtual ICallout getCalloutClient() {
+        return this.calloutClient;
     }
 
     public virtual String getAccessToken() {

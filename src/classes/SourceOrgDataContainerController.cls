@@ -32,9 +32,9 @@ public with sharing class SourceOrgDataContainerController {
         calloutClient.setEndpoint(calloutParams.endpoint);
         calloutClient.clearAllHeaders();
         calloutClient.setHeader('Authorization', 'Bearer ' + calloutParams.accessToken);
-
+        SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(calloutClient);
         System.debug('aaaa--_ ' + calloutClient.getEndpoint());
-        return new SourceOrgApi(calloutClient);
+        return new SourceOrgApi(authProvider);
     }
 
     private static Boolean hadUserAlreadyAuthorized() {

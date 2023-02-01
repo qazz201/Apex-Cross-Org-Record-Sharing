@@ -4,12 +4,16 @@ public with sharing class SourceOrgApi {
     private RestApiManager restApiManager;
 
 
-    public SourceOrgApi(ICallout calloutClient) {
-        this.restApiManager = new RestApiManager(calloutClient);
+//    public SourceOrgApi(ICallout calloutClient) {
+//        this.restApiManager = new RestApiManager(calloutClient);
+//    }
+
+    public SourceOrgApi(Auth authProvider) {
+        this.restApiManager = new RestApiManager(authProvider);
     }
 
     public List<String> getCustomObjectNames() {
-        return restApiManager.toolingApi().getObjectNames(); //todo make api as variable ar make singleton!
+        return restApiManager.toolingApi().getCustomObjectNames();//.getObjectNames(); //todo make api as variable ar make singleton!
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {

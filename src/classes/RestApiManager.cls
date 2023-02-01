@@ -1,17 +1,17 @@
 public with sharing class RestApiManager {
-    private final ICallout calloutClient;
-    // private String endpointDomain;
+//    private final ICallout calloutClient;
+    private Auth authProvider;
 
-    public RestApiManager(ICallout calloutClient) {
-        this.calloutClient = calloutClient;
+    public RestApiManager(Auth authProvider) {
+        this.authProvider = authProvider;
         //  this.endpointDomain = endpointDomain;
     }
 
-    public ToolingApiProvider toolingApi() {
-        return new ToolingApiProvider(this.calloutClient);
+    public Api toolingApi() {
+        return new ToolingApiService(this.authProvider);//new ToolingApiProvider(this.authProvider);
     }
 
-    public QueryApiProvider queryApi() {
-        return new QueryApiProvider(this.calloutClient);
+    public Api queryApi() {
+        return new QueryApiService(this.authProvider);//new QueryApiProvider(this.calloutClient);
     }
 }
