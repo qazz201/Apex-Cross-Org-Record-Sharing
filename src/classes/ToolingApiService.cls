@@ -40,8 +40,6 @@ public with sharing class ToolingApiService extends Api {
         } else if (response.getStatusCode() != 200) {
             throw new ApiException(String.valueOf(response.getBody()));
         }
-      
-        //response = this.handleCustomObjectNamesResponseStatuses(response, pathCustomObjectQuery);
 
         for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
             names.add(record.DeveloperName + this.CUSTOM_FIELD_POSTFIX);
@@ -49,45 +47,6 @@ public with sharing class ToolingApiService extends Api {
 
         return names;
     }
-
-//    public List<String> getCustomObjectNames(Type authProvider) {
-//
-//        return null;
-//    }
-
-
-//    private HttpResponse handleCustomObjectNamesResponseStatuses(HttpResponse response, String endpoint) {
-//        HttpResponse newResponse = response;
-//
-//        if (response.getStatusCode() == 400) {
-//            //400 "expired access/refresh token"
-//            System.debug('getCustomObjectNames__ CODE=400');
-//        } else if (response.getStatusCode() == 401) {
-//            //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
-//            System.debug('getCustomObjectNames__ CODE=401');
-//            newResponse = this.calloutWithRefreshedAccessToken(endpoint);
-//        } else if (response.getStatusCode() != 200) {
-//            throw new ApiException(String.valueOf(response.getStatusCode()));
-//        }
-//
-//        return newResponse;
-//    }
-//
-//    //todo: Rewrite because reauthorization is HARDCODED
-//    private HttpResponse calloutWithRefreshedAccessToken(String endpoint) {
-//        this.calloutClient.clearAllHeaders();
-//        SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(this.calloutClient);
-//        Auth.RefreshTokenResponse refreshTokenResponse = authProvider.getNewAccessToken();
-//        calloutClient.setHeader(this.AUTHORIZATION, this.BEARER + refreshTokenResponse.access_token);
-//
-//        HttpResponse response = this.executeGetCallout(endpoint);
-//
-//        //update access_token after callout
-//        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse.access_token);
-//        System.debug('NEW TOKEN: calloutWithRefreshedAccessToken__ ' + refreshTokenResponse);
-//
-//        return response;
-//    }
 
     public ToolingQueryResponse parseCustomObjectQueryResponse(String body) {
         return (ToolingQueryResponse) JSON.deserialize(body, ToolingQueryResponse.class);

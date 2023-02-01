@@ -1,23 +1,16 @@
 public with sharing class SourceOrgApi {
-//    private static final String ROOT_PATH = 'callout:CrossOrgDataTransferNamedCredential';
-//    private static RestApiManager restApiManager = new RestApiManager(new CalloutClient(), ROOT_PATH);
     private RestApiManager restApiManager;
-
-
-//    public SourceOrgApi(ICallout calloutClient) {
-//        this.restApiManager = new RestApiManager(calloutClient);
-//    }
 
     public SourceOrgApi(Auth authProvider) {
         this.restApiManager = new RestApiManager(authProvider);
     }
 
     public List<String> getCustomObjectNames() {
-        return restApiManager.toolingApi().getCustomObjectNames();//.getObjectNames(); //todo make api as variable ar make singleton!
+        return this.restApiManager.toolingApi().getCustomObjectNames();//.getObjectNames(); //todo make api as variable ar make singleton!
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-        return restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount); //todo make api as variable!
+        return this.restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount); //todo make api as variable!
     }
 }
 

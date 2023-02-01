@@ -18,8 +18,8 @@ public abstract with sharing class Auth {
         this.calloutClient = calloutClient;
     }
 
-    public Auth() {
-    }
+//    public Auth() {
+//    }
 
     protected abstract String getAccessTokenEndpoint();
     protected abstract String getRefreshTokenEndpoint();

@@ -32,8 +32,8 @@ public abstract with sharing class Api {
     protected virtual HttpResponse executeGetCallout(String resourceEndpoint) {
         this.calloutClient.setEndpoint(resourceEndpoint);
         HttpResponse response = this.calloutClient.get();
-        response = this.handleCalloutResponseStatusCode(response, resourceEndpoint);
-        
+        response = this.handleCalloutResponseByStatusCode(response, resourceEndpoint);
+        System.debug('RESPONSE__: ' + response.getBody());
         return response;
     }
 
@@ -41,15 +41,15 @@ public abstract with sharing class Api {
         return this.endpointApiUrl + apiResource;
     }
 
-    private HttpResponse handleCalloutResponseStatusCode(HttpResponse response, String resourceEndpoint) {
+    private HttpResponse handleCalloutResponseByStatusCode(HttpResponse response, String resourceEndpoint) {
         HttpResponse newResponse = response;
 
         if (response.getStatusCode() == 400 && this.authProvider != null) {
             //400 "expired access/refresh token"
-            System.debug('getCustomObjectNames__ CODE=400');
+            System.debug('HANDLE STATUS CODE_ CODE=400');
         } else if (response.getStatusCode() == 401 && this.authProvider != null) {
             //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
-            System.debug('getCustomObjectNames__ CODE=401');
+            System.debug('HANDLE STATUS CODE_ CODE=401');
             newResponse = this.calloutGetWithRefreshedAccessToken(resourceEndpoint);
         }
 

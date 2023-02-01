@@ -1,6 +1,8 @@
 public with sharing class SourceOrgDataContainerController {
     private static ICallout calloutClient = new CalloutClient();
 
+    private static final String AUTHORIZATION_REQUIRED_MSG = 'Authorization required!';
+
     @AuraEnabled
     public static Boolean checkAuthorization() {
         return hadUserAlreadyAuthorized();
@@ -9,9 +11,8 @@ public with sharing class SourceOrgDataContainerController {
     @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
         if (!hadUserAlreadyAuthorized()) {
-            throw new AuraHandledException('Authorization required!');
+            throw new AuraHandledException(AUTHORIZATION_REQUIRED_MSG);
         }
-
         List<String> customObjectNames = new List<String>();
 
         try {
@@ -32,9 +33,9 @@ public with sharing class SourceOrgDataContainerController {
         calloutClient.setEndpoint(calloutParams.endpoint);
         calloutClient.clearAllHeaders();
         calloutClient.setHeader('Authorization', 'Bearer ' + calloutParams.accessToken);
-        SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(calloutClient);
+
         System.debug('aaaa--_ ' + calloutClient.getEndpoint());
-        return new SourceOrgApi(authProvider);
+        return new SourceOrgApi(new SfWebFlowAuthProvider(calloutClient));
     }
 
     private static Boolean hadUserAlreadyAuthorized() {

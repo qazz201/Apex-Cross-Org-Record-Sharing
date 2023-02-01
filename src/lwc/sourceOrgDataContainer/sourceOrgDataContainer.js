@@ -14,11 +14,10 @@ const AUTHORIZE_EVENT = 'authorize';
 
 export default class SourceOrgDataContainer extends LightningElement {
     @api showContainer = false;
+    @wire(CurrentPageReference) pageRef; // Required by pubsub
 
     _options = [];
     selectedObjectName = '';
-
-    @wire(CurrentPageReference) pageRef; // Required by pubsub
 
     // @wire(getSourceOrgCustomObjectNames)
     // getCustomObjectNamesList({error, data}) {

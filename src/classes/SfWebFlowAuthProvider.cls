@@ -16,9 +16,9 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         super(calloutClient);
     }
     
-    public SfWebFlowAuthProvider() {
-        super();
-    }
+//    public SfWebFlowAuthProvider() {
+//        super();
+//    }
     
     protected override String getAccessTokenEndpoint() {
         return this.getResultEndpointUrl(

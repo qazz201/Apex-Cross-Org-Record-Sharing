@@ -12,6 +12,7 @@ public with sharing class AuthManager {
         SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(authorizationParams, calloutClient); //  RecordTransferCustomSettingService.getOrgDefaultSetting().AuthorizationCode__c,
         authProvider.authenticate();
 
+        //TODO:
         if (authProvider.getAccessToken() == null) {
             System.debug('ERRRORR___ ');
             return;
