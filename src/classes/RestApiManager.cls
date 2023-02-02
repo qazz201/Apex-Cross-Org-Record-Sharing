@@ -5,11 +5,11 @@ public with sharing class RestApiManager {
         this.authProvider = authProvider;
     }
 
-    public Api toolingApi() {
-        return new ToolingApiService(this.authProvider);
+    public ToolingApiService toolingApi() {
+        return ToolingApiService.getInstance(this.authProvider);
     }
 
-    public Api queryApi() {
-        return new QueryApiService(this.authProvider);
+    public QueryApiService queryApi() {
+        return QueryApiService.getInstance(this.authProvider);
     }
 }

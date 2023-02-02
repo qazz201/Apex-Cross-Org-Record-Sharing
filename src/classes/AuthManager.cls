@@ -1,7 +1,5 @@
 public with sharing class AuthManager {
-    //private ICallout calloutClient = new CalloutClient();
-
-// check if authorization success( sf no means tat user needs to reauthorize)
+    // check if authorization success( sf no means tat user needs to reauthorize)
     public static void sfWebFlowAuthenticate(String authorizationCode) {
         sfWebFlowAuthenticate(new Auth.AuthorizationParams(authorizationCode, null, null, null));
     }
@@ -12,7 +10,7 @@ public with sharing class AuthManager {
         SfWebFlowAuthProvider authProvider = new SfWebFlowAuthProvider(authorizationParams, calloutClient); //  RecordTransferCustomSettingService.getOrgDefaultSetting().AuthorizationCode__c,
         authProvider.authenticate();
 
-        //TODO:
+        //TODO:__
         if (authProvider.getAccessToken() == null) {
             System.debug('ERRRORR___ ');
             return;

@@ -18,14 +18,23 @@ public abstract with sharing class Api {
         this.endpointApiUrl = this.calloutClient.getEndpoint() + this.getApiPath();
     }
 
-    //Public methods
-    public virtual List<String> getCustomObjectNames() {
-        return null;
-    }
-
-    public virtual List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-        return null;
-    }
+//    //ToolingApi
+//    public virtual List<String> getCustomObjectNames() {
+//        return null;
+//    }
+//    //QueryApi
+//    public virtual List<Map<String, Object>> getRecordsAsMap(String objectName, Integer limitCount) {
+//        return null;
+//    }
+//    public virtual List<SObject> saveRecordsByObjectName(String objectName, Integer limitCount) {
+//        return null;
+//    }
+//    public virtual List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
+//        return null;
+//    }
+//    public virtual List<SObject> generateSObjectsFromQueryResponse(HttpResponse response, String sObjectName) {
+//        return null;
+//    }
 
     protected abstract String getApiPath();
 
@@ -42,12 +51,13 @@ public abstract with sharing class Api {
     }
 
     private HttpResponse handleCalloutResponseByStatusCode(HttpResponse response, String resourceEndpoint) {
+        if (this.authProvider == null) return response;
         HttpResponse newResponse = response;
 
-        if (response.getStatusCode() == 400 && this.authProvider != null) {
+        if (response.getStatusCode() == 400) {
             //400 "expired access/refresh token"
             System.debug('HANDLE STATUS CODE_ CODE=400');
-        } else if (response.getStatusCode() == 401 && this.authProvider != null) {
+        } else if (response.getStatusCode() == 401) {
             //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
             System.debug('HANDLE STATUS CODE_ CODE=401');
             newResponse = this.calloutGetWithRefreshedAccessToken(resourceEndpoint);

@@ -1,9 +1,10 @@
 public with sharing class QueryApiService extends Api {
+    private static QueryApiService instance;
     // Path
     private final String QUERY_API_ROOT_PATH = '/services/data/v56.0/query/?q=';
 
     // Default query
-    private final String SELECT_OBJECT_BY_NAME = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
+    private final String QUERY_OBJECT_BY_NAME = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
     private Integer DEFAULT_QUERY_LIMIT = 200;
 
     public QueryApiService(ICallout calloutClient) {
@@ -19,46 +20,85 @@ public with sharing class QueryApiService extends Api {
     }
 
     /**
+    * @description 
+    */
+    public static QueryApiService getInstance(Auth authProvider) {
+        if (instance == null) {
+            instance = new QueryApiService(authProvider);
+        }
+        return instance;
+    }
+
+
+    /**
+      * @description 
+    */
+    public List<Map<String, Object>> getRecordsAsMap(String objectName, Integer limitCount) {
+        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPath(objectName, limitCount));
+        return this.parseQueryObjectResponse(response);
+    }
+
+    /**
+      * @description 
+    */
+    public List<SObject> saveRecordsByObjectName(String objectName, Integer limitCount) {
+        List<SObject> sObjects = this.getRecordsByObjectName(objectName, limitCount);
+        insert sObjects; //todo: use database.insert
+        return sObjects;
+    }
+
+    /**
      * @description 
     */
-    public override List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
+    public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
         if (String.isBlank(objectName)) return new List<SObject>();
         if (limitCount == 0 || limitCount == null) {
             limitCount = this.DEFAULT_QUERY_LIMIT;
         }
 
-        HttpResponse response = this.executeGetCallout(
-                this.getEndpointPath(
-                        String.format(this.SELECT_OBJECT_BY_NAME, new List<Object>{
-                                objectName, limitCount
-                        })
-                )
-        );
-        return this.createSObjectsFromQueryResponse(response, objectName);
+        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPath(objectName, limitCount));
+
+        return this.generateSObjectsFromQueryResponse(response, objectName);
     }
 
-    private List<SObject> createSObjectsFromQueryResponse(HttpResponse response, String sObjectName) {
+    /**
+     * @description 
+    */
+    public List<SObject> generateSObjectsFromQueryResponse(HttpResponse response, String sObjectName) {
         List<SObject> result = new List<SObject>();
+        Map<String, Schema.SObjectField> objectFieldToName = Schema.getGlobalDescribe().get(sObjectName).getDescribe().fields.getMap(); // the object should exist on current org!
+        List<Map<String, Object>> listFieldNameToValue = this.parseQueryObjectResponse(response);
 
-        Map<String, Object> valueToFieldNames = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
-        List<Object> records = (List<Object>) JSON.deserializeUntyped(JSON.serialize(valueToFieldNames.get('records')));
-        Map<String, Schema.SObjectField> objectFieldToName = Schema.getGlobalDescribe().get(sObjectName).getDescribe().fields.getMap();
-
-        for (Object record : records) {
+        for (Map<String, Object> parsedObj : listFieldNameToValue) {
             SObject dynamicSObject = Schema.getGlobalDescribe().get(sObjectName).newSObject();
-            Map<String, Object> objValueToFieldName = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(record));
 
-            for (String fieldName : objValueToFieldName.keySet()) {
+            for (String fieldName : parsedObj.keySet()) {
+                Schema.SObjectField objectField = objectFieldToName.get(fieldName);
+                if (objectField == null) continue;
+
                 this.setSObjectFieldValue(
                         dynamicSObject,
-                        objectFieldToName.get(fieldName),
+                        objectField,
                         fieldName,
-                        objValueToFieldName.get(fieldName)
+                        parsedObj.get(fieldName)
                 );
             }
             result.add(dynamicSObject);
         }
 
+        return result;
+    }
+
+    private List<Map<String, Object>> parseQueryObjectResponse(HttpResponse response) {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+
+        Map<String, Object> valueToFieldNames = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+        List<Object> records = (List<Object>) JSON.deserializeUntyped(JSON.serialize(valueToFieldNames.get('records')));
+
+        for (Object record : records) {
+            Map<String, Object> objValueToFieldName = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(record));
+            result.add(objValueToFieldName);
+        }
         return result;
     }
 
@@ -76,7 +116,14 @@ public with sharing class QueryApiService extends Api {
             sObjectToFill.put(fieldName, Dates.getValue(fieldValue));
             return;
         }
-
         sObjectToFill.put(fieldName, fieldValue);
+    }
+
+    private String getFormattedQueryPath(String objectName, Integer limitCount) {
+        return this.getEndpointPath(
+                String.format(this.QUERY_OBJECT_BY_NAME, new List<Object>{
+                        objectName, limitCount
+                })
+        );
     }
 }

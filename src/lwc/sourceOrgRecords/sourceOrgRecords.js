@@ -1,13 +1,11 @@
-import {LightningElement} from 'lwc';
+import {LightningElement, api} from 'lwc';
+import {isEmptyString} from "c/commons";
 
 export default class SourceOrgRecords extends LightningElement {
+    @api objectName = '';
 
     data = [];
-
-    connectedCallback() {
-        this.data = this.generateData({amountOfRecords: 3});
-    }
-
+    
     columns = [
         {label: 'Label', fieldName: 'name'},
         {label: 'Website', fieldName: 'website', type: 'url'},
@@ -15,6 +13,15 @@ export default class SourceOrgRecords extends LightningElement {
         {label: 'Balance', fieldName: 'amount', type: 'currency'},
         {label: 'CloseAt', fieldName: 'closeAt', type: 'date'},
     ];
+
+    connectedCallback() {
+        this.data = this.generateData({amountOfRecords: 3});
+    }
+
+    getRecords() {
+        if (isEmptyString(this.objectName)) return;
+        //...
+    }
 
     generateData({amountOfRecords}) {
         return [...Array(amountOfRecords)].map((_, index) => {

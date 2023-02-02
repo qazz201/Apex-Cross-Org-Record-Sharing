@@ -6,13 +6,20 @@ public with sharing class SourceOrgApi {
     }
 
     public List<String> getCustomObjectNames() {
-        return this.restApiManager.toolingApi().getCustomObjectNames();//.getObjectNames(); //todo make api as variable ar make singleton!
+        return this.restApiManager.toolingApi().getCustomObjectNames();
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-        return this.restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount); //todo make api as variable!
+        return this.restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount);
     }
+
+    public void buildLwcTableData(String objectName, Integer limitCount, Integer columnsToShow) { //List<Map<String, Object>>
+        List<Map<String, Object>> recordsAsMap = this.restApiManager.queryApi().getRecordsAsMap(objectName, limitCount);
+        new DataTable(recordsAsMap, columnsToShow).build();
+    }
+
 }
+
 
 // /services/data/v56.0/tooling/sobjects/CustomObject/describe/     //'/services/data/v56.0/query/?q=SELECT+name+from+MyCustomObject__c' // /services/data/v56.0/sobjects/
 //'/services/data/v56.0/sobjects/Contact/0036800000G0E5KAAV' // /services/data/v56.0/ui-api/record-defaults/clone/0036800000G0E5KAAV

@@ -18,9 +18,6 @@ public abstract with sharing class Auth {
         this.calloutClient = calloutClient;
     }
 
-//    public Auth() {
-//    }
-
     protected abstract String getAccessTokenEndpoint();
     protected abstract String getRefreshTokenEndpoint();
 
@@ -55,7 +52,7 @@ public abstract with sharing class Auth {
         this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
         HttpResponse response = calloutClient.post();
 
-        System.debug('AAAA-- _' + response.getBody());
+        System.debug('getNewAccessToken__ ' + response.getBody());
         if (response.getStatusCode() != 200) {
             throw new AuthException('Reauthorization Error: ' + response.getBody());
         }
@@ -111,7 +108,7 @@ public abstract with sharing class Auth {
         this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
         RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
 
-        System.debug('____ ' + this.accessTokenResponse);
+        System.debug('__refreshAuthentication_accessTokenResponse__ ' + this.accessTokenResponse);
     }
     
     protected virtual void saveAuthParamsInCustomSetting() {

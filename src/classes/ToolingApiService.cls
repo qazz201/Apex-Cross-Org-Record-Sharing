@@ -20,9 +20,12 @@ public with sharing class ToolingApiService extends Api {
         return this.TOOLING_API_ROOT_PATH;
     }
 
-    public static ToolingApiService getInstance(ICallout calloutClient) {
+    /**
+    * @description 
+    */
+    public static ToolingApiService getInstance(Auth authProvider) {
         if (instance == null) {
-            instance = new ToolingApiService(calloutClient);
+            instance = new ToolingApiService(authProvider);
         }
         return instance;
     }
@@ -30,7 +33,7 @@ public with sharing class ToolingApiService extends Api {
     /**
     * @description 
     */
-    public override List<String> getCustomObjectNames() {
+    public List<String> getCustomObjectNames() {
         List<String> names = new List<String>();
         String pathCustomObjectQuery = this.getEndpointPath(this.QUERY_PATH + this.QUERY_CUSTOM_OBJECT_NAMES);
         HttpResponse response = this.executeGetCallout(pathCustomObjectQuery);

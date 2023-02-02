@@ -23,6 +23,7 @@ public with sharing class SourceOrgDataContainerController {
 
             customObjectNames = sourceOrgApi.getCustomObjectNames();
         } catch (Exception ex) {
+            System.debug('ERRR__ '+ex);
             throw new AuraHandledException(ex.getMessage());
         }
 
