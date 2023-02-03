@@ -12,8 +12,9 @@ export default class SourceOrgRecords extends LightningElement {
     @api columns = [];
 
     showSpinner = false;
+    selectedRows = [];
     _objectName = '';
-    
+
 
     @api set objectName(value) {
         if (isEmptyString(value)) return;
@@ -30,10 +31,12 @@ export default class SourceOrgRecords extends LightningElement {
 
     getData(objectName = '') {
         if (isEmptyString(objectName)) return;
+        this.columns = [];
+        this.records = [];
         this.showSpinner = true;
 
         getDatatableDataConfig({
-            objectName,
+            objectName,//: 'Contact',//TODO: DELETE HARDCODE
             visibleRecords: 3,
             visibleColumns: 10
         }).then(response => {
@@ -47,8 +50,9 @@ export default class SourceOrgRecords extends LightningElement {
     }
 
     handleRowSelection(event) {
-        const selectedRows = event.detail.selectedRows
-        console.log(JSON.stringify(selectedRows));
+        this.selectedRows = event.detail.selectedRows
+        console.log(JSON.stringify(event.detail));
+        console.log(JSON.stringify(this.selectedRows));
     }
 
     showToastNotification(title = '', message = '', variant = 'info') {
@@ -67,5 +71,9 @@ export default class SourceOrgRecords extends LightningElement {
 
     get areRecordsEmpty() {
         return !this.records?.length;
+    }
+
+    get doesCopyRecordsDisabled() {
+        return !this.selectedRows?.length;
     }
 }

@@ -7,8 +7,8 @@ public with sharing class DataTable {
             'Id', 'Name', 'Type'
     };
 
-    private Set<String> omitColumn = new Set<String>{
-            'attributes', 'IsDeleted'
+    private Set<String> omitColumns = new Set<String>{
+            'attributes', 'IsDeleted', 'CreatedById', 'LastModifiedById', 'SystemModstamp'
     };
 
     public DataTable(List<Map<String, Object>> recordsAsMap, Integer visibleColumns) {
@@ -84,7 +84,7 @@ public with sharing class DataTable {
 
         for (String fieldName : firstRecord.keySet()) {
             if (createdColumns == columnsToCreate) break;
-            if (this.requiredColumnsInTable.contains(fieldName) || this.omitColumn.contains(fieldName)) continue;
+            if (this.requiredColumnsInTable.contains(fieldName) || this.omitColumns.contains(fieldName)) continue;
 
             columnConfig.add(this.buildColumnConfig(fieldName));
             createdColumns++;
@@ -96,7 +96,7 @@ public with sharing class DataTable {
         DataTableColumnsConfig.Builder config = new DataTableColumnsConfig.Builder()
                 .setFieldName(fieldName)
                 .setLabel(fieldName);
-                
+
         //TODO: delete?
         if (fieldName == 'Name') {
             config.setType('url')

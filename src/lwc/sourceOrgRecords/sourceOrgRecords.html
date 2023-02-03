@@ -30,8 +30,15 @@
                     </lightning-combobox>
                 </div>
                 <!--Copy Records Button-->
-                <div class="slds-col slds-p-around_small slds-align-bottom slds-size_1-of-8">
-                    <button class="slds-button slds-button_success" disabled>Copy Records</button>
+                <div class="slds-col slds-p-around_small slds-align-bottom slds-text-align_center slds-size_1-of-8">
+                    <button class="slds-button slds-button_success"
+                            disabled={doesCopyRecordsDisabled}>
+                        Copy Records
+                    </button>
+                </div>
+                <!--Search-->
+                <div class="slds-col slds-p-around_small slds-align-bottom slds-size_3-of-8">
+                    <lightning-input placeholder="Search" type="search"></lightning-input>
                 </div>
             </div>
 
