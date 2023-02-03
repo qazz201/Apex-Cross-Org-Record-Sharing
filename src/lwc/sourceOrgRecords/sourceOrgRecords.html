@@ -1,8 +1,59 @@
 <template>
-    <lightning-datatable
-            key-field="id"
-            data={data}
-            columns={columns}
-            onrowselection={handleRowSelection}>
-    </lightning-datatable>
+    <div class="slds-is-relative">
+        <!--Table Container-->
+        <template if:false={areRecordsEmpty}>
+            <div class="slds-text-heading_medium slds-text-align_center">
+                Records
+            </div>
+
+            <div class="slds-grid slds-grid_pull-padded-medium">
+                <!--Visible Records-->
+                <div class="slds-col slds-p-around_small slds-size_1-of-8">
+                    <lightning-combobox
+                            name="progress"
+                            label="Select records to show"
+                            value={value}
+                            placeholder="Records"
+                            options={options}
+                            onchange={handleChange}>
+                    </lightning-combobox>
+                </div>
+                <!--Visible Columns-->
+                <div class="slds-col slds-p-around_small slds-size_1-of-8">
+                    <lightning-combobox
+                            name="progress"
+                            label="Select visible columns"
+                            value={value}
+                            placeholder="Columns"
+                            options={}
+                            onchange={handleChange}>
+                    </lightning-combobox>
+                </div>
+                <!--Copy Records Button-->
+                <div class="slds-col slds-p-around_small slds-align-bottom slds-size_1-of-8">
+                    <button class="slds-button slds-button_success" disabled>Copy Records</button>
+                </div>
+            </div>
+
+            <!--Table-->
+            <lightning-datatable
+                    key-field="id"
+                    data={records}
+                    columns={columns}
+                    onrowselection={handleRowSelection}>
+            </lightning-datatable>
+        </template>
+
+        <!--Spinner-->
+        <template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!--No Records-->
+        <template if:true={areRecordsEmpty}>
+            <div class="slds-text-heading_medium slds-text-align_center">
+                No data to display
+            </div>
+        </template>
+    </div>
 </template>

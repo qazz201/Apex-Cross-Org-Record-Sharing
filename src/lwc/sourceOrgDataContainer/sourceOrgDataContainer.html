@@ -1,14 +1,26 @@
 <template>
-    <template if:true={showContainer}>
-        <c-object-names-list options={options} onchange={handleSelectObjectName}></c-object-names-list>
-        <c-source-org-records class="slds-p-around_medium"
-                              object-name={selectedObjectName}>
-        </c-source-org-records>
-    </template>
+    <div class="slds-is-relative">
+        <template if:true={showContainer}>
+            <c-object-names-list options={options}
+                                 label="Select Custom Object"
+                                 onchange={handleSelectObjectName}>
 
-    <template if:false={showContainer}>
-        <h2 class="slds-text-align_center"> Please authorize!</h2>
-    </template>
+            </c-object-names-list>
+            <c-source-org-records class="slds-p-around_medium"
+                                  object-name={selectedObjectName}>
+            </c-source-org-records>
+        </template>
 
-    <p> SELECTED NAME: {selectedObjectName}</p>
+        <!--Spinner-->
+        <template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!--Please authorize-->
+        <template if:false={showAuthorizationText}>
+            <h2 class="slds-text-align_center"> Please authorize!</h2>
+        </template>
+
+        <p> SELECTED NAME: {selectedObjectName}</p>
+    </div>
 </template>

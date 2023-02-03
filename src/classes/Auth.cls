@@ -23,6 +23,7 @@ public abstract with sharing class Auth {
 
     /**
    *  @description authenticate via params from custom settings or passed auth params
+   *  reauthorization is supported
    */
     public virtual void authenticate() {
         this.calloutClient.clearAllHeaders();
@@ -34,7 +35,7 @@ public abstract with sharing class Auth {
 
         if (response.getStatusCode() >= 400) {
             System.debug('Reauthorization...');
-            this.refreshAuthentication();
+            this.reauthorize();
             return;
         }
 
@@ -60,10 +61,10 @@ public abstract with sharing class Auth {
         return this.parseRefreshTokenResponse(response.getBody());
     }
 
-    public virtual void setCalloutClient(ICallout calloutClient) {
-        this.calloutClient = calloutClient;
-    }
-    
+//    public virtual void setCalloutClient(ICallout calloutClient) {
+//        this.calloutClient = calloutClient;
+//    }
+
     public virtual ICallout getCalloutClient() {
         return this.calloutClient;
     }
@@ -103,14 +104,14 @@ public abstract with sharing class Auth {
         return String.isNotBlank(currentCallbackUrl) ? currentCallbackUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.RedirectUri__c;
     }
 
-    protected virtual void refreshAuthentication() {
+    protected virtual void reauthorize() {
         RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
         this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
         RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
 
-        System.debug('__refreshAuthentication_accessTokenResponse__ ' + this.accessTokenResponse);
+        System.debug('__reauthorize_accessTokenResponse__ ' + this.accessTokenResponse);
     }
-    
+
     protected virtual void saveAuthParamsInCustomSetting() {
         RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
                 RecordTransferSettings__c.AuthorizationCode__c => this.getAuthorizationCode(),

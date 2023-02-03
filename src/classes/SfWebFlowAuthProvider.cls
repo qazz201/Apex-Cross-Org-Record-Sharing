@@ -21,7 +21,7 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
                 this.getTokenUrlParams(
                         new Map<String, String>{
                                 '&grant_type=' => this.GRANT_TYPE_AUTH_CODE,
-                                '&code=' => this.getAuthorizationCode()//this.authorizationCode
+                                '&code=' => this.getAuthorizationCode()
                         }
                 )
         );

@@ -1,6 +1,7 @@
 public with sharing class DataTable {
     private List<Map<String, Object>> recordsAsMap;
-    private Integer columnsToShow;
+    private Integer visibleColumns;
+    private String sourceOrgUrl;
 
     private Set<String> requiredColumnsInTable = new Set<String>{
             'Id', 'Name', 'Type'
@@ -10,10 +11,11 @@ public with sharing class DataTable {
             'attributes', 'IsDeleted'
     };
 
-    public DataTable(List<Map<String, Object>> recordsAsMap, Integer columnsToShow) {
-        if (Lists.isEmpty(recordsAsMap) || columnsToShow == 0) return;
+    public DataTable(List<Map<String, Object>> recordsAsMap, Integer visibleColumns) {
+        if (Lists.isEmpty(recordsAsMap) || visibleColumns == 0) return;
         this.recordsAsMap = recordsAsMap;
-        this.columnsToShow = columnsToShow;
+        this.visibleColumns = visibleColumns;
+        this.sourceOrgUrl = RecordTransferCustomSettingService.getOrgDefaultSettingValueByName(RecordTransferSettings__c.Instance_Url__c);
     }
 
     public Table build() {
@@ -31,7 +33,7 @@ public with sharing class DataTable {
         Map<String, Object> firstRecord = (Map<String, Object>) Lists.getFirst(this.recordsAsMap);
 
         columnConfig.addAll(this.createRequiredColumnsConfig(firstRecord));
-        columnConfig.addAll(this.createNOTRequiredColumnsConfig(firstRecord, this.columnsToShow - this.requiredColumnsInTable.size()));
+        columnConfig.addAll(this.createNOTRequiredColumnsConfig(firstRecord, this.visibleColumns - this.requiredColumnsInTable.size()));
 
         return columnConfig;
     }
@@ -45,6 +47,10 @@ public with sharing class DataTable {
             for (DataTableColumnsConfig config : columnsConfig) {
                 String configFieldName = config.fieldName;
 
+//                if (record.containsKey(configFieldName) && configFieldName == 'Name') {
+//                    filteredRecordFields.put(configFieldName, this.sourceOrgUrl + '/' + record.get('Id'));
+//
+//                }
                 if (record.containsKey(configFieldName)) {
                     filteredRecordFields.put(configFieldName, record.get(configFieldName));
                 }
@@ -60,7 +66,7 @@ public with sharing class DataTable {
         Integer createdColumns = 0;
 
         for (String requiredField : this.requiredColumnsInTable) {
-            if (createdColumns == this.columnsToShow) break;
+            if (createdColumns == this.visibleColumns) break;
             if (!firstRecord.containsKey(requiredField)) continue;
 
             columnConfig.add(this.buildColumnConfig(requiredField));
@@ -87,10 +93,24 @@ public with sharing class DataTable {
     }
 
     private DataTableColumnsConfig buildColumnConfig(String fieldName) {
-        return new DataTableColumnsConfig.Builder()
+        DataTableColumnsConfig.Builder config = new DataTableColumnsConfig.Builder()
                 .setFieldName(fieldName)
-                .setLabel(fieldName)
-                .build();
+                .setLabel(fieldName);
+                
+        //TODO: delete?
+        if (fieldName == 'Name') {
+            config.setType('url')
+                    .setTypeAttributes(
+                            new Map<String, Object>{
+                                    'label' => new Map<String, String>{
+                                            'fieldName' => fieldName
+                                    },
+                                    'target' => '_blank'
+                            }
+                    );//typeAttributes: {label: { fieldName: 'Name' }, target: '_blank'} },
+        }
+        return config.build();
+
     }
 
     public class Table {

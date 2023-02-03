@@ -9,7 +9,6 @@ import {isEmptyArray} from 'c/commons';
 import getSourceOrgCustomObjectNames
     from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
 
-
 const AUTHORIZE_EVENT = 'authorize';
 
 export default class SourceOrgDataContainer extends LightningElement {
@@ -18,41 +17,7 @@ export default class SourceOrgDataContainer extends LightningElement {
 
     _options = [];
     selectedObjectName = '';
-
-    // @wire(getSourceOrgCustomObjectNames)
-    // getCustomObjectNamesList({error, data}) {
-    //     if (error) {
-    //         console.log('err__- ', error)
-    //         return this.showToastNotification('Error', error?.message, 'error');
-    //     } else if (data) {
-    //         this.showContainer = true;
-    //         this.options = data;
-    //     }
-    // };
-
-    connectedCallback() {
-        registerListener(
-            AUTHORIZE_EVENT,
-            this.handleAuthorizationEvent,
-            this
-        );
-
-        console.log('GET DATA___')
-        getSourceOrgCustomObjectNames().then((data) => {
-            this.options = data;
-            this.showContainer = true;
-        }).catch(error => {
-            console.error('Err_- ', error);
-            return this.showToastNotification('Error', error?.body?.message, 'error');
-        })
-    }
-
-    // createListOptionsFromObjectNames(objectNames = []) {
-    //     if (isEmptyArray(objectNames)) return;
-    //     this.options = objectNames.map(objectName => {
-    //         return {label: objectName, value: objectName};
-    //     })
-    // }
+    showSpinner = false;
 
     @api
     set options(values) {
@@ -63,8 +28,29 @@ export default class SourceOrgDataContainer extends LightningElement {
         })
     }
 
-    get options() {
-        return this._options;
+    connectedCallback() {
+        registerListener(
+            AUTHORIZE_EVENT,
+            this.handleAuthorizationEvent,
+            this
+        );
+        this.getCustomObjectNames();
+    }
+
+    disconnectedCallback() {
+        unregisterListener(AUTHORIZE_EVENT, this.handleAuthorizationEvent, this);
+    }
+
+    getCustomObjectNames() {
+        this.showSpinner = true;
+
+        getSourceOrgCustomObjectNames().then((data) => {
+            this.options = data;
+            this.showContainer = true;
+        }).catch(error => {
+            console.error('SourceOrgDataContainer ERROR: ', error);
+            return this.showToastNotification('Error', error?.body?.message, 'error');
+        }).finally(() => this.showSpinner = false);
     }
 
     handleAuthorizationEvent(params = {}) {
@@ -84,6 +70,15 @@ export default class SourceOrgDataContainer extends LightningElement {
                 title: title,
                 message: message,
                 variant: variant,
-            }));
+            })
+        );
+    }
+
+    get options() {
+        return this._options;
+    }
+
+    get showAuthorizationText() {
+        return this.showContainer && !this.showSpinner;
     }
 }
