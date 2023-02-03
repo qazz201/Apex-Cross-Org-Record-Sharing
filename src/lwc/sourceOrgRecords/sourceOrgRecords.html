@@ -10,23 +10,21 @@
                 <!--Visible Records-->
                 <div class="slds-col slds-p-around_small slds-size_1-of-8">
                     <lightning-combobox
-                            name="progress"
                             label="Select records to show"
-                            value={value}
+                            value={visibleRecords}
                             placeholder="Records"
-                            options={options}
-                            onchange={handleChange}>
+                            options={visibleRecordsDiapasonOptions}
+                            onchange={handleVisibleRecordsChange}>
                     </lightning-combobox>
                 </div>
                 <!--Visible Columns-->
                 <div class="slds-col slds-p-around_small slds-size_1-of-8">
                     <lightning-combobox
-                            name="progress"
                             label="Select visible columns"
-                            value={value}
+                            value={visibleColumns}
                             placeholder="Columns"
-                            options={}
-                            onchange={handleChange}>
+                            options={visibleColumnsDiapasonOptions}
+                            onchange={handleVisibleColumnsChange}>
                     </lightning-combobox>
                 </div>
                 <!--Copy Records Button-->

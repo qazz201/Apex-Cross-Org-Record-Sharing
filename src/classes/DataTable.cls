@@ -4,7 +4,7 @@ public with sharing class DataTable {
     private String sourceOrgUrl;
 
     private Set<String> requiredColumnsInTable = new Set<String>{
-            'Id', 'Name', 'Type'
+            'Id', 'Name'
     };
 
     private Set<String> omitColumns = new Set<String>{
