@@ -1,12 +1,12 @@
-public with sharing class SourceOrgDataContainerController {
+public with sharing class SourceOrgDataContainerController extends Controller {
     private static ICallout calloutClient = new CalloutClient();
 
     private static final String AUTHORIZATION_REQUIRED_MSG = 'Authorization required!';
 
-    @AuraEnabled
-    public static Boolean checkAuthorization() {
-        return hadUserAlreadyAuthorized();
-    }
+//    @AuraEnabled
+//    public static Boolean checkAuthorization() {
+//        return hadUserAlreadyAuthorized();
+//    }
 
     @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
@@ -16,27 +16,13 @@ public with sharing class SourceOrgDataContainerController {
         List<String> customObjectNames = new List<String>();
 
         try {
-            SourceOrgApi sourceOrgApi = getSourceOrgApi(new CalloutParams(
-                    getAuthDefaultSetting(RecordTransferSettings__c.Instance_Url__c),
-                    getAuthDefaultSetting(RecordTransferSettings__c.AccessToken__c))
-            );
-
-            customObjectNames = sourceOrgApi.getCustomObjectNames();
+            customObjectNames = new SourceOrgApi(new SfWebFlowAuthProvider(getCalloutClient())).getCustomObjectNames();
         } catch (Exception ex) {
-            System.debug('ERRR__ '+ex);
+            System.debug('ERRR__ ' + ex);
             throw new AuraHandledException(ex.getMessage());
         }
 
         return customObjectNames;
-    }
-
-    private static SourceOrgApi getSourceOrgApi(CalloutParams calloutParams) {
-        calloutClient.setEndpoint(calloutParams.endpoint);
-        calloutClient.clearAllHeaders();
-        calloutClient.setHeader('Authorization', 'Bearer ' + calloutParams.accessToken);
-
-        System.debug('aaaa--_ ' + calloutClient.getEndpoint());
-        return new SourceOrgApi(new SfWebFlowAuthProvider(calloutClient));
     }
 
     private static Boolean hadUserAlreadyAuthorized() {
@@ -60,12 +46,12 @@ public with sharing class SourceOrgDataContainerController {
         }
     }
 
-    public class Authorization {
-        @AuraEnabled
-        public Boolean hadUserAlreadyAuthorized { get; set; }
-        @AuraEnabled
-        public Boolean doesAuthCodeValid { get; set; }
-        @AuraEnabled
-        public Boolean doesAccessTokenValid { get; set; }
-    }
+//    public class Authorization {
+//        @AuraEnabled
+//        public Boolean hadUserAlreadyAuthorized { get; set; }
+//        @AuraEnabled
+//        public Boolean doesAuthCodeValid { get; set; }
+//        @AuraEnabled
+//        public Boolean doesAccessTokenValid { get; set; }
+//    }
 }

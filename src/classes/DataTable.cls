@@ -1,6 +1,9 @@
 public with sharing class DataTable {
     private List<Map<String, Object>> recordsAsMap;
     private Integer columnsToShow;
+    private Set<String> requiredColumnsToShow = new Set<String>{
+            'Id', 'Name'
+    };
 
     public DataTable(List<Map<String, Object>> recordsAsMap, Integer columnsToShow) {
         if (Lists.isEmpty(recordsAsMap) || columnsToShow == 0) return;
@@ -8,9 +11,14 @@ public with sharing class DataTable {
         this.columnsToShow = columnsToShow;
     }
 
-    public void build() {
+    public Table build() {
+        Table table = new Table();
+        table.columns = this.createColumnsConfig();
+        table.data = this.filterRecordFieldsByConfig(table.columns);
+
         System.debug('DATATABLE___');
-        System.debug(this.createColumnsConfig());
+        System.debug(table);
+        return table;
     }
 
     private List<DataTableColumnsConfig> createColumnsConfig() {
@@ -18,19 +26,38 @@ public with sharing class DataTable {
         Map<String, Object> firstRecord = (Map<String, Object>) Lists.getFirst(this.recordsAsMap);
         Integer columnsCreated = 0;
 
-        for (String fieldNAme : firstRecord.keySet()) {
+        for (String fieldName : firstRecord.keySet()) {
             if (columnsCreated == this.columnsToShow) break;
 
             columnConfig.add(
                     new DataTableColumnsConfig.Builder()
-                            .setFieldName(fieldNAme)
-                            .setLabel(fieldNAme)
+                            .setFieldName(fieldName)
+                            .setLabel(fieldName)
                             .build()
             );
             columnsCreated++;
         }
 
         return columnConfig;
+    }
+
+    private List<Map<String, Object>> filterRecordFieldsByConfig(List<DataTableColumnsConfig> columnsConfig) {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+
+        for (Map<String, Object> record : this.recordsAsMap) {
+            Map<String, Object> filteredRecordFields = new Map<String, Object>();
+
+            for (DataTableColumnsConfig config : columnsConfig) {
+                String configFieldName = config.fieldName;
+
+                if (record.containsKey(configFieldName)) {
+                    filteredRecordFields.put(configFieldName, record.get(configFieldName));
+                }
+            }
+            result.add(filteredRecordFields);
+        }
+
+        return result;
     }
 
     public class ColumnItem {
@@ -44,12 +71,12 @@ public with sharing class DataTable {
 
     public class Table {
         @AuraEnabled
-        public List<ColumnItem> columns { get; set; }
+        public List<DataTableColumnsConfig> columns { get; set; }
         @AuraEnabled
         public List<Map<String, Object>> data { get; set; }
 
         public Table() {
-            this.columns = new List<ColumnItem>();
+            this.columns = new List<DataTableColumnsConfig>();
             this.data = new List<Map<String, Object>>();
         }
     }

@@ -13,9 +13,9 @@ public with sharing class SourceOrgApi {
         return this.restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount);
     }
 
-    public void buildLwcTableData(String objectName, Integer limitCount, Integer columnsToShow) { //List<Map<String, Object>>
+    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer columnsToShow) { //List<Map<String, Object>>
         List<Map<String, Object>> recordsAsMap = this.restApiManager.queryApi().getRecordsAsMap(objectName, limitCount);
-        new DataTable(recordsAsMap, columnsToShow).build();
+        return new DataTable(recordsAsMap, columnsToShow).build();
     }
 
 }

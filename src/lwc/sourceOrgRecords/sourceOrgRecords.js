@@ -1,11 +1,14 @@
 import {LightningElement, api} from 'lwc';
 import {isEmptyString} from "c/commons";
 
+//Apex
+import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.getDatatableDataConfig';
+
 export default class SourceOrgRecords extends LightningElement {
     @api objectName = '';
 
     data = [];
-    
+
     columns = [
         {label: 'Label', fieldName: 'name'},
         {label: 'Website', fieldName: 'website', type: 'url'},
@@ -14,13 +17,28 @@ export default class SourceOrgRecords extends LightningElement {
         {label: 'CloseAt', fieldName: 'closeAt', type: 'date'},
     ];
 
-    connectedCallback() {
-        this.data = this.generateData({amountOfRecords: 3});
+    async connectedCallback() {
+        //  this.data = this.generateData({amountOfRecords: 3});
+        console.log('DATATABLE____')
+        await this.getData();
     }
 
-    getRecords() {
-        if (isEmptyString(this.objectName)) return;
-        //...
+    async getData() {
+       // if (isEmptyString(this.objectName)) return;
+        try {
+            const {columns, data} = await getDatatableDataConfig({
+                objectName: 'Contact',
+                recordsToShow: 3,
+                columnsToShow: 6
+            });
+            this.columns = columns;
+            this.data = data;
+
+            console.log(JSON.stringify(columns));
+            console.log(JSON.stringify(data));
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     generateData({amountOfRecords}) {
