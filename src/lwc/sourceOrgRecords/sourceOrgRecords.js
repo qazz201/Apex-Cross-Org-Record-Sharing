@@ -5,10 +5,10 @@ import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 //Apex
 import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.getDatatableDataConfig';
 
-const VISIBLE_RECORDS_DIAPASON = [1, 2, 5, 10, 20, 50, 100];
+const VISIBLE_RECORDS_DIAPASON = [1, 2, 5, 10, 20, 35, 50, 70, 100];
 const VISIBLE_RECORDS = '20';
-const VISIBLE_COLUMNS_DIAPASON = [1, 2, 3, 4, 5, 10, 15, 20, 25];
-const VISIBLE_COLUMNS = '10';
+const VISIBLE_COLUMNS_DIAPASON = [1, 2, 3, 4, 5, 8, 10, 15, 20, 25, 30, 35, 50, 70, 100];
+const VISIBLE_COLUMNS = '8';
 
 export default class SourceOrgRecords extends LightningElement {
     // @api visibleRecords;
@@ -42,7 +42,7 @@ export default class SourceOrgRecords extends LightningElement {
         this.showSpinner = true;
 
         getDatatableDataConfig({
-            objectName: this.objectName,//: 'Contact',//TODO: DELETE HARDCODE
+            objectName: this.objectName, //'Contact', //TODO: DELETE HARDCODE
             visibleRecords: this.visibleRecords,
             visibleColumns: this.visibleColumns,
         }).then(response => {

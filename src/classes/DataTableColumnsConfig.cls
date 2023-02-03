@@ -6,6 +6,8 @@ public with sharing class DataTableColumnsConfig {
     @AuraEnabled
     public String fieldName { get; set; }
     @AuraEnabled
+    public Decimal initialWidth { get; set; }
+    @AuraEnabled
     public Map<String, Object> typeAttributes { get; set; }
 
     public DataTableColumnsConfig() {
@@ -36,6 +38,10 @@ public with sharing class DataTableColumnsConfig {
         }
         public Builder setFieldName(String fieldName) {
             config.fieldName = fieldName;
+            return this;
+        }
+        public Builder setInitialWidth(Decimal initialWidth) {
+            config.initialWidth = initialWidth;
             return this;
         }
     }

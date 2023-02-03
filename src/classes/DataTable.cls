@@ -3,6 +3,8 @@ public with sharing class DataTable {
     private Integer visibleColumns;
     private String sourceOrgUrl;
 
+    private final Integer INITIAL_COLUMN_WIDTH = 200;
+
     private Set<String> requiredColumnsInTable = new Set<String>{
             'Id', 'Name'
     };
@@ -95,7 +97,8 @@ public with sharing class DataTable {
     private DataTableColumnsConfig buildColumnConfig(String fieldName) {
         DataTableColumnsConfig.Builder config = new DataTableColumnsConfig.Builder()
                 .setFieldName(fieldName)
-                .setLabel(fieldName);
+                .setLabel(fieldName)
+                .setInitialWidth(INITIAL_COLUMN_WIDTH);
 
         //TODO: delete?
         if (fieldName == 'Name') {
