@@ -21,7 +21,7 @@ public with sharing class ToolingApiService extends Api {
     }
 
     /**
-    * @description 
+    * @description Singleton
     */
     public static ToolingApiService getInstance(Auth authProvider) {
         if (instance == null) {

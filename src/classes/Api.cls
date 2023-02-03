@@ -18,24 +18,6 @@ public abstract with sharing class Api {
         this.endpointApiUrl = this.calloutClient.getEndpoint() + this.getApiPath();
     }
 
-//    //ToolingApi
-//    public virtual List<String> getCustomObjectNames() {
-//        return null;
-//    }
-//    //QueryApi
-//    public virtual List<Map<String, Object>> getRecordsAsMap(String objectName, Integer limitCount) {
-//        return null;
-//    }
-//    public virtual List<SObject> saveRecordsByObjectName(String objectName, Integer limitCount) {
-//        return null;
-//    }
-//    public virtual List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-//        return null;
-//    }
-//    public virtual List<SObject> generateSObjectsFromQueryResponse(HttpResponse response, String sObjectName) {
-//        return null;
-//    }
-
     protected abstract String getApiPath();
 
     protected virtual HttpResponse executeGetCallout(String resourceEndpoint) {
@@ -57,6 +39,7 @@ public abstract with sharing class Api {
         if (response.getStatusCode() == 400) {
             //400 "expired access/refresh token"
             System.debug('HANDLE STATUS CODE_ CODE=400');
+            //TODO: create handler
         } else if (response.getStatusCode() == 401) {
             //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
             System.debug('HANDLE STATUS CODE_ CODE=401');
@@ -66,6 +49,7 @@ public abstract with sharing class Api {
         return newResponse;
     }
 
+    //TODO: Add retry counter( may be infinite call if status code=400 or 401)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     private HttpResponse calloutGetWithRefreshedAccessToken(String resourceEndpoint) {
         Auth.RefreshTokenResponse refreshedToken = this.authProvider.getNewAccessToken();
 

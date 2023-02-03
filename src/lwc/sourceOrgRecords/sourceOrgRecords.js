@@ -5,8 +5,18 @@ import {isEmptyString} from "c/commons";
 import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.getDatatableDataConfig';
 
 export default class SourceOrgRecords extends LightningElement {
-    @api objectName = '';
+    @api set objectName(value) {
+        if (isEmptyString(value)) return;
 
+        this.getData(value);
+        this._objectName = value;
+    };
+
+    get objectName() {
+        return this._objectName;
+    }
+
+    _objectName = '';
     data = [];
 
     columns = [
@@ -17,28 +27,28 @@ export default class SourceOrgRecords extends LightningElement {
         {label: 'CloseAt', fieldName: 'closeAt', type: 'date'},
     ];
 
-    async connectedCallback() {
+    connectedCallback() {
         //  this.data = this.generateData({amountOfRecords: 3});
         console.log('DATATABLE____')
-        await this.getData();
+        // await this.getData();
     }
 
-    async getData() {
-       // if (isEmptyString(this.objectName)) return;
-        try {
-            const {columns, data} = await getDatatableDataConfig({
-                objectName: 'Contact',
-                recordsToShow: 3,
-                columnsToShow: 6
-            });
+    getData(objectName = '') {
+        if (isEmptyString(objectName)) return;
+
+        getDatatableDataConfig({
+            objectName:'Account',// TODO:DELETE HARDCODE
+            recordsToShow: 3,
+            columnsToShow: 10
+        }).then(response => {
+            const {columns, data} = response;
             this.columns = columns;
             this.data = data;
 
             console.log(JSON.stringify(columns));
             console.log(JSON.stringify(data));
-        } catch (e) {
-            console.error(e);
-        }
+        }).catch(err => console.error('SourceOrgRecords Error: ', err));
+
     }
 
     generateData({amountOfRecords}) {

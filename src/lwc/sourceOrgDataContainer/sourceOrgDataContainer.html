@@ -1,7 +1,9 @@
 <template>
     <template if:true={showContainer}>
         <c-object-names-list options={options} onchange={handleSelectObjectName}></c-object-names-list>
-        <c-source-org-records class="slds-p-around_medium"></c-source-org-records>
+        <c-source-org-records class="slds-p-around_medium"
+                              object-name={selectedObjectName}>
+        </c-source-org-records>
     </template>
 
     <template if:false={showContainer}>

@@ -1,8 +1,13 @@
 public with sharing class DataTable {
     private List<Map<String, Object>> recordsAsMap;
     private Integer columnsToShow;
-    private Set<String> requiredColumnsToShow = new Set<String>{
-            'Id', 'Name'
+
+    private Set<String> requiredColumnsInTable = new Set<String>{
+            'Id', 'Name', 'Type'
+    };
+
+    private Set<String> omitColumn = new Set<String>{
+            'attributes', 'IsDeleted'
     };
 
     public DataTable(List<Map<String, Object>> recordsAsMap, Integer columnsToShow) {
@@ -24,19 +29,9 @@ public with sharing class DataTable {
     private List<DataTableColumnsConfig> createColumnsConfig() {
         List<DataTableColumnsConfig> columnConfig = new List<DataTableColumnsConfig>();
         Map<String, Object> firstRecord = (Map<String, Object>) Lists.getFirst(this.recordsAsMap);
-        Integer columnsCreated = 0;
 
-        for (String fieldName : firstRecord.keySet()) {
-            if (columnsCreated == this.columnsToShow) break;
-
-            columnConfig.add(
-                    new DataTableColumnsConfig.Builder()
-                            .setFieldName(fieldName)
-                            .setLabel(fieldName)
-                            .build()
-            );
-            columnsCreated++;
-        }
+        columnConfig.addAll(this.createRequiredColumnsConfig(firstRecord));
+        columnConfig.addAll(this.createNOTRequiredColumnsConfig(firstRecord, this.columnsToShow - this.requiredColumnsInTable.size()));
 
         return columnConfig;
     }
@@ -60,13 +55,42 @@ public with sharing class DataTable {
         return result;
     }
 
-    public class ColumnItem {
-        @AuraEnabled
-        public String label { get; set; }
-        @AuraEnabled
-        public String fieldName { get; set; }
-        @AuraEnabled
-        public String type { get; set; }
+    private List<DataTableColumnsConfig> createRequiredColumnsConfig(Map<String, Object> firstRecord) {
+        List<DataTableColumnsConfig> columnConfig = new List<DataTableColumnsConfig>();
+        Integer createdColumns = 0;
+
+        for (String requiredField : this.requiredColumnsInTable) {
+            if (createdColumns == this.columnsToShow) break;
+            if (!firstRecord.containsKey(requiredField)) continue;
+
+            columnConfig.add(this.buildColumnConfig(requiredField));
+            createdColumns++;
+        }
+
+        return columnConfig;
+    }
+
+    private List<DataTableColumnsConfig> createNOTRequiredColumnsConfig(Map<String, Object> firstRecord, Integer columnsToCreate) {
+        List<DataTableColumnsConfig> columnConfig = new List<DataTableColumnsConfig>();
+        if (columnsToCreate <= 0) return columnConfig;
+
+        Integer createdColumns = 0;
+
+        for (String fieldName : firstRecord.keySet()) {
+            if (createdColumns == columnsToCreate) break;
+            if (this.requiredColumnsInTable.contains(fieldName) || this.omitColumn.contains(fieldName)) continue;
+
+            columnConfig.add(this.buildColumnConfig(fieldName));
+            createdColumns++;
+        }
+        return columnConfig;
+    }
+
+    private DataTableColumnsConfig buildColumnConfig(String fieldName) {
+        return new DataTableColumnsConfig.Builder()
+                .setFieldName(fieldName)
+                .setLabel(fieldName)
+                .build();
     }
 
     public class Table {
