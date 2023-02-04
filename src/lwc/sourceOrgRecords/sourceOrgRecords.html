@@ -1,54 +1,27 @@
 <template>
     <div class="slds-is-relative">
-        <!--Table Container-->
-        <template if:false={areRecordsEmpty}>
-            <div class="slds-text-heading_medium slds-text-align_center">
-                Records
-            </div>
+        <div class="slds-text-heading_medium slds-text-align_center">
+            Records
+        </div>
 
-            <div class="slds-grid slds-grid_pull-padded-medium">
-                <!--Visible Records-->
-                <div class="slds-col slds-p-around_small slds-size_1-of-8">
-                    <lightning-combobox
-                            label="Select records to show"
-                            value={visibleRecords}
-                            placeholder="Records"
-                            options={visibleRecordsDiapasonOptions}
-                            onchange={handleVisibleRecordsChange}>
-                    </lightning-combobox>
-                </div>
-                <!--Visible Columns-->
-                <div class="slds-col slds-p-around_small slds-size_1-of-8">
-                    <lightning-combobox
-                            label="Select visible columns"
-                            value={visibleColumns}
-                            placeholder="Columns"
-                            options={visibleColumnsDiapasonOptions}
-                            onchange={handleVisibleColumnsChange}>
-                    </lightning-combobox>
-                </div>
-                <!--Copy Records Button-->
-                <div class="slds-col slds-p-around_small slds-align-bottom slds-text-align_center slds-size_1-of-8">
-                    <button class="slds-button slds-button_success"
-                            disabled={doesCopyRecordsDisabled}>
-                        Copy Records
-                    </button>
-                </div>
-                <!--Search-->
-                <div class="slds-col slds-p-around_small slds-align-bottom slds-size_3-of-8">
-                    <lightning-input placeholder="Search" type="search"></lightning-input>
-                </div>
-            </div>
+        <!--Table Header Panel-->
+        <c-datatable-header-panel
+                visible-records-count={visibleRecordsCount}
+                visible-columns-count={visibleColumnsCount}
+                forbid-records-copy-action={forbidRecordsCopyAction}
+                forbid-search={areRecordsEmpty}
+                onvisiblerecordschange={handleVisibleRecordsChange}
+                onvisiblecolumnschange={handleVisibleColumnsChange}>
+        </c-datatable-header-panel>
 
-            <!--Table-->
-            <lightning-datatable
-                    key-field="id"
-                    data={records}
-                    columns={columns}
-                    show-row-number-column
-                    onrowselection={handleRowSelection}>
-            </lightning-datatable>
-        </template>
+        <!--Table-->
+        <lightning-datatable
+                key-field="id"
+                data={records}
+                columns={columns}
+                show-row-number-column
+                onrowselection={handleRowSelection}>
+        </lightning-datatable>
 
         <!--Spinner-->
         <template if:true={showSpinner}>

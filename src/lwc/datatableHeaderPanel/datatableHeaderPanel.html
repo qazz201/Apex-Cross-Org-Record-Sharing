@@ -1,0 +1,35 @@
+<template>
+    <div class="slds-grid slds-grid_pull-padded-medium">
+        <!--Visible Records-->
+        <div class="slds-col slds-p-around_small slds-size_1-of-8">
+            <lightning-combobox
+                    label="Select records to show"
+                    value={visibleRecordsCount}
+                    placeholder="Records"
+                    options={visibleRecordsDiapasonOptions}
+                    onchange={handleVisibleRecordsChange}>
+            </lightning-combobox>
+        </div>
+        <!--Visible Columns-->
+        <div class="slds-col slds-p-around_small slds-size_1-of-8">
+            <lightning-combobox
+                    label="Select visible columns"
+                    value={visibleColumnsCount}
+                    placeholder="Columns"
+                    options={visibleColumnsDiapasonOptions}
+                    onchange={handleVisibleColumnsChange}>
+            </lightning-combobox>
+        </div>
+        <!--Copy Records Button-->
+        <div class="slds-col slds-p-around_small slds-align-bottom slds-text-align_center slds-size_1-of-8">
+            <button class="slds-button slds-button_success"
+                    disabled={forbidRecordsCopyAction}>
+                Copy Records
+            </button>
+        </div>
+        <!--Search-->
+        <div class="slds-col slds-p-around_small slds-align-bottom slds-size_3-of-8">
+            <lightning-input placeholder="Search" type="search" disabled={forbidSearch}></lightning-input>
+        </div>
+    </div>
+</template>
