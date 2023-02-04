@@ -2,34 +2,38 @@ import {LightningElement, wire} from 'lwc';
 // import {CurrentPageReference} from 'lightning/navigation';
 // import {registerListener, unregisterListener} from 'c/pubsub';
 
+//Labels
+import authorizeOrChangeAuthorizationData from '@salesforce/label/c.Auth_Lbl_AuthorizeOrChangeAuthorizationData';
+import reauthorize from '@salesforce/label/c.Auth_Lbl_Reauthorize';
+
 const AUTHORIZE_EVENT = 'authorize';
+const RUN_AUTH_FLOW_ACTION = 'runAuthFlow';
+const REAUTHORIZATION_REQUIRED_ACTION = 'reauthorizationRequired';
 
 export default class RecordTransferContainer extends LightningElement {
-    // @wire(CurrentPageReference) pageRef; // Required by pubsub
-    //
-    // connectedCallback() {
-    //     registerListener(
-    //         AUTHORIZE_EVENT,
-    //         this.handleAuthorization,
-    //         this
-    //     );
-    // }
-    //
-    // disconnectedCallback() {
-    //     unregisterListener(AUTHORIZE_EVENT, this.handleAuthorization, this);
-    // }
-    //
-    // handleAuthorization(params = {}) {
-    //     const {success} = params;
-    //     console.log('AUTHORIZE_SUCCESS??_ ', success);
-    //     console.log('PUBSUB CATCH EVENT??_ ', JSON.stringify(params));
-    //
-    //     if (success === true) {
-    //         this.$authorizationContainer?.closeAuthorizationModal();
-    //     }
-    // }
-    //
-    // get $authorizationContainer() {
-    //     return this.template.querySelector('c-authorization-container');
-    // }
+
+    labels = {
+        authorizeOrChangeAuthorizationData,
+        reauthorize,
+    };
+
+    menuActions = {
+        runAuthFlow: RUN_AUTH_FLOW_ACTION,
+        reauthorizationRequired: REAUTHORIZATION_REQUIRED_ACTION,
+    };
+
+    handleMenuOnselect(event) {
+        const {value: actionName} = event.detail;
+        console.log(actionName);
+
+        if (actionName === this.menuActions.runAuthFlow) {
+            this.$authorizationContainer?.runAuthorizationFlow();
+        } else if (actionName === this.menuActions.reauthorizationRequired) {
+            console.log('Action: ', REAUTHORIZATION_REQUIRED_ACTION);
+        }
+    }
+
+    get $authorizationContainer() {
+        return this.template.querySelector('c-authorization-container');
+    }
 }

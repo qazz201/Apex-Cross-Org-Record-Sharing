@@ -1,7 +1,7 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
     private static ICallout calloutClient = new CalloutClient();
 
-    private static final String AUTHORIZATION_REQUIRED_MSG = 'Authorization required!';
+//    private static final String AUTHORIZATION_REQUIRED_MSG = Label.AuthAuthorizationRequired;
 
 //    @AuraEnabled
 //    public static Boolean checkAuthorization() {
@@ -11,7 +11,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
     @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
         if (!hadUserAlreadyAuthorized()) {
-            throw new AuraHandledException(AUTHORIZATION_REQUIRED_MSG);
+            throw new AuraHandledException(Label.Auth_Lbl_AuthorizationRequired);
         }
         List<String> customObjectNames = new List<String>();
 

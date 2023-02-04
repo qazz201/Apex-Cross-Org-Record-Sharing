@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Auth_Lbl_AuthorizationRequired</fullName>
+        <categories>Auth</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Authorization required</shortDescription>
+        <value>Authorization required!</value>
+    </labels>
+    <labels>
+        <fullName>Auth_Lbl_PleaseAuthorize</fullName>
+        <categories>Auth</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Please authorize!</shortDescription>
+        <value>Please authorize!</value>
+    </labels>
+    <labels>
+        <fullName>Auth_Lbl_AuthorizeOrChangeAuthorizationData</fullName>
+        <categories>Auth</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Authorize or Change Authorization Data</shortDescription>
+        <value>Authorize or Change Authorization Data</value>
+    </labels>
+    <labels>
+        <fullName>Auth_Lbl_Reauthorize</fullName>
+        <categories>Auth</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reauthorize</shortDescription>
+        <value>Reauthorize</value>
+    </labels>
+    <labels>
+        <fullName>SourceOrg_Lbl_NoDataToDisplay</fullName>
+        <categories>SourceOrg</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No data to display</shortDescription>
+        <value>No data to display</value>
+    </labels>
+    <labels>
+        <fullName>SourceOrg_Lbl_CopySelectedRecords</fullName>
+        <categories>SourceOrg</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Copy Selected Records</shortDescription>
+        <value>Copy Selected Records</value>
+    </labels>
+    <labels>
+        <fullName>SourceOrg_Lbl_SelectCustomObject</fullName>
+        <categories>SourceOrg</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Custom Object</shortDescription>
+        <value>Select Custom Object</value>
+    </labels>
+    <labels>
+        <fullName>SourceOrg_Lbl_SelectColumns</fullName>
+        <categories>SourceOrg</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select columns</shortDescription>
+        <value>Select columns</value>
+    </labels>
+    <labels>
+        <fullName>SourceOrg_Lbl_SelectRows</fullName>
+        <categories>SourceOrg</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select rows</shortDescription>
+        <value>Select rows</value>
+    </labels>
+</CustomLabels>

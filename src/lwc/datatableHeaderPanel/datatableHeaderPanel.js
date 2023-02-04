@@ -1,6 +1,11 @@
 import {LightningElement, api} from 'lwc';
 import {isEmptyArray} from 'c/commons';
 
+//Labels
+import copySelectedRecords from '@salesforce/label/c.SourceOrg_Lbl_CopySelectedRecords';
+import selectRows from '@salesforce/label/c.SourceOrg_Lbl_SelectRows';
+import selectColumns from '@salesforce/label/c.SourceOrg_Lbl_SelectColumns';
+
 //Constants
 const DEFAULT_VISIBLE_RECORDS_DIAPASON = [1, 2, 5, 10, 20, 35, 50, 70, 100];
 const DEFAULT_VISIBLE_RECORDS = '20';
@@ -17,6 +22,12 @@ export default class DatatableHeaderPanel extends LightningElement {
 
     _visibleRecordsCount = DEFAULT_VISIBLE_RECORDS;
     _visibleColumnsCount = DEFAULT_VISIBLE_COLUMNS;
+
+    labels = {
+        copySelectedRecords,
+        selectRows,
+        selectColumns,
+    };
 
     @api set visibleRecordsCount(value) {
         this._visibleRecordsCount = `${value}`;

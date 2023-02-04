@@ -3,7 +3,7 @@
         <!--Visible Records-->
         <div class="slds-col slds-p-around_small slds-size_1-of-8">
             <lightning-combobox
-                    label="Select records to show"
+                    label={labels.selectRows}
                     value={visibleRecordsCount}
                     placeholder="Records"
                     options={visibleRecordsDiapasonOptions}
@@ -13,7 +13,7 @@
         <!--Visible Columns-->
         <div class="slds-col slds-p-around_small slds-size_1-of-8">
             <lightning-combobox
-                    label="Select visible columns"
+                    label={labels.selectColumns}
                     value={visibleColumnsCount}
                     placeholder="Columns"
                     options={visibleColumnsDiapasonOptions}
@@ -24,7 +24,7 @@
         <div class="slds-col slds-p-around_small slds-align-bottom slds-text-align_center slds-size_1-of-8">
             <button class="slds-button slds-button_success"
                     disabled={forbidRecordsCopyAction}>
-                Copy Records
+                {labels.copySelectedRecords}
             </button>
         </div>
         <!--Search-->

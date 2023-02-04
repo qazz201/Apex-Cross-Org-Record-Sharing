@@ -1,10 +1,10 @@
 <template>
     <div class="slds-is-relative">
         <template if:true={showContainer}>
+            <!--Source Object Select-->
             <c-object-names-list options={options}
-                                 label="Select Custom Object"
+                                 label={labels.selectCustomObject}
                                  onchange={handleSelectObjectName}>
-
             </c-object-names-list>
 
             <!--Records Related List-->
@@ -22,9 +22,7 @@
 
         <!--Please authorize-->
         <template if:false={showAuthorizationText}>
-            <h2 class="slds-text-align_center"> Please authorize!</h2>
+            <h2 class="slds-text-align_center slds-text-heading_small">{labels.pleaseAuthorize}</h2>
         </template>
-
-        <p> SELECTED NAME: {selectedObjectName}</p>
     </div>
 </template>

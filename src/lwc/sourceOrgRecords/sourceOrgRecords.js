@@ -5,6 +5,9 @@ import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 //Apex
 import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.getDatatableDataConfig';
 
+//Labels
+import noDataToDisplay from '@salesforce/label/c.SourceOrg_Lbl_NoDataToDisplay';
+
 //Constants
 const DEFAULT_VISIBLE_RECORDS = 20;
 const DEFAULT_VISIBLE_COLUMNS = 8;
@@ -20,6 +23,9 @@ export default class SourceOrgRecords extends LightningElement {
 
     selectedRows = [];
     _objectName = '';
+    labels = {
+        noDataToDisplay
+    }
 
     @api set objectName(value) {
         if (isEmptyString(value)) return;
@@ -34,7 +40,7 @@ export default class SourceOrgRecords extends LightningElement {
         this.showSpinner = true;
 
         getDatatableDataConfig({
-            objectName: this.objectName, //'Contact', //TODO: DELETE HARDCODE
+            objectName: 'Contact',//this.objectName, //'Contact', //TODO: DELETE HARDCODE
             visibleRecords: this.visibleRecordsCount,
             visibleColumns: this.visibleColumnsCount,
         }).then(response => {

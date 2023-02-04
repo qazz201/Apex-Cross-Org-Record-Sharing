@@ -1,14 +1,28 @@
 <!-- Authorization -->
 <template>
     <div class="slds-box slds-color__background_gray-1">
-        <c-authorization></c-authorization>
+        <!-- Authorization-->
+        <!--        <c-authorization></c-authorization>-->
+        <c-authorization-container enable-silent-mode></c-authorization-container>
 
-        <c-authorization-container></c-authorization-container>
+        <!--Menu-->
+        <lightning-button-menu alternative-text="Show menu"
+                               icon-name="utility:settings"
+                               variant="border-filled"
+                               onselect={handleMenuOnselect}>
+            <!--Menu Items-->
+            <lightning-menu-item value={menuActions.runAuthFlow}
+                                 label={labels.authorizeOrChangeAuthorizationData}>
+            </lightning-menu-item>
+            <lightning-menu-item value="reauthorizationIsNeeded"
+                                 label={labels.reauthorize}
+                                 disabled>
+            </lightning-menu-item>
+        </lightning-button-menu>
 
-
+        <!--Data-->
         <div class="slds-p-top_large">
             <c-source-org-data-container></c-source-org-data-container>
         </div>
     </div>
-
 </template>

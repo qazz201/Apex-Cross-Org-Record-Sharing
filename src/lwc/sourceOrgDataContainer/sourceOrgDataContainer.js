@@ -4,12 +4,21 @@ import {CurrentPageReference} from 'lightning/navigation';
 import {registerListener, unregisterListener} from 'c/pubsub';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import {isEmptyArray} from 'c/commons';
+
 //Apex
-// import checkAuthorization from '@salesforce/apex/SourceOrgDataContainerController.checkAuthorization';
 import getSourceOrgCustomObjectNames
     from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
 
+//Labels
+import authorizationRequired from '@salesforce/label/c.Auth_Lbl_AuthorizationRequired';
+import pleaseAuthorize from '@salesforce/label/c.Auth_Lbl_PleaseAuthorize';
+import selectCustomObject from '@salesforce/label/c.SourceOrg_Lbl_SelectCustomObject';
+
 const AUTHORIZE_EVENT = 'authorize';
+const ERROR_VARIANT = 'error';
+const ERROR_TITLE = 'Error';
+const WARNING_VARIANT = 'warning';
+const WARNING_TITLE = 'Warning';
 
 export default class SourceOrgDataContainer extends LightningElement {
     @api showContainer = false;
@@ -18,6 +27,12 @@ export default class SourceOrgDataContainer extends LightningElement {
     _options = [];
     selectedObjectName = '';
     showSpinner = false;
+
+    labels = {
+        authorizationRequired,
+        pleaseAuthorize,
+        selectCustomObject,
+    };
 
     @api
     set options(values) {
@@ -48,8 +63,7 @@ export default class SourceOrgDataContainer extends LightningElement {
             this.options = data;
             this.showContainer = true;
         }).catch(error => {
-            console.error('SourceOrgDataContainer ERROR: ', error);
-            return this.showToastNotification('Error', error?.body?.message, 'error');
+            this.handleGetCustomObjectNamesError(error);
         }).finally(() => this.showSpinner = false);
     }
 
@@ -62,6 +76,18 @@ export default class SourceOrgDataContainer extends LightningElement {
         const {value} = event?.detail;
         this.selectedObjectName = value;
         console.log(value)
+    }
+
+    handleGetCustomObjectNamesError(error = {}) {
+        console.error('SourceOrgDataContainer ERROR: ', error);
+
+        const {message} = error?.body;
+        if (message?.toLowerCase()?.includes(this.labels?.authorizationRequired.toLowerCase())) {
+            this.showToastNotification(WARNING_TITLE, message, WARNING_VARIANT);
+            return;
+        }
+
+        this.showToastNotification(ERROR_TITLE, message, ERROR_VARIANT);
     }
 
     showToastNotification(title = '', message = '', variant = 'info') {
