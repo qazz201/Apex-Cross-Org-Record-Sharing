@@ -3,23 +3,23 @@ import {LightningElement, wire} from 'lwc';
 // import {registerListener, unregisterListener} from 'c/pubsub';
 
 //Labels
-import authorizeOrChangeAuthorizationData from '@salesforce/label/c.Auth_Lbl_AuthorizeOrChangeAuthorizationData';
-import reauthorize from '@salesforce/label/c.Auth_Lbl_Reauthorize';
+import authenticateOrChangeAuthData from '@salesforce/label/c.Auth_Lbl_AuthenticateOrChangeAuthData';
+import reauthenticate from '@salesforce/label/c.Auth_Lbl_Reauthenticate';
 
-const AUTHORIZE_EVENT = 'authorize';
+const AUTH_EVENT = 'authenticate';
 const RUN_AUTH_FLOW_ACTION = 'runAuthFlow';
-const REAUTHORIZATION_REQUIRED_ACTION = 'reauthorizationRequired';
+const RE_AUTHENTICATION_REQUIRED_ACTION = 'reAuthenticationRequired';
 
 export default class RecordTransferContainer extends LightningElement {
 
     labels = {
-        authorizeOrChangeAuthorizationData,
-        reauthorize,
+        authenticateOrChangeAuthData,
+        reauthenticate,
     };
 
     menuActions = {
         runAuthFlow: RUN_AUTH_FLOW_ACTION,
-        reauthorizationRequired: REAUTHORIZATION_REQUIRED_ACTION,
+        reAuthenticationRequired: RE_AUTHENTICATION_REQUIRED_ACTION,
     };
 
     handleMenuOnselect(event) {
@@ -27,13 +27,13 @@ export default class RecordTransferContainer extends LightningElement {
         console.log(actionName);
 
         if (actionName === this.menuActions.runAuthFlow) {
-            this.$authorizationContainer?.runAuthorizationFlow();
-        } else if (actionName === this.menuActions.reauthorizationRequired) {
-            console.log('Action: ', REAUTHORIZATION_REQUIRED_ACTION);
+            this.$authenticationContainer?.runAuthorizationFlow();
+        } else if (actionName === this.menuActions.reAuthenticationRequired) {
+            console.log('Action: ', RE_AUTHENTICATION_REQUIRED_ACTION);
         }
     }
 
-    get $authorizationContainer() {
-        return this.template.querySelector('c-authorization-container');
+    get $authenticationContainer() {
+        return this.template.querySelector('c-authentication-container');
     }
 }

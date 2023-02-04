@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Auth_Lbl_AuthorizationRequired</fullName>
+        <fullName>Auth_Lbl_AuthenticationRequired</fullName>
         <categories>Auth</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Authorization required</shortDescription>
-        <value>Authorization required!</value>
+        <shortDescription>Authentication required</shortDescription>
+        <value>Authentication required!</value>
     </labels>
     <labels>
-        <fullName>Auth_Lbl_PleaseAuthorize</fullName>
+        <fullName>Auth_Lbl_PleaseAuthenticate</fullName>
         <categories>Auth</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Please authorize!</shortDescription>
-        <value>Please authorize!</value>
+        <shortDescription>Please authenticate!</shortDescription>
+        <value>Please authenticate!</value>
     </labels>
     <labels>
-        <fullName>Auth_Lbl_AuthorizeOrChangeAuthorizationData</fullName>
+        <fullName>Auth_Lbl_AuthenticateOrChangeAuthData</fullName>
         <categories>Auth</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Authorize or Change Authorization Data</shortDescription>
-        <value>Authorize or Change Authorization Data</value>
+        <shortDescription>Authenticate or Change Auth Data</shortDescription>
+        <value>Authenticate or Change Auth Data</value>
     </labels>
     <labels>
-        <fullName>Auth_Lbl_Reauthorize</fullName>
+        <fullName>Auth_Lbl_Reauthenticate</fullName>
         <categories>Auth</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Reauthorize</shortDescription>
-        <value>Reauthorize</value>
+        <shortDescription>Re-authenticate</shortDescription>
+        <value>Re-authenticate</value>
     </labels>
     <labels>
         <fullName>SourceOrg_Lbl_NoDataToDisplay</fullName>

@@ -10,11 +10,11 @@ import getSourceOrgCustomObjectNames
     from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
 
 //Labels
-import authorizationRequired from '@salesforce/label/c.Auth_Lbl_AuthorizationRequired';
-import pleaseAuthorize from '@salesforce/label/c.Auth_Lbl_PleaseAuthorize';
+import authenticationRequired from '@salesforce/label/c.Auth_Lbl_AuthenticationRequired';
+import pleaseAuthenticate from '@salesforce/label/c.Auth_Lbl_PleaseAuthenticate';
 import selectCustomObject from '@salesforce/label/c.SourceOrg_Lbl_SelectCustomObject';
 
-const AUTHORIZE_EVENT = 'authorize';
+const AUTH_EVENT = 'authenticate';
 const ERROR_VARIANT = 'error';
 const ERROR_TITLE = 'Error';
 const WARNING_VARIANT = 'warning';
@@ -29,8 +29,8 @@ export default class SourceOrgDataContainer extends LightningElement {
     showSpinner = false;
 
     labels = {
-        authorizationRequired,
-        pleaseAuthorize,
+        authenticationRequired,
+        pleaseAuthenticate,
         selectCustomObject,
     };
 
@@ -45,15 +45,16 @@ export default class SourceOrgDataContainer extends LightningElement {
 
     connectedCallback() {
         registerListener(
-            AUTHORIZE_EVENT,
-            this.handleAuthorizationEvent,
+            AUTH_EVENT,
+            this.handleAuthEvent,
             this
         );
+
         this.getCustomObjectNames();
     }
 
     disconnectedCallback() {
-        unregisterListener(AUTHORIZE_EVENT, this.handleAuthorizationEvent, this);
+        unregisterListener(AUTH_EVENT, this.handleAuthEvent, this);
     }
 
     getCustomObjectNames() {
@@ -67,7 +68,7 @@ export default class SourceOrgDataContainer extends LightningElement {
         }).finally(() => this.showSpinner = false);
     }
 
-    handleAuthorizationEvent(params = {}) {
+    handleAuthEvent(params = {}) {
         const {success} = params;
         if (success) this.showContainer = true;
     }
@@ -82,7 +83,7 @@ export default class SourceOrgDataContainer extends LightningElement {
         console.error('SourceOrgDataContainer ERROR: ', error);
 
         const {message} = error?.body;
-        if (message?.toLowerCase()?.includes(this.labels?.authorizationRequired.toLowerCase())) {
+        if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {
             this.showToastNotification(WARNING_TITLE, message, WARNING_VARIANT);
             return;
         }

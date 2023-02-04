@@ -1,9 +1,9 @@
-public with sharing class AuthorizationController {
+public with sharing class AuthenticationController {
 
     @AuraEnabled
-    public static void tryToAuthenticate(String authCode, String clientId, String clientSecret, String callbackUrl) {
+    public static void authorize(String authCode, String clientId, String clientSecret, String callbackUrl) {
         try {
-            AuthManager.sfWebFlowAuthenticate(new Auth.AuthorizationParams(authCode, clientId, clientSecret, callbackUrl));
+            AuthManager.sfWebFlowAuthorize(new Auth.AuthorizationParams(authCode, clientId, clientSecret, callbackUrl));
 
             System.debug(authCode);
             System.debug(clientId);

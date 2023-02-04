@@ -1,9 +1,9 @@
 <!-- Authorization -->
 <template>
     <div class="slds-box slds-color__background_gray-1">
-        <!-- Authorization-->
+        <!-- Authentication-->
         <!--        <c-authorization></c-authorization>-->
-        <c-authorization-container enable-silent-mode></c-authorization-container>
+        <c-authentication-container enable-silent-mode></c-authentication-container>
 
         <!--Menu-->
         <lightning-button-menu alternative-text="Show menu"
@@ -12,10 +12,10 @@
                                onselect={handleMenuOnselect}>
             <!--Menu Items-->
             <lightning-menu-item value={menuActions.runAuthFlow}
-                                 label={labels.authorizeOrChangeAuthorizationData}>
+                                 label={labels.authenticateOrChangeAuthData}>
             </lightning-menu-item>
-            <lightning-menu-item value="reauthorizationIsNeeded"
-                                 label={labels.reauthorize}
+            <lightning-menu-item value={menuActions.reAuthenticationRequired}
+                                 label={labels.reauthenticate}
                                  disabled>
             </lightning-menu-item>
         </lightning-button-menu>

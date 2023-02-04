@@ -35,7 +35,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>AuthorizationWindow</targetReference>
+            <targetReference>AuthWindow</targetReference>
         </connector>
     </assignments>
     <choices>
@@ -68,6 +68,7 @@
             <stringValue>https://test.salesforce.com/</stringValue>
         </value>
     </constants>
+    <environments>Default</environments>
     <interviewLabel>Record Transfer Authorization Flow {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Record Transfer Authorization Flow</label>
     <processMetadataValues>
@@ -90,12 +91,12 @@
     </processMetadataValues>
     <processType>Flow</processType>
     <screens>
-        <name>AuthorizationWindow</name>
-        <label>Authorization Window</label>
+        <name>AuthWindow</name>
+        <label>Authentication Window</label>
         <locationX>176</locationX>
         <locationY>518</locationY>
         <allowBack>true</allowBack>
-        <allowFinish>true</allowFinish>
+        <allowFinish>false</allowFinish>
         <allowPause>false</allowPause>
         <fields>
             <name>AuthorizeComponent</name>
@@ -103,8 +104,8 @@
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
-            <name>AuthorizationComponent</name>
-            <extensionName>c:authorization</extensionName>
+            <name>AuthenticationComponent</name>
+            <extensionName>c:authentication</extensionName>
             <fieldType>ComponentInstance</fieldType>
             <inputParameters>
                 <name>callbackUrl</name>
@@ -226,7 +227,7 @@
             <targetReference>CreateParentConnectedApp</targetReference>
         </connector>
     </start>
-    <status>Draft</status>
+    <status>Active</status>
     <variables>
         <name>callbackUrl</name>
         <dataType>String</dataType>

@@ -22,10 +22,10 @@ public abstract with sharing class Auth {
     protected abstract String getRefreshTokenEndpoint();
 
     /**
-   *  @description authenticate via params from custom settings or passed auth params
+   *  @description authorize via params from custom settings (by using clientId and clientSecret and authCode) or passed auth params
    *  reauthorization is supported
    */
-    public virtual void authenticate() {
+    public virtual void authorize() {
         this.calloutClient.clearAllHeaders();
         calloutClient.setEndpoint(this.getAccessTokenEndpoint());
         HttpResponse response = calloutClient.post();

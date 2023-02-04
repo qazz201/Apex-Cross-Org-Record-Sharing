@@ -3,31 +3,31 @@ import {CurrentPageReference} from 'lightning/navigation';
 import {registerListener, unregisterListener} from 'c/pubsub';
 
 //Labels
-import authorizeOrChangeAuthorizationData from '@salesforce/label/c.Auth_Lbl_AuthorizeOrChangeAuthorizationData';
+import authenticateOrChangeAuthData from '@salesforce/label/c.Auth_Lbl_AuthenticateOrChangeAuthData';
 
-const AUTHORIZE_EVENT = 'authorize';
-const AUTHORIZATION_FLOWAPI_NAME = 'RecordTransferAuthorizationFlow';
+const AUTH_EVENT = 'authenticate';
+const AUTHORIZATION_FLOW_API_NAME = 'RecordTransferAuthorizationFlow';
 
-export default class AuthorizationContainer extends LightningElement {
+export default class AuthenticationContainer extends LightningElement {
     @api enableSilentMode = false;
     @wire(CurrentPageReference) pageRef; // Required by pubsub
 
     labels = {
-        authorizeOrChangeAuthorizationData,
+        authenticateOrChangeAuthData,
     };
 
-    authorizationFlowApiName = AUTHORIZATION_FLOWAPI_NAME;
+    authorizationFlowApiName = AUTHORIZATION_FLOW_API_NAME;
 
     connectedCallback() {
         registerListener(
-            AUTHORIZE_EVENT,
-            this.handleAuthorization,
+            AUTH_EVENT,
+            this.handleAuthentication,
             this
         );
     }
 
     disconnectedCallback() {
-        unregisterListener(AUTHORIZE_EVENT, this.handleAuthorization, this);
+        unregisterListener(AUTH_EVENT, this.handleAuthentication, this);
     }
 
     @api runAuthorizationFlow() {
@@ -38,7 +38,7 @@ export default class AuthorizationContainer extends LightningElement {
         this.template.querySelector('c-modal-window')?.closeModal();
     }
 
-    handleAuthorization(params = {}) {
+    handleAuthentication(params = {}) {
         const {success} = params;
         console.log('AUTHORIZE_SUCCESS??_ ', success);
         console.log('PUBSUB CATCH EVENT??_ ', JSON.stringify(params));

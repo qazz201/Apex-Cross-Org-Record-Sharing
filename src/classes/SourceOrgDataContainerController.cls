@@ -1,17 +1,17 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
-    private static ICallout calloutClient = new CalloutClient();
+//    private static ICallout calloutClient = new CalloutClient();
 
 //    private static final String AUTHORIZATION_REQUIRED_MSG = Label.AuthAuthorizationRequired;
 
 //    @AuraEnabled
 //    public static Boolean checkAuthorization() {
-//        return hadUserAlreadyAuthorized();
+//        return hadUserAlreadyAuthenticated();
 //    }
 
     @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
-        if (!hadUserAlreadyAuthorized()) {
-            throw new AuraHandledException(Label.Auth_Lbl_AuthorizationRequired);
+        if (!hadUserAlreadyAuthenticated()) {
+            throw new AuraHandledException(Label.Auth_Lbl_AuthenticationRequired);
         }
         List<String> customObjectNames = new List<String>();
 
@@ -25,7 +25,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         return customObjectNames;
     }
 
-    private static Boolean hadUserAlreadyAuthorized() {
+    private static Boolean hadUserAlreadyAuthenticated() {
         return String.isNotBlank(getAuthDefaultSetting(RecordTransferSettings__c.AuthorizationCode__c))
                 && String.isNotBlank(getAuthDefaultSetting(RecordTransferSettings__c.Client_Id__c))
                 && String.isNotBlank(getAuthDefaultSetting(RecordTransferSettings__c.ClientSecret__c))
@@ -48,7 +48,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
 
 //    public class Authorization {
 //        @AuraEnabled
-//        public Boolean hadUserAlreadyAuthorized { get; set; }
+//        public Boolean hadUserAlreadyAuthenticated { get; set; }
 //        @AuraEnabled
 //        public Boolean doesAuthCodeValid { get; set; }
 //        @AuraEnabled

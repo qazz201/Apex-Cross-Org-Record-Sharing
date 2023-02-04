@@ -6,13 +6,13 @@ import {isEmptyString, isEmptyArray} from 'c/commons';
 import {fireEvent} from 'c/pubsub';
 
 //Apex
-import tryToAuthenticate from '@salesforce/apex/AuthorizationController.tryToAuthenticate';
+import tryToAuthorize from '@salesforce/apex/AuthenticationController.authorize';
 
 const AUTH_CODE = 'code';
-const AUTHORIZE_EVENT = 'authorize';
+const AUTH_EVENT = 'authenticate';
 const AUTHORIZATION_PATH = 'services/oauth2/authorize';
 
-export default class Authorization extends LightningElement {
+export default class Authentication extends LightningElement {
     @wire(CurrentPageReference) pageRef; // Required by pubsub
     //authUrl = 'https://login.salesforce.com/services/oauth2/authorize?client_id=3MVG9vvlaB0y1YsLh_esB2JsdW0GXbrlIkGLkYDI51JVZ8s2zdsSOjnhh3ubBeI0qLO1La.MJiwD6uj88vUeX&response_type=code&redirect_uri=https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/TransferRecordsFromAnotherOrg';
     @api clientId = '';
@@ -58,15 +58,15 @@ export default class Authorization extends LightningElement {
         this.clearIntervals();
 
         if (!this.authCode || isEmptyString(this.authCode)) {
-            this.handleFailedAuthorization();
+            this.handleFailedAuthentication();
             return;
         }
 
-        this.handleSuccessfulAuthorization();
+        this.handleSuccessfulAuthentication();
     }
 
-    handleSuccessfulAuthorization() {
-        tryToAuthenticate({
+    handleSuccessfulAuthentication() {
+        tryToAuthorize({
             authCode: this.authCode,
             clientId: this.clientId,
             clientSecret: this.clientSecret,
@@ -75,7 +75,7 @@ export default class Authorization extends LightningElement {
             console.log('Connected app data saved!')
             const eventParams = {...this.defaultAuthEventDetail, success: true};
 
-            fireEvent(this.pageRef, AUTHORIZE_EVENT, eventParams);
+            fireEvent(this.pageRef, AUTH_EVENT, eventParams);
             this.dispatchAuthorizationEvent(eventParams);
             this.showToastNotification('Authorization is successful', '', 'success');
         }).catch(exception => {
@@ -85,9 +85,9 @@ export default class Authorization extends LightningElement {
         })
     }
 
-    handleFailedAuthorization() {
+    handleFailedAuthentication() {
         this.dispatchAuthorizationEvent(this.defaultAuthEventDetail);
-        fireEvent(this.pageRef, AUTHORIZE_EVENT, this.defaultAuthEventDetail);
+        fireEvent(this.pageRef, AUTH_EVENT, this.defaultAuthEventDetail);
         //TODO: Show Error
     }
 
@@ -106,7 +106,7 @@ export default class Authorization extends LightningElement {
     }
 
     dispatchAuthorizationEvent(detail = {}) {
-        this.dispatchEvent(new CustomEvent(AUTHORIZE_EVENT, {detail}));
+        this.dispatchEvent(new CustomEvent(AUTH_EVENT, {detail}));
     }
 
     trackWindowLocationChange() {
@@ -149,6 +149,7 @@ export default class Authorization extends LightningElement {
             const errorMsg = `Please give the next information: Environment URL,Client Id,Callback URL.
              Your values are: Environment URL- ${this.environmentUrl}, Client Id- ${this.clientId}, Callback URL- ${this.callbackUrl}`;
             throw new Error(errorMsg);
+            // todo: SHOW TOAST ERROR
         }
 
         this.validateEnvironmentUrl();
