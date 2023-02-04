@@ -6,9 +6,13 @@
                                  onchange={handleSelectObjectName}>
 
             </c-object-names-list>
-            <c-source-org-records class="slds-p-around_medium"
-                                  object-name={selectedObjectName}>
-            </c-source-org-records>
+
+            <!--Records Related List-->
+            <template if:true={selectedObjectName}>
+                <c-source-org-records class="slds-p-around_medium"
+                                      object-name={selectedObjectName}>
+                </c-source-org-records>
+            </template>
         </template>
 
         <!--Spinner-->

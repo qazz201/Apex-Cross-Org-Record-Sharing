@@ -1,32 +1,31 @@
 <template>
-    <div class="slds-is-relative">
-        <div class="slds-text-heading_medium slds-text-align_center">
-            Records
+    <lightning-card variant="Narrow" title="Records" icon-name="standard:related_list">
+        <!--Table Header Panel-->
+        <div class="slds-p-left_medium">
+            <c-datatable-header-panel
+                    visible-records-count={visibleRecordsCount}
+                    visible-columns-count={visibleColumnsCount}
+                    forbid-records-copy-action={forbidRecordsCopyAction}
+                    forbid-search={areRecordsEmpty}
+                    onvisiblerecordschange={handleVisibleRecordsChange}
+                    onvisiblecolumnschange={handleVisibleColumnsChange}>
+            </c-datatable-header-panel>
         </div>
 
-        <!--Table Header Panel-->
-        <c-datatable-header-panel
-                visible-records-count={visibleRecordsCount}
-                visible-columns-count={visibleColumnsCount}
-                forbid-records-copy-action={forbidRecordsCopyAction}
-                forbid-search={areRecordsEmpty}
-                onvisiblerecordschange={handleVisibleRecordsChange}
-                onvisiblecolumnschange={handleVisibleColumnsChange}>
-        </c-datatable-header-panel>
-
         <!--Table-->
-        <lightning-datatable
-                key-field="id"
-                data={records}
-                columns={columns}
-                show-row-number-column
-                onrowselection={handleRowSelection}>
-        </lightning-datatable>
-
-        <!--Spinner-->
-        <template if:true={showSpinner}>
-            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
-        </template>
+        <div class="slds-is-relative slds-p-around_medium">
+            <lightning-datatable
+                    key-field="id"
+                    data={records}
+                    columns={columns}
+                    show-row-number-column
+                    onrowselection={handleRowSelection}>
+            </lightning-datatable>
+            <!--Spinner-->
+            <template if:true={showSpinner}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+        </div>
 
         <!--No Records-->
         <template if:true={areRecordsEmpty}>
@@ -34,5 +33,42 @@
                 No data to display
             </div>
         </template>
-    </div>
+    </lightning-card>
+
+    <!--    <div class="slds-is-relative">-->
+    <!--        <div class="slds-text-heading_medium slds-text-align_center">-->
+    <!--            Records-->
+    <!--        </div>-->
+
+    <!--        &lt;!&ndash;Table Header Panel&ndash;&gt;-->
+    <!--        <c-datatable-header-panel-->
+    <!--                visible-records-count={visibleRecordsCount}-->
+    <!--                visible-columns-count={visibleColumnsCount}-->
+    <!--                forbid-records-copy-action={forbidRecordsCopyAction}-->
+    <!--                forbid-search={areRecordsEmpty}-->
+    <!--                onvisiblerecordschange={handleVisibleRecordsChange}-->
+    <!--                onvisiblecolumnschange={handleVisibleColumnsChange}>-->
+    <!--        </c-datatable-header-panel>-->
+
+    <!--        &lt;!&ndash;Table&ndash;&gt;-->
+    <!--        <lightning-datatable-->
+    <!--                key-field="id"-->
+    <!--                data={records}-->
+    <!--                columns={columns}-->
+    <!--                show-row-number-column-->
+    <!--                onrowselection={handleRowSelection}>-->
+    <!--        </lightning-datatable>-->
+
+    <!--        &lt;!&ndash;Spinner&ndash;&gt;-->
+    <!--        <template if:true={showSpinner}>-->
+    <!--            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>-->
+    <!--        </template>-->
+
+    <!--        &lt;!&ndash;No Records&ndash;&gt;-->
+    <!--        <template if:true={areRecordsEmpty}>-->
+    <!--            <div class="slds-text-heading_medium slds-text-align_center">-->
+    <!--                No data to display-->
+    <!--            </div>-->
+    <!--        </template>-->
+    <!--    </div>-->
 </template>
