@@ -8,6 +8,9 @@ import {fireEvent} from 'c/pubsub';
 //Apex
 import tryToAuthorize from '@salesforce/apex/AuthenticationController.authorize';
 
+//Labels
+import authenticationSuccessful from '@salesforce/label/c.Auth_Lbl_AuthenticationSuccessful';
+
 const AUTH_CODE = 'code';
 const AUTH_EVENT = 'authenticate';
 const AUTHORIZATION_PATH = 'services/oauth2/authorize';
@@ -21,15 +24,16 @@ export default class Authentication extends LightningElement {
     @api environmentUrl = 'https://login.salesforce.com'; // production or sandbox
 
     // @api autoLaunchAuthorization = false;
-    /**
-     * @description To silently get new auth code(if needed) and also check if user already authorized
-     */ 
-    @api silentAuthorization = false;
+    // /**
+    //  * @description To silently get new auth code(if needed) and also check if user already authorized
+    //  */ 
+    // @api silentAuthorization = false;
 
     authCode = ''; //extracted from url
     authWindow;
     intervalIds = [];
     defaultAuthEventDetail = {success: false};
+    labels = {authenticationSuccessful,};
 
     disconnectedCallback() {
         if (isEmptyArray(this.intervalIds)) return;
@@ -77,18 +81,18 @@ export default class Authentication extends LightningElement {
 
             fireEvent(this.pageRef, AUTH_EVENT, eventParams);
             this.dispatchAuthorizationEvent(eventParams);
-            this.showToastNotification('Authorization is successful', '', 'success');
+            this.showToastNotification(this.labels?.authenticationSuccessful, '', 'success');
         }).catch(exception => {
-            console.log('ERROR__ ', exception);
-            console.log('ERROR__ msg ', exception?.body?.message);
-            this.showToastNotification('Error', exception?.body?.message, 'error');
+            this.handleFailedAuthentication(exception?.body?.message)
         })
     }
 
-    handleFailedAuthentication() {
+    handleFailedAuthentication(errorMessage = '') {
+        console.error('Failed Authentication error: ', errorMessage);
+
         this.dispatchAuthorizationEvent(this.defaultAuthEventDetail);
         fireEvent(this.pageRef, AUTH_EVENT, this.defaultAuthEventDetail);
-        //TODO: Show Error
+        errorMessage && this.showToastNotification('Error', errorMessage, 'error');
     }
 
     handleChangeWindowLocation(urlSearchParams = '') {
@@ -161,7 +165,4 @@ export default class Authentication extends LightningElement {
             & !isEmptyString(this.clientId)
             & !isEmptyString(this.callbackUrl);
     }
-
-    // Silent Authorization
-
 }

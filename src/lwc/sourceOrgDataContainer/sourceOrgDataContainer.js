@@ -68,6 +68,7 @@ export default class SourceOrgDataContainer extends LightningElement {
         }).finally(() => this.showSpinner = false);
     }
 
+    //TODO: Use platform event to handle successful Authentication !!!!!!!!!!!!
     handleAuthEvent(params = {}) {
         const {success} = params;
         if (success) this.showContainer = true;
