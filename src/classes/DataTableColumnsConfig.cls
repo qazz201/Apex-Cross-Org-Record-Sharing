@@ -11,7 +11,7 @@ public with sharing class DataTableColumnsConfig {
     public Map<String, Object> typeAttributes { get; set; }
 
     public DataTableColumnsConfig() {
-        this.type = 'text';
+        this.type = Constants.DataTable.TEXT_TYPE;
     }
 
     public class Builder {
@@ -45,13 +45,4 @@ public with sharing class DataTableColumnsConfig {
             return this;
         }
     }
-
-//    public class ColumnItem {
-//        @AuraEnabled
-//        public String label { get; set; }
-//        @AuraEnabled
-//        public String fieldName { get; set; }
-//        @AuraEnabled
-//        public String type { get; set; }
-//    }
 }

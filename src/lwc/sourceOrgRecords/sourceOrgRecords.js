@@ -7,6 +7,7 @@ import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.
 
 //Labels
 import noDataToDisplay from '@salesforce/label/c.SourceOrg_Lbl_NoDataToDisplay';
+import sourceOrgRecords from '@salesforce/label/c.SourceOrg_Lbl_Records';
 
 //Constants
 const DEFAULT_VISIBLE_RECORDS = 20;
@@ -24,7 +25,8 @@ export default class SourceOrgRecords extends LightningElement {
     selectedRows = [];
     _objectName = '';
     labels = {
-        noDataToDisplay
+        noDataToDisplay,
+        sourceOrgRecords
     }
 
     @api set objectName(value) {

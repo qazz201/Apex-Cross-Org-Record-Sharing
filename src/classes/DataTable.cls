@@ -3,8 +3,6 @@ public with sharing class DataTable {
     private Integer visibleColumns;
     private String sourceOrgUrl;
 
-    private final Integer INITIAL_COLUMN_WIDTH = 200;
-
     private Set<String> requiredColumnsInTable = new Set<String>{
             'Id', 'Name'
     };
@@ -98,17 +96,17 @@ public with sharing class DataTable {
         DataTableColumnsConfig.Builder config = new DataTableColumnsConfig.Builder()
                 .setFieldName(fieldName)
                 .setLabel(fieldName)
-                .setInitialWidth(INITIAL_COLUMN_WIDTH);
+                .setInitialWidth(Constants.DataTable.INITIAL_COLUMN_WIDTH);
 
         //TODO: delete?
         if (fieldName == 'Name') {
-            config.setType('url')
+            config.setType(Constants.DataTable.URL_TYPE)
                     .setTypeAttributes(
                             new Map<String, Object>{
-                                    'label' => new Map<String, String>{
-                                            'fieldName' => fieldName
+                                    Constants.DataTable.LABEL_ATTRIBUTE => new Map<String, String>{
+                                            Constants.DataTable.FIELD_NAME => fieldName
                                     },
-                                    'target' => '_blank'
+                                    Constants.DataTable.TARGET_ATTRIBUTE => Constants.DataTable.TARGET_BLANC
                             }
                     );//typeAttributes: {label: { fieldName: 'Name' }, target: '_blank'} },
         }

@@ -1,8 +1,8 @@
 public with sharing class SfWebFlowAuthProvider extends Auth {
     // private final String AUTHORIZATION_ENDPOINT = 'https://login.salesforce.com/services/oauth2/authorize';
-    private final String TOKEN_ROOT_ENDPOINT = 'https://login.salesforce.com/services/oauth2/token';
-    private final String GRANT_TYPE_AUTH_CODE = 'authorization_code';
-    private final String GRANT_TYPE_REFRESH_TOKEN = 'refresh_token';
+//    private final String TOKEN_ROOT_ENDPOINT = 'https://login.salesforce.com/services/oauth2/token';
+//    private final String GRANT_TYPE_AUTH_CODE = 'authorization_code';
+//    private final String GRANT_TYPE_REFRESH_TOKEN = 'refresh_token';
 
     public SfWebFlowAuthProvider(String authorizationCode, ICallout calloutClient) {
         super(authorizationCode, calloutClient);
@@ -15,13 +15,17 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
     public SfWebFlowAuthProvider(ICallout calloutClient) {
         super(calloutClient);
     }
-    
+
     protected override String getAccessTokenEndpoint() {
         return this.getResultEndpointUrl(
                 this.getTokenUrlParams(
                         new Map<String, String>{
-                                '&grant_type=' => this.GRANT_TYPE_AUTH_CODE,
-                                '&code=' => this.getAuthorizationCode()
+                                Constants.Auth.AMPERSAND_SIGN
+                                        + Constants.Auth.GRANT_TYPE
+                                        + Constants.Auth.EQUAL_SIGN => Constants.Auth.AUTHORIZATION_CODE,//'&grant_type='this.GRANT_TYPE_AUTH_CODE,
+                                Constants.Auth.AMPERSAND_SIGN
+                                        + Constants.Auth.CODE
+                                        + Constants.Auth.EQUAL_SIGN => this.getAuthorizationCode() //'&code='// TODO: CHANGE getAuthorizationCode to authentication
                         }
                 )
         );
@@ -31,8 +35,12 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         return this.getResultEndpointUrl(
                 this.getTokenUrlParams(
                         new Map<String, String>{
-                                '&grant_type=' => this.GRANT_TYPE_REFRESH_TOKEN,
-                                '&refresh_token=' => this.getRefreshToken()
+                                Constants.Auth.AMPERSAND_SIGN
+                                        + Constants.Auth.GRANT_TYPE
+                                        + Constants.Auth.EQUAL_SIGN => Constants.Auth.REFRESH_TOKEN,//'&grant_type=' this.GRANT_TYPE_REFRESH_TOKEN,
+                                Constants.Auth.AMPERSAND_SIGN
+                                        + Constants.Auth.REFRESH_TOKEN
+                                        + Constants.Auth.EQUAL_SIGN => this.getRefreshToken() //'&refresh_token='
                         }
                 )
         );
@@ -40,9 +48,15 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
 
     private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
         Map<String, String> defaultTokenUrlParams = new Map<String, String>{
-                '?client_id=' => this.getClientId(),
-                '&client_secret=' => this.getClientSecret(),
-                '&redirect_uri=' => this.getCallbackUrl()
+                Constants.Auth.QUESTION_SIGN
+                        + Constants.Auth.CLIENT_ID
+                        + Constants.Auth.EQUAL_SIGN => this.getClientId(), // '?client_id='
+                Constants.Auth.AMPERSAND_SIGN
+                        + Constants.Auth.CLIENT_SECRET
+                        + Constants.Auth.EQUAL_SIGN => this.getClientSecret(),// '&client_secret='
+                Constants.Auth.AMPERSAND_SIGN
+                        + Constants.Auth.REDIRECT_URI
+                        + Constants.Auth.EQUAL_SIGN => this.getCallbackUrl() // '&redirect_uri='
         };
         defaultTokenUrlParams.putAll(specificUrlParams);
         return defaultTokenUrlParams;
@@ -55,7 +69,7 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         for (String urlKey : urlParams.keySet()) {
             combinedUrlParams += urlKey + urlParams.get(urlKey);
         }
-        return this.TOKEN_ROOT_ENDPOINT + combinedUrlParams;
+        return Constants.Auth.TOKEN_ENDPOINT + combinedUrlParams;
     }
 
     public class SfWebFlowAuthProviderException extends Exception {

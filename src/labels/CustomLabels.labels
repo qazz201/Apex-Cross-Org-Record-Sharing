@@ -7,7 +7,7 @@
         <protected>true</protected>
         <shortDescription>Authentication required</shortDescription>
         <value>Authentication required!</value>
-    </labels>    
+    </labels>
     <labels>
         <fullName>Auth_Lbl_AuthenticationSuccessful</fullName>
         <categories>Auth</categories>
@@ -79,5 +79,13 @@
         <protected>true</protected>
         <shortDescription>Select rows</shortDescription>
         <value>Select rows</value>
+    </labels>
+    <labels>
+        <fullName>SourceOrg_Lbl_Records</fullName>
+        <categories>SourceOrg</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source Records</shortDescription>
+        <value>Source Records</value>
     </labels>
 </CustomLabels>

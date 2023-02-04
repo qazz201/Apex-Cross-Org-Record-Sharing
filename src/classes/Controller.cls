@@ -15,5 +15,4 @@ public virtual with sharing class Controller {
         );
         return calloutClient;
     }
-
 }

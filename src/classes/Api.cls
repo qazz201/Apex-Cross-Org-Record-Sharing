@@ -4,8 +4,8 @@ public abstract with sharing class Api {
     protected String endpointApiUrl;
 
     protected final String CUSTOM_FIELD_POSTFIX = '__c';
-    protected final String AUTHORIZATION = 'Authorization';
-    protected final String BEARER = 'Bearer ';
+//    protected final String AUTHORIZATION = 'Authorization';
+//    protected final String BEARER = 'Bearer ';
 
     public Api(ICallout calloutClient) {
         this.calloutClient = calloutClient;
@@ -54,7 +54,7 @@ public abstract with sharing class Api {
         Auth.RefreshTokenResponse refreshedToken = this.authProvider.getNewAccessToken();
 
         this.calloutClient.clearAllHeaders();
-        this.calloutClient.setHeader(this.AUTHORIZATION, this.BEARER + refreshedToken.access_token);
+        this.calloutClient.setHeader(Constants.Auth.AUTHORIZATION_HEADER, Constants.Auth.BEARER_HEADER + refreshedToken.access_token);
         HttpResponse response = this.executeGetCallout(resourceEndpoint);
 
         //update access_token after callout
