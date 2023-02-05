@@ -12,7 +12,6 @@ public with sharing class DataTable {
     };
 
     public DataTable(List<Map<String, Object>> recordsAsMap, Integer visibleColumns) {
-        if (Lists.isEmpty(recordsAsMap) || visibleColumns == 0) return;
         this.recordsAsMap = recordsAsMap;
         this.visibleColumns = visibleColumns;
         this.sourceOrgUrl = RecordTransferCustomSettingService.getOrgDefaultSettingValueByName(RecordTransferSettings__c.Instance_Url__c);
@@ -20,11 +19,12 @@ public with sharing class DataTable {
 
     public Table build() {
         Table table = new Table();
+        if (Lists.isEmpty(this.recordsAsMap) || this.visibleColumns == 0) return table;
+
         table.columns = this.createColumnsConfig();
         table.data = this.filterRecordFieldsByConfig(table.columns);
 
-        System.debug('DATATABLE___');
-        System.debug(table);
+        System.debug('Datatable.build() result: ' + table);
         return table;
     }
 
@@ -108,10 +108,9 @@ public with sharing class DataTable {
                                     },
                                     Constants.DataTable.TARGET_ATTRIBUTE => Constants.DataTable.TARGET_BLANC
                             }
-                    );//typeAttributes: {label: { fieldName: 'Name' }, target: '_blank'} },
+                    ); //typeAttributes: {label: { fieldName: 'Name' }, target: '_blank'} },
         }
         return config.build();
-
     }
 
     public class Table {

@@ -104,7 +104,7 @@ public abstract with sharing class Auth {
         return String.isNotBlank(currentCallbackUrl) ? currentCallbackUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.RedirectUri__c;
     }
 
-    protected virtual void reauthorize() {
+    protected virtual void reauthorize() { // TODO:Add counter for Reauth
         RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
         this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
         RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);

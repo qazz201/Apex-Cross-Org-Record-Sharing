@@ -14,6 +14,13 @@ public with sharing class Constants {
         set;
     }
 
+    public static Api Api {
+        get {
+            return Api == null ? Api = new Api() : Api;
+        }
+        set;
+    }
+
     public class Auth {
         private Auth() {
         }
@@ -31,6 +38,17 @@ public with sharing class Constants {
         public final String CLIENT_SECRET = 'client_secret';
         public final String REDIRECT_URI = 'redirect_uri';
     }
+
+    public class Api {
+        private Api() {
+        }
+        public final String TOOLING_API_ROOT_PATH = '/services/data/v56.0/tooling/';
+        public final String QUERY_API_ROOT_PATH = '/services/data/v56.0/query/?q=';
+        public final String QUERY_PATH = 'query/?q=';
+        public final String QUERY_CUSTOM_OBJECT_NAMES = 'SELECT+DeveloperName+from+CustomObject';
+        public final String QUERY_OBJECT_BY_NAME_WITH_ALL_FIELDS = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
+    }
+
 
     public class Datatable {
         private Datatable() {

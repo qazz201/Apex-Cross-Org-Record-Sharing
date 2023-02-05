@@ -42,7 +42,7 @@ export default class SourceOrgRecords extends LightningElement {
         this.showSpinner = true;
 
         getDatatableDataConfig({
-            objectName: 'Contact',//this.objectName, //'Contact', //TODO: DELETE HARDCODE
+            objectName: this.objectName, //'Contact', //TODO: DELETE HARDCODE
             visibleRecords: this.visibleRecordsCount,
             visibleColumns: this.visibleColumnsCount,
         }).then(response => {
@@ -51,7 +51,7 @@ export default class SourceOrgRecords extends LightningElement {
             this.records = data;
         }).catch(err => {
             console.error('SourceOrgRecords Error: ', err);
-            this.showToastNotification('Error', err?.body?.message, 'error');
+            this.showToastNotification('Error', err?.body?.message?.replaceAll(/[{}]/gi,''), 'error');
         }).finally(() => this.showSpinner = false);
     }
 

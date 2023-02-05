@@ -1,10 +1,6 @@
 public with sharing class QueryApiService extends Api {
     private static QueryApiService instance;
-    // Path
-    private final String QUERY_API_ROOT_PATH = '/services/data/v56.0/query/?q=';
-
-    // Default query
-    private final String QUERY_OBJECT_BY_NAME = 'SELECT+FIELDS(ALL)+FROM+{0}+LIMIT+{1}';
+    
     private Integer DEFAULT_QUERY_LIMIT = 200;
 
     public QueryApiService(ICallout calloutClient) {
@@ -16,7 +12,7 @@ public with sharing class QueryApiService extends Api {
     }
 
     protected override String getApiPath() {
-        return this.QUERY_API_ROOT_PATH;
+        return Constants.Api.QUERY_API_ROOT_PATH;
     }
 
     /**
@@ -121,7 +117,7 @@ public with sharing class QueryApiService extends Api {
 
     private String getFormattedQueryPath(String objectName, Integer limitCount) {
         return this.getEndpointPath(
-                String.format(this.QUERY_OBJECT_BY_NAME, new List<Object>{
+                String.format(Constants.Api.QUERY_OBJECT_BY_NAME_WITH_ALL_FIELDS, new List<Object>{
                         objectName, limitCount
                 })
         );

@@ -1,12 +1,4 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
-//    private static ICallout calloutClient = new CalloutClient();
-
-//    private static final String AUTHORIZATION_REQUIRED_MSG = Label.AuthAuthorizationRequired;
-
-//    @AuraEnabled
-//    public static Boolean checkAuthorization() {
-//        return hadUserAlreadyAuthenticated();
-//    }
 
     @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
@@ -18,7 +10,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         try {
             customObjectNames = new SourceOrgApi(new SfWebFlowAuthProvider(getCalloutClient())).getCustomObjectNames();
         } catch (Exception ex) {
-            System.debug('ERRR__ ' + ex);
+            System.debug('ERROR_SourceOrgDataContainerController.getSourceOrgCustomObjectNames(): ' + ex.getStackTraceString());
             throw new AuraHandledException(ex.getMessage());
         }
 
@@ -45,13 +37,4 @@ public with sharing class SourceOrgDataContainerController extends Controller {
             this.accessToken = accessToken;
         }
     }
-
-//    public class Authorization {
-//        @AuraEnabled
-//        public Boolean hadUserAlreadyAuthenticated { get; set; }
-//        @AuraEnabled
-//        public Boolean doesAuthCodeValid { get; set; }
-//        @AuraEnabled
-//        public Boolean doesAccessTokenValid { get; set; }
-//    }
 }

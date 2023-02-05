@@ -1,13 +1,6 @@
 public with sharing class ToolingApiService extends Api {
     private static ToolingApiService instance;
 
-    // Paths
-    private final String TOOLING_API_ROOT_PATH = '/services/data/v56.0/tooling/';
-    private final String QUERY_PATH = 'query/?q=';
-
-    // Default query
-    private final String QUERY_CUSTOM_OBJECT_NAMES = 'SELECT+DeveloperName+from+CustomObject';
-
     public ToolingApiService(ICallout calloutClient) {
         super(calloutClient);
     }
@@ -17,7 +10,7 @@ public with sharing class ToolingApiService extends Api {
     }
 
     protected override String getApiPath() {
-        return this.TOOLING_API_ROOT_PATH;
+        return Constants.Api.TOOLING_API_ROOT_PATH;
     }
 
     /**
@@ -35,7 +28,7 @@ public with sharing class ToolingApiService extends Api {
     */
     public List<String> getCustomObjectNames() {
         List<String> names = new List<String>();
-        String pathCustomObjectQuery = this.getEndpointPath(this.QUERY_PATH + this.QUERY_CUSTOM_OBJECT_NAMES);
+        String pathCustomObjectQuery = this.getEndpointPath(Constants.Api.QUERY_PATH + Constants.Api.QUERY_CUSTOM_OBJECT_NAMES);
         HttpResponse response = this.executeGetCallout(pathCustomObjectQuery);
 
         if (response == null || response.getBody() == null) {
@@ -45,6 +38,7 @@ public with sharing class ToolingApiService extends Api {
         }
 
         for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
+            if (record.DeveloperName.contains(this.CUSTOM_FIELD_POSTFIX)) continue;
             names.add(record.DeveloperName + this.CUSTOM_FIELD_POSTFIX);
         }
 

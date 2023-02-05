@@ -1,8 +1,4 @@
 public with sharing class SfWebFlowAuthProvider extends Auth {
-    // private final String AUTHORIZATION_ENDPOINT = 'https://login.salesforce.com/services/oauth2/authorize';
-//    private final String TOKEN_ROOT_ENDPOINT = 'https://login.salesforce.com/services/oauth2/token';
-//    private final String GRANT_TYPE_AUTH_CODE = 'authorization_code';
-//    private final String GRANT_TYPE_REFRESH_TOKEN = 'refresh_token';
 
     public SfWebFlowAuthProvider(String authorizationCode, ICallout calloutClient) {
         super(authorizationCode, calloutClient);

@@ -13,11 +13,10 @@ public with sharing class SourceOrgApi {
         return this.restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount);
     }
 
-    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns) { //List<Map<String, Object>>
+    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns) {
         List<Map<String, Object>> recordsAsMap = this.restApiManager.queryApi().getRecordsAsMap(objectName, limitCount);
         return new DataTable(recordsAsMap, visibleColumns).build();
     }
-
 }
 
 

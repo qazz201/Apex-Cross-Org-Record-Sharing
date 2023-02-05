@@ -4,8 +4,6 @@ public abstract with sharing class Api {
     protected String endpointApiUrl;
 
     protected final String CUSTOM_FIELD_POSTFIX = '__c';
-//    protected final String AUTHORIZATION = 'Authorization';
-//    protected final String BEARER = 'Bearer ';
 
     public Api(ICallout calloutClient) {
         this.calloutClient = calloutClient;
@@ -39,6 +37,7 @@ public abstract with sharing class Api {
         if (response.getStatusCode() == 400) {
             //400 "expired access/refresh token"
             System.debug('HANDLE STATUS CODE_ CODE=400');
+            throw new ApiException(response.getBody());
             //TODO: create handler
         } else if (response.getStatusCode() == 401) {
             //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
