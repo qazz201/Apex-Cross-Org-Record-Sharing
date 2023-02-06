@@ -28,7 +28,9 @@ public with sharing class ToolingApiService extends Api {
     */
     public List<String> getCustomObjectNames() {
         List<String> names = new List<String>();
-        String pathCustomObjectQuery = this.getEndpointPath(Constants.Api.QUERY_PATH + Constants.Api.QUERY_CUSTOM_OBJECT_NAMES);
+        RestQueryBuilder queryBuilder = new RestQueryBuilder(Constants.Query.CUSTOM_OBJECT_SOBJECT, Constants.Query.DEVELOPER_NAME_FIELD);
+
+        String pathCustomObjectQuery = this.getEndpointPath(Constants.Api.QUERY_PATH + queryBuilder.toRestSoql());
         HttpResponse response = this.executeGetCallout(pathCustomObjectQuery);
 
         if (response == null || response.getBody() == null) {

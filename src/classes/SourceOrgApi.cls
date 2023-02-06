@@ -1,20 +1,46 @@
 public with sharing class SourceOrgApi {
     private RestApiManager restApiManager;
+    private ToolingApiService toolingApiService {
+        get {
+            return toolingApiService == null ? this.restApiManager.toolingApi() : toolingApiService;
+        }
+        set;
+    }
+
+    private QueryApiService queryApiService {
+        get {
+            return queryApiService == null ? this.restApiManager.queryApi() : queryApiService;
+        }
+        set;
+    }
 
     public SourceOrgApi(Auth authProvider) {
         this.restApiManager = new RestApiManager(authProvider);
     }
 
     public List<String> getCustomObjectNames() {
-        return this.restApiManager.toolingApi().getCustomObjectNames();
+        return this.toolingApiService.getCustomObjectNames();
+    }
+
+    public List<SObject> copyRecordsToCurrentOrg(String objectName, Set<Id>sourceOrgRecordIds) {
+        if (sourceOrgRecordIds.isEmpty()) return null;
+        Map<Id, Object> cachedRecordToIds = this.queryApiService.getResponseRecordsFromCache(sourceOrgRecordIds);
+        Set<Id> filteredIds = sourceOrgRecordIds;
+
+        if (!Maps.isEmpty(cachedRecordToIds)) {
+            filteredIds.removeAll(cachedRecordToIds.keySet());
+        }
+
+        //TODO: CONTINUE LOGIC
+        return null;
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
-        return this.restApiManager.queryApi().getRecordsByObjectName(objectName, limitCount);
+        return this.queryApiService.getRecordsByObjectName(objectName, limitCount);
     }
 
     public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns) {
-        List<Map<String, Object>> recordsAsMap = this.restApiManager.queryApi().getRecordsAsMap(objectName, limitCount);
+        List<Map<String, Object>> recordsAsMap = this.queryApiService.getRecordsAsMap(objectName, limitCount);
         return new DataTable(recordsAsMap, visibleColumns).build();
     }
 }

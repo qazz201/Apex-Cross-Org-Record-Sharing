@@ -4,11 +4,16 @@ public with sharing class DataTable {
     private String sourceOrgUrl;
 
     private Set<String> requiredColumnsInTable = new Set<String>{
-            'Id', 'Name'
+            Constants.Query.ID_FIELD,
+            Constants.Query.NAME_FIELD
     };
 
     private Set<String> omitColumns = new Set<String>{
-            'attributes', 'IsDeleted', 'CreatedById', 'LastModifiedById', 'SystemModstamp'
+            Constants.Query.ATTRIBUTES_FIELD,
+            Constants.Query.IS_DELETED_FIELD,
+            Constants.Query.CREATED_BY_ID_FIELD,
+            Constants.Query.LAST_MODIFIED_BY_ID_FIELD,
+            Constants.Query.SYSTEM_MODSTAMP_FIELD
     };
 
     public DataTable(List<Map<String, Object>> recordsAsMap, Integer visibleColumns) {
@@ -99,7 +104,7 @@ public with sharing class DataTable {
                 .setInitialWidth(Constants.DataTable.INITIAL_COLUMN_WIDTH);
 
         //TODO: delete?
-        if (fieldName == 'Name') {
+        if (fieldName == Constants.Query.NAME_FIELD) {
             config.setType(Constants.DataTable.URL_TYPE)
                     .setTypeAttributes(
                             new Map<String, Object>{

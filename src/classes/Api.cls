@@ -21,6 +21,7 @@ public abstract with sharing class Api {
     protected virtual HttpResponse executeGetCallout(String resourceEndpoint) {
         this.calloutClient.setEndpoint(resourceEndpoint);
         HttpResponse response = this.calloutClient.get();
+        System.debug('CALLOUT URL: ' + resourceEndpoint);
         response = this.handleCalloutResponseByStatusCode(response, resourceEndpoint);
         System.debug('RESPONSE__: ' + response.getBody());
         return response;
@@ -56,6 +57,7 @@ public abstract with sharing class Api {
         this.calloutClient.setHeader(Constants.Auth.AUTHORIZATION_HEADER, Constants.Auth.BEARER_HEADER + refreshedToken.access_token);
         HttpResponse response = this.executeGetCallout(resourceEndpoint);
 
+        //TODO: add save method in AuthProvider!!!!
         //update access_token after callout
         RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshedToken.access_token);
         System.debug('NEW TOKEN: calloutWithRefreshedAccessToken__ ' + refreshedToken);
