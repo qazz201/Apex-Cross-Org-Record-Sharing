@@ -47,10 +47,35 @@ public with sharing class RestQueryBuilder {
         return this;
     }
 
+
+    /**
+  * @description 
+ */
+    public RestQueryBuilder addCondition(String field, String operator, Set<Id> ids) {
+        String groupedIds = '';
+
+        for (Id value : ids) {
+            if (String.isBlank(groupedIds)) {
+                groupedIds = '\'' + value + '\'';
+                continue;
+            }
+
+            groupedIds += ',\'' + value + '\'';
+        }
+
+        groupedIds = String.format(Constants.RestQueryBuilder.QUOTES_TEMPLATE, new List<String>{
+                groupedIds
+        });
+        this.addCondition(field, operator, groupedIds);
+
+        return this;
+    }
+
     /**
      * @description 
     */
     public RestQueryBuilder addLimit(Integer limitValue) {
+        if (limitValue == 0 || limitValue == null) return this; // todo:add default limit
         this.limitCondition = Constants.RestQueryBuilder.PLUS_SIGN + String.format(Constants.RestQueryBuilder.LIMIT_TEMPLATE, new List<Integer>{
                 limitValue
         });

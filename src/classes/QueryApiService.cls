@@ -26,21 +26,6 @@ public with sharing class QueryApiService extends Api {
         return instance;
     }
 
-//    /**
-//    * @description 
-//    */
-//    public Map<Id, Object> getCache() {
-//        return responseRecordsCache;
-//    }
-
-    /**
-    * @description 
-    */
-    public List<Map<String, Object>> getRecordsAsMap(String objectName, Integer limitCount) {
-        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
-        return this.parseQueryObjectResponse(response);
-    }
-
     /**
     * @description 
     */
@@ -65,22 +50,40 @@ public with sharing class QueryApiService extends Api {
         }
 
         HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
-        return this.generateSObjects(objectName, this.parseQueryObjectResponse(response));
+        return this.generateSObjects(objectName, this.parseQueryObjectResponseAndCacheIt(response));
     }
+
 
     /**
      * @description 
     */
     public List<SObject> getRecordsByObjectNameAndIds(String objectName, Set<Id> sourceOrgRecordIds) {
-        // a02IY000001412vYAA BoardActivityType__c
-        // https://brave-fox-wwflpc-dev-ed.my.salesforce.com/services/data/v56.0/query/?q=SELECT+FIELDS(ALL)+FROM+Contact+WHERE+Id+In('003IY000001pZfxYAE','003IY000001pZfyYAE')
-        //
-        //
-        //
-        //
-        //
-        //
-        return null;
+        if (String.isBlank(objectName) || Sets.isEmpty(sourceOrgRecordIds)) return new List<SObject>();
+        List<Map<String, Object>> restRecordsForSobjects = new List<Map<String, Object>>();
+        Map<Id, Object> cachedRecordByIds = this.getResponseRecordsFromCache(sourceOrgRecordIds);
+        Set<Id> filteredIds = sourceOrgRecordIds;
+
+        if (!Maps.isEmpty(cachedRecordByIds)) {
+            filteredIds.removeAll(cachedRecordByIds.keySet());
+        }
+
+        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithRecordIds(objectName, filteredIds));
+        List<Map<String, Object>> parsedResponse = this.parseQueryObjectResponseAndCacheIt(response);
+
+        if (!Maps.isEmpty(cachedRecordByIds)) {
+            restRecordsForSobjects.addAll((List<Map<String, Object>>) cachedRecordByIds.values());
+        }
+        restRecordsForSobjects.addAll(parsedResponse);
+
+        return this.generateSObjects(objectName, restRecordsForSobjects);
+    }
+
+    /**
+    * @description 
+    */
+    public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount) {
+        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
+        return this.parseQueryObjectResponseAndCacheIt(response);
     }
 
     private void addResponseRecordsToCache(List<Map<String, Object>> parsedRecordsResponse) {
@@ -100,10 +103,13 @@ public with sharing class QueryApiService extends Api {
 
     private List<SObject> generateSObjects(String sObjectName, List<Map<String, Object>> listFieldNameToValue) {
         List<SObject> result = new List<SObject>();
-        Map<String, Schema.SObjectField> sobjectFieldName = Schema.getGlobalDescribe().get(sObjectName).getDescribe().fields.getMap(); // the object should exist on current org!
+        SObjectType recordSObjectType = Schema.getGlobalDescribe().get(sObjectName);
+        if (recordSObjectType == null) return result; //TODO: THROW ERROR THAT OBJ NOT EXIST ON CURRENT ORG!!!!!!!!!!!!!
+
+        Map<String, Schema.SObjectField> sobjectFieldName = recordSObjectType.getDescribe().fields.getMap(); // the object should exist on current org!
 
         for (Map<String, Object> parsedObj : listFieldNameToValue) {
-            SObject dynamicSObject = Schema.getGlobalDescribe().get(sObjectName).newSObject();
+            SObject dynamicSObject = recordSObjectType.newSObject();
 
             for (String fieldName : parsedObj.keySet()) {
                 Schema.SObjectField objectField = sobjectFieldName.get(fieldName);
@@ -122,7 +128,7 @@ public with sharing class QueryApiService extends Api {
         return result;
     }
 
-    private List<Map<String, Object>> parseQueryObjectResponse(HttpResponse response) {
+    private List<Map<String, Object>> parseQueryObjectResponseAndCacheIt(HttpResponse response) {
         // map of field name to value
         List<Map<String, Object>> result = new List<Map<String, Object>>();
 
@@ -146,18 +152,38 @@ public with sharing class QueryApiService extends Api {
 
         String fieldValue = String.valueOf(fieldValueObj);
         if (String.isBlank(fieldValue)) return; // TODO: remove for record update??
+        String fieldTypeName = objectField.getDescribe().getType().name();
 
-        if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) return;
-        if (Dates.isDate(fieldValue)) {
+        System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
+
+        if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) {
+            return;
+        } else if (Dates.isDate(fieldValue)) {
             sObjectToFill.put(fieldName, Dates.getValue(fieldValue));
             return;
+        } else if (fieldTypeName == String.valueOf(DisplayType.STRING) && Numbers.isDecimal(fieldValue)) {
+            sObjectToFill.put(fieldName, String.ValueOf(fieldValue));
+            return;
+        } else if (fieldTypeName != String.valueOf(DisplayType.STRING) && Numbers.isDecimal(fieldValue)) {
+            sObjectToFill.put(fieldName, Integer.valueOf(Numbers.getDecimalValue(fieldValue)));
+            return;
+        } else if (fieldTypeName == String.valueOf(DisplayType.BOOLEAN)) {
+            sObjectToFill.put(fieldName, Boolean.valueOf(fieldValue));
+            return;
         }
+
         sObjectToFill.put(fieldName, fieldValue);
     }
 
     private String getFormattedQueryPathWithAllFields(String objectName, Integer limitCount) {
         RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);
         queryBuilder.addLimit(limitCount);
+        return this.getEndpointPath(queryBuilder.toRestSoql());
+    }
+
+    private String getFormattedQueryPathWithRecordIds(String objectName, Set <Id> sourceRecordIds) {
+        RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);
+        queryBuilder.addCondition(Constants.Query.ID_FIELD, Constants.RestQueryBuilder.OPERATOR_IN, sourceRecordIds);
         return this.getEndpointPath(queryBuilder.toRestSoql());
     }
 }

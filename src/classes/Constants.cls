@@ -68,9 +68,11 @@ public with sharing class Constants {
         public final String SELECT_TEMPLATE = 'SELECT+{0}+FROM+{1}';
         public final String WHERE_TEMPLATE = 'WHERE+{0}';
         public final String LIMIT_TEMPLATE = 'LIMIT+{0}';
+        public final String QUOTES_TEMPLATE = '({0})';
         public final String PLUS_SIGN = '+';
         public final String LOGICAL_AND = 'AND';
         public final String LOGICAL_OR = 'OR';
+        public final String OPERATOR_IN = 'IN';
     }
 
     public class Datatable {

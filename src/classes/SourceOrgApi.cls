@@ -22,17 +22,10 @@ public with sharing class SourceOrgApi {
         return this.toolingApiService.getCustomObjectNames();
     }
 
-    public List<SObject> copyRecordsToCurrentOrg(String objectName, Set<Id>sourceOrgRecordIds) {
-        if (sourceOrgRecordIds.isEmpty()) return null;
-        Map<Id, Object> cachedRecordToIds = this.queryApiService.getResponseRecordsFromCache(sourceOrgRecordIds);
-        Set<Id> filteredIds = sourceOrgRecordIds;
-
-        if (!Maps.isEmpty(cachedRecordToIds)) {
-            filteredIds.removeAll(cachedRecordToIds.keySet());
-        }
-
-        //TODO: CONTINUE LOGIC
-        return null;
+    public List<SObject> transferRecordsFromSourceToCurrentOrg(String objectName, Set<Id> sourceOrgRecordIds) {
+        List<SObject> records = this.queryApiService.getRecordsByObjectNameAndIds(objectName, sourceOrgRecordIds);
+        // Database.insert(records,false); :TODO: uncomment
+        return records;
     }
 
     public List<SObject> getRecordsByObjectName(String objectName, Integer limitCount) {
@@ -40,7 +33,7 @@ public with sharing class SourceOrgApi {
     }
 
     public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns) {
-        List<Map<String, Object>> recordsAsMap = this.queryApiService.getRecordsAsMap(objectName, limitCount);
+        List<Map<String, Object>> recordsAsMap = this.queryApiService.getResponseRecords(objectName, limitCount);
         return new DataTable(recordsAsMap, visibleColumns).build();
     }
 }
