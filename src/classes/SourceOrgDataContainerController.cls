@@ -1,6 +1,11 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
 
     @AuraEnabled
+    public static Boolean checkIfUserAuthenticated() {
+        return hadUserAlreadyAuthenticated();
+    }
+
+    @AuraEnabled
     public static List<String> getSourceOrgCustomObjectNames() {
         if (!hadUserAlreadyAuthenticated()) {
             throw new AuraHandledException(Label.Auth_Lbl_AuthenticationRequired);
@@ -16,6 +21,24 @@ public with sharing class SourceOrgDataContainerController extends Controller {
 
         return customObjectNames;
     }
+    
+    @AuraEnabled
+    public static List<String> getStandardObjectNames() {
+        if (!hadUserAlreadyAuthenticated()) {
+            throw new AuraHandledException(Label.Auth_Lbl_AuthenticationRequired);
+        }
+        List<String> standardObjectNames = new List<String>();
+
+        for (Schema.SObjectType typ : Schema.getGlobalDescribe().values()) {
+            String sobjName = String.valueOf(typ);
+            if (!sobjName.contains('__c')) {
+                standardObjectNames.add(sobjName);
+            }
+        }
+        standardObjectNames.sort();
+        return standardObjectNames;
+    }
+
 
     private static Boolean hadUserAlreadyAuthenticated() {
         return String.isNotBlank(getAuthDefaultSetting(RecordTransferSettings__c.AuthorizationCode__c))

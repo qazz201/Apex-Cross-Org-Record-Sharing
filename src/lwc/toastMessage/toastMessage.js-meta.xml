@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>56.0</apiVersion>
-    <description>Object Names List</description>
+    <description>Toast Message</description>
     <isExposed>false</isExposed>
-    <masterLabel>Object Names List</masterLabel>
+    <masterLabel>Toast Message</masterLabel>
 </LightningComponentBundle>

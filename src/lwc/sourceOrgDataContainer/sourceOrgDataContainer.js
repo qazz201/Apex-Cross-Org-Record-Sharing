@@ -8,6 +8,7 @@ import {isEmptyArray} from 'c/commons';
 //Apex
 import getSourceOrgCustomObjectNames
     from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
+import checkIfUserAuthenticated from '@salesforce/apex/SourceOrgDataContainerController.checkIfUserAuthenticated';
 
 //Labels
 import authenticationRequired from '@salesforce/label/c.Auth_Lbl_AuthenticationRequired';
@@ -50,23 +51,27 @@ export default class SourceOrgDataContainer extends LightningElement {
             this
         );
 
-        this.getCustomObjectNames();
+        this.showSpinner = true;
+        //this.getCustomObjectNames();
+        checkIfUserAuthenticated().then(resp => {
+            this.showContainer = resp;
+        }).catch(err => this.showContainer = false).finally(() => this.showSpinner = false);
     }
 
     disconnectedCallback() {
         unregisterListener(AUTH_EVENT, this.handleAuthEvent, this);
     }
 
-    getCustomObjectNames() {
-        this.showSpinner = true;
-
-        getSourceOrgCustomObjectNames().then((data) => {
-            this.options = data;
-            this.showContainer = true;
-        }).catch(error => {
-            this.handleGetCustomObjectNamesError(error);
-        }).finally(() => this.showSpinner = false);
-    }
+    // getCustomObjectNames() {
+    //     this.showSpinner = true;
+    //
+    //     getSourceOrgCustomObjectNames().then((data) => {
+    //         this.options = data;
+    //         this.showContainer = true;
+    //     }).catch(error => {
+    //         this.handleGetCustomObjectNamesError(error);
+    //     }).finally(() => this.showSpinner = false);
+    // }
 
     //TODO: Use platform event to handle successful Authentication !!!!!!!!!!!!
     handleAuthEvent(params = {}) {
@@ -76,31 +81,32 @@ export default class SourceOrgDataContainer extends LightningElement {
 
     handleSelectObjectName(event) {
         const {value} = event?.detail;
+        console.log('SourceOrgDataContainer__OBJ NAME_', JSON.stringify(event.detail))
         this.selectedObjectName = value;
-        console.log(value)
+
     }
 
-    handleGetCustomObjectNamesError(error = {}) {
-        console.error('SourceOrgDataContainer ERROR: ', error);
+    // handleGetCustomObjectNamesError(error = {}) {
+    //     console.error('SourceOrgDataContainer ERROR: ', error);
+    //
+    //     const {message} = error?.body;
+    //     if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {
+    //         this.showToastNotification(WARNING_TITLE, message, WARNING_VARIANT);
+    //         return;
+    //     }
+    //
+    //     this.showToastNotification(ERROR_TITLE, message, ERROR_VARIANT);
+    // }
 
-        const {message} = error?.body;
-        if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {
-            this.showToastNotification(WARNING_TITLE, message, WARNING_VARIANT);
-            return;
-        }
-
-        this.showToastNotification(ERROR_TITLE, message, ERROR_VARIANT);
-    }
-
-    showToastNotification(title = '', message = '', variant = 'info') {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant,
-            })
-        );
-    }
+    // showToastNotification(title = '', message = '', variant = 'info') {
+    //     this.dispatchEvent(
+    //         new ShowToastEvent({
+    //             title: title,
+    //             message: message,
+    //             variant: variant,
+    //         })
+    //     );
+    // }
 
     get options() {
         return this._options;

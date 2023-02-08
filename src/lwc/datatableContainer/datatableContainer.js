@@ -13,7 +13,7 @@ import sourceOrgRecords from '@salesforce/label/c.SourceOrg_Lbl_Records';
 const DEFAULT_VISIBLE_RECORDS = 20;
 const DEFAULT_VISIBLE_COLUMNS = 8;
 
-export default class SourceOrgRecords extends LightningElement {
+export default class DatatableContainer extends LightningElement {
     @api records = [];
     @api columns = [];
 

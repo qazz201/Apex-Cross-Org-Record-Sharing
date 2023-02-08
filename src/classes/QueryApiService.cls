@@ -125,6 +125,13 @@ public with sharing class QueryApiService extends Api {
             result.add(dynamicSObject);
         }
 
+        // TODO:!!!!
+        if (Lists.isEmpty(result)) {
+            throw new QueryApiServiceException(String.format(Label.SourceOrg_Lbl_ObjectCanNotBeCopied,
+                    new List<String>{
+                            sObjectName
+                    }));
+        }
         return result;
     }
 
@@ -157,6 +164,7 @@ public with sharing class QueryApiService extends Api {
         System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
 
         if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) {
+            System.debug('Can not update: ' + fieldName);
             return;
         } else if (Dates.isDate(fieldValue)) {
             sObjectToFill.put(fieldName, Dates.getValue(fieldValue));
@@ -185,5 +193,8 @@ public with sharing class QueryApiService extends Api {
         RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);
         queryBuilder.addCondition(Constants.Query.ID_FIELD, Constants.RestQueryBuilder.OPERATOR_IN, sourceRecordIds);
         return this.getEndpointPath(queryBuilder.toRestSoql());
+    }
+
+    public class QueryApiServiceException extends Exception {
     }
 }
