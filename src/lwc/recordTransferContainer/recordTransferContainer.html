@@ -2,23 +2,30 @@
 <template>
     <div class="slds-box slds-color__background_gray-1">
         <!-- Authentication-->
-        <!--        <c-authorization></c-authorization>-->
         <c-authentication-container enable-silent-mode></c-authentication-container>
 
         <!--Menu-->
-        <lightning-button-menu alternative-text="Show menu"
-                               icon-name="utility:settings"
-                               variant="border-filled"
-                               onselect={handleMenuOnselect}>
-            <!--Menu Items-->
-            <lightning-menu-item value={menuActions.runAuthFlow}
-                                 label={labels.authenticateOrChangeAuthData}>
-            </lightning-menu-item>
-            <lightning-menu-item value={menuActions.reAuthenticationRequired}
-                                 label={labels.reauthenticate}
-                                 disabled>
-            </lightning-menu-item>
-        </lightning-button-menu>
+        <div class="slds-grid slds-grid_pull-padded-medium">
+            <div class="slds-col slds-p-left_small slds-size_1-of-12">
+                <lightning-button-menu alternative-text="Show menu"
+                                       icon-name="utility:settings"
+                                       variant="border-filled"
+                                       onselect={handleMenuOnselect}>
+                    <!--Menu Items-->
+                    <lightning-menu-item value={menuActions.runAuthFlow}
+                                         label={labels.authenticateOrChangeAuthData}>
+                    </lightning-menu-item>
+                    <lightning-menu-item value={menuActions.reAuthenticationRequired}
+                                         label={labels.reauthenticate}
+                                         disabled>
+                    </lightning-menu-item>
+                </lightning-button-menu>
+            </div>
+            
+            <div class="slds-col slds-size_11-of-12 slds-p-right_xx-large">
+                <div class="slds-text-heading_medium slds-text-align_center">Transfer Records</div>
+            </div>
+        </div>
 
         <!--Data-->
         <div class="slds-p-top_large">

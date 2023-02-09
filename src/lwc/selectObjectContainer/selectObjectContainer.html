@@ -1,43 +1,19 @@
 <template>
-    <div class="slds-grid slds-grid_pull-padded-medium">
-        <!--        &lt;!&ndash;Select Standard Object&ndash;&gt;-->
-        <!--        <div class="slds-col slds-p-around_small slds-size_1-of-8">-->
-        <!--            <lightning-combobox-->
-        <!--                    spinner-active="true"-->
-        <!--                    name="objects"-->
-        <!--                    label="Select Standard Object"-->
-        <!--                    placeholder="Select Object"-->
-        <!--                    options={options}-->
-        <!--                    onchange={handleChange}>-->
-        <!--                onselect={handleGetStandardObjects}-->
-        <!--            </lightning-combobox>-->
-        <!--        </div>-->
-
-        <!--        &lt;!&ndash;Select Custom Object&ndash;&gt;-->
-        <!--        <div class="slds-col slds-p-around_small slds-size_1-of-8">-->
-        <!--            <lightning-combobox-->
-        <!--                    name="objects"-->
-        <!--                    label="Select Custom Object"-->
-        <!--                    placeholder="Select Object"-->
-        <!--                    options={options}-->
-        <!--                    onchange={handleChange}>-->
-        <!--            </lightning-combobox>-->
-        <!--        </div>-->
-
+    <div class="slds-grid slds-grid_pull-padded-medium slds-align_absolute-center">
         <!--Select Standard Object-->
-        <div class="slds-col slds-p-around_small slds-size_1-of-8">
+        <div class="slds-col slds-p-around_small slds-size_2-of-12">
             <c-custom-select label="Select Standard Object"
-                             onclick={handleGetStandardObjectNames}
-                             onchange={handleChangeObjectName}
+                             onclicked={handleGetStandardObjectNames}
+                             onchanged={handleChangeObjectName}
                              options={standardObjectOptions}>
             </c-custom-select>
         </div>
 
         <!--Select Custom Object-->
-        <div class="slds-col slds-p-around_small slds-size_1-of-8">
+        <div class="slds-col slds-p-around_small slds-size_2-of-12">
             <c-custom-select label="Select Custom Object"
-                             onclick={handleGetCustomObjectNames}
-                             onchange={handleChangeObjectName}
+                             onclicked={handleGetCustomObjectNames}
+                             onchanged={handleChangeObjectName}
                              options={customObjectOptions}>
             </c-custom-select>
         </div>

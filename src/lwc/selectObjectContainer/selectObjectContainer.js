@@ -1,90 +1,76 @@
 import {LightningElement, api} from 'lwc';
+import {isEmptyArray} from "c/commons";
+import {showToastNotification, ERROR_VARIANT, ERROR_TITLE, WARNING_VARIANT, WARNING_TITLE} from "c/toastMessage";
 
 //Apex
 import getSourceOrgCustomObjectNames
     from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
 import getStandardObjectNames from '@salesforce/apex/SourceOrgDataContainerController.getStandardObjectNames';
 
-import {isEmptyArray} from "c/commons";
-import {showToastNotification} from "c/toastMessage";
-
-// import {ShowToastEvent} from "lightning/platformShowToastEvent";
-
-const CHANGE_EVENT = 'change';
-const ERROR_VARIANT = 'error';
-const ERROR_TITLE = 'Error';
-const WARNING_VARIANT = 'warning';
-const WARNING_TITLE = 'Warning';
+const CHANGE_NAME_EVENT = 'changename';
 
 export default class SelectObjectContainer extends LightningElement {
     @api standardObjectOptions = [];
     @api customObjectOptions = [];
     @api label = '';
-    @api options = []; //TODO: delete later, not now
 
     selectedObjectName = '';
 
-    handleGetStandardObjectNames() {
+    async handleGetStandardObjectNames() {
         if (!isEmptyArray(this.standardObjectOptions)) return;
-        this.getStandardObjectNames();
+        await this.getStandardObjectNames();
     }
 
-    handleGetCustomObjectNames() {
+    async handleGetCustomObjectNames() {
         if (!isEmptyArray(this.customObjectOptions)) return;
-        this.getCustomObjectNames();
-    }
-
-    handleChange(event) {
-        console.log('XXX_', event?.detail.value);
-        this.dispatchEvent(new CustomEvent(CHANGE_EVENT, {detail: event?.detail?.value}));
+        await this.getCustomObjectNames();
     }
 
     handleChangeObjectName(event) {
         const {detail} = event;
-        this.dispatchEvent(new CustomEvent(CHANGE_EVENT, {detail}));
+        this.dispatchEvent(new CustomEvent(CHANGE_NAME_EVENT, {detail}));
         this.selectedObjectName = detail?.value;
     }
 
-    getCustomObjectNames() {
-        console.log('GET CCCOOBJ');
-        // this.showSpinner = true;
-        getSourceOrgCustomObjectNames().then((data) => {
-            if (isEmptyArray(data)) return;
-            this.customObjectOptions = data.map(objectName => {
-                return {label: objectName, value: objectName};
-            })
-
-            // this.showContainer = true;
-        }).catch(error => {
-            this.handleGetCustomObjectNamesError(error);
-        }).finally(() => this.showSpinner = false);
-    }
-
-    getStandardObjectNames() {
+    async getStandardObjectNames() {
         console.log('GET STAND OBJ');
-        // this.showSpinner = true;
-        getStandardObjectNames().then((data) => {
-            if (isEmptyArray(data)) return;
-            this.standardObjectOptions = data.map(objectName => {
-                return {label: objectName, value: objectName};
-            })
-
-            // this.showContainer = true;
-        }).catch(error => {
-            this.handleGetCustomObjectNamesError(error);
-        }).finally(() => this.showSpinner = false);
+        try {
+            const objNames = await getStandardObjectNames();
+            this.standardObjectOptions = this.createOptions(objNames);
+        } catch (error) {
+            this.handleGetObjectNamesError(error);
+        }
     }
 
-    //TODO: rewrite
-    handleGetCustomObjectNamesError(error = {}) {
+    async getCustomObjectNames() {
+        console.log('GET CCCOOBJ');
+        try {
+            const objNames = await getSourceOrgCustomObjectNames();
+            this.customObjectOptions = this.createOptions(objNames);
+        } catch (error) {
+            this.handleGetObjectNamesError(error);
+        }
+    }
+
+    handleGetObjectNamesError(error = {}) {
         console.error('SourceOrgDataContainer ERROR: ', error);
 
         const {message} = error?.body;
+        let title = '';
+        let variant = '';
+
         if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {
-            showToastNotification(WARNING_TITLE, message, WARNING_VARIANT);
-            return;
+            title = WARNING_TITLE;
+            variant = WARNING_VARIANT;
         }
 
-        showToastNotification(ERROR_TITLE, message, ERROR_VARIANT);
+        showToastNotification(title, message, variant);
+    }
+
+    createOptions(values = []) {
+        if (isEmptyArray(values)) return values;
+        return values.map(objectName => {
+            return {label: objectName, value: objectName};
+        });
     }
 }

@@ -5,6 +5,7 @@
             <c-datatable-header-panel
                     visible-records-count={visibleRecordsCount}
                     visible-columns-count={visibleColumnsCount}
+                    oncopy={handleCopyEvent}
                     forbid-records-copy-action={forbidRecordsCopyAction}
                     forbid-search={areRecordsEmpty}
                     onvisiblerecordschange={handleVisibleRecordsChange}

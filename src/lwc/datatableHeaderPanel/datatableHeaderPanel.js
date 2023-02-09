@@ -15,6 +15,7 @@ const DEFAULT_VISIBLE_COLUMNS = '8';
 //Events
 const VISIBLE_RECORDS_CHANGE = 'visiblerecordschange';
 const VISIBLE_COLUMNS_CHANGE = 'visiblecolumnschange';
+const COPY = 'copy';
 
 export default class DatatableHeaderPanel extends LightningElement {
     @api forbidRecordsCopyAction = false;
@@ -43,6 +44,10 @@ export default class DatatableHeaderPanel extends LightningElement {
 
     handleVisibleColumnsChange(event) {
         this.eventDispatcher(VISIBLE_COLUMNS_CHANGE, event.detail);
+    }
+
+    handleCopyAction(event) {
+        this.eventDispatcher(COPY, event.detail);
     }
 
     eventDispatcher(eventName = '', detail = {}) {

@@ -2,12 +2,10 @@ import {LightningElement, api, wire} from 'lwc';
 import {CurrentPageReference} from 'lightning/navigation';
 
 import {registerListener, unregisterListener} from 'c/pubsub';
-import {ShowToastEvent} from 'lightning/platformShowToastEvent';
+import {showToastNotification, ERROR_VARIANT, ERROR_TITLE, WARNING_VARIANT, WARNING_TITLE} from "c/toastMessage";
 import {isEmptyArray} from 'c/commons';
 
 //Apex
-import getSourceOrgCustomObjectNames
-    from '@salesforce/apex/SourceOrgDataContainerController.getSourceOrgCustomObjectNames';
 import checkIfUserAuthenticated from '@salesforce/apex/SourceOrgDataContainerController.checkIfUserAuthenticated';
 
 //Labels
@@ -16,18 +14,16 @@ import pleaseAuthenticate from '@salesforce/label/c.Auth_Lbl_PleaseAuthenticate'
 import selectCustomObject from '@salesforce/label/c.SourceOrg_Lbl_SelectCustomObject';
 
 const AUTH_EVENT = 'authenticate';
-const ERROR_VARIANT = 'error';
-const ERROR_TITLE = 'Error';
-const WARNING_VARIANT = 'warning';
-const WARNING_TITLE = 'Warning';
+
 
 export default class SourceOrgDataContainer extends LightningElement {
     @api showContainer = false;
     @wire(CurrentPageReference) pageRef; // Required by pubsub
 
-    _options = [];
+    //_options = [];
     selectedObjectName = '';
     showSpinner = false;
+    domDatatableContainer = '';
 
     labels = {
         authenticationRequired,
@@ -35,81 +31,50 @@ export default class SourceOrgDataContainer extends LightningElement {
         selectCustomObject,
     };
 
-    @api
-    set options(values) {
-        console.log("NAMES__", values)
-        if (isEmptyArray(values)) return;
-        this._options = values.map(objectName => {
-            return {label: objectName, value: objectName};
-        })
-    }
-
-    connectedCallback() {
+    async connectedCallback() {
         registerListener(
             AUTH_EVENT,
             this.handleAuthEvent,
             this
         );
+        await this.checkIfUserAuthenticated();
+    }
 
-        this.showSpinner = true;
-        //this.getCustomObjectNames();
-        checkIfUserAuthenticated().then(resp => {
-            this.showContainer = resp;
-        }).catch(err => this.showContainer = false).finally(() => this.showSpinner = false);
+    renderedCallback() {
+        if (this.domDatatableContainer) return;
+        this.domDatatableContainer = this.template.querySelector('c-datatable-container');
     }
 
     disconnectedCallback() {
         unregisterListener(AUTH_EVENT, this.handleAuthEvent, this);
     }
 
-    // getCustomObjectNames() {
-    //     this.showSpinner = true;
-    //
-    //     getSourceOrgCustomObjectNames().then((data) => {
-    //         this.options = data;
-    //         this.showContainer = true;
-    //     }).catch(error => {
-    //         this.handleGetCustomObjectNamesError(error);
-    //     }).finally(() => this.showSpinner = false);
-    // }
+    async checkIfUserAuthenticated() {
+        try {
+            this.showSpinner = true;
+            const {userAuthenticated} = await checkIfUserAuthenticated();
+            this.showContainer = userAuthenticated;
+        } catch (error) {
+            console.log(error.stack);
+            showToastNotification(ERROR_TITLE, error.message, ERROR_VARIANT);
+        }
+        this.showSpinner = false;
+    }
 
-    //TODO: Use platform event to handle successful Authentication !!!!!!!!!!!!
-    handleAuthEvent(params = {}) {
-        const {success} = params;
-        if (success) this.showContainer = true;
+    handleCopyEvent() {
+        console.log('AAAA')
+        const recordIds = this.domDatatableContainer?.getSelectedRecordIds();
+        console.log(JSON.stringify(recordIds))
     }
 
     handleSelectObjectName(event) {
         const {value} = event?.detail;
-        console.log('SourceOrgDataContainer__OBJ NAME_', JSON.stringify(event.detail))
         this.selectedObjectName = value;
-
     }
 
-    // handleGetCustomObjectNamesError(error = {}) {
-    //     console.error('SourceOrgDataContainer ERROR: ', error);
-    //
-    //     const {message} = error?.body;
-    //     if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {
-    //         this.showToastNotification(WARNING_TITLE, message, WARNING_VARIANT);
-    //         return;
-    //     }
-    //
-    //     this.showToastNotification(ERROR_TITLE, message, ERROR_VARIANT);
-    // }
-
-    // showToastNotification(title = '', message = '', variant = 'info') {
-    //     this.dispatchEvent(
-    //         new ShowToastEvent({
-    //             title: title,
-    //             message: message,
-    //             variant: variant,
-    //         })
-    //     );
-    // }
-
-    get options() {
-        return this._options;
+    handleAuthEvent(params = {}) {
+        const {success} = params;
+        if (success) this.showContainer = true;
     }
 
     get showAuthorizationText() {

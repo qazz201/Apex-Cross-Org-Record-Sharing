@@ -3,8 +3,8 @@ import {LightningElement, api} from 'lwc';
 // import getPickListValues from '@salesforce/apex/PicklistController.getPickListValues';
 // import getFieldLabel from '@salesforce/apex/PicklistController.getFieldLabel';
 
-const CHANGE_EVENT = 'change';
-const CLICK_EVENT = 'click';
+const CHANGED_EVENT = 'changed';
+const CLICKED_EVENT = 'clicked';
 
 export default class CustomSelect extends LightningElement {
     @api label = '';
@@ -12,12 +12,12 @@ export default class CustomSelect extends LightningElement {
 
     handleClick() {
         console.log('CLICK');
-        this.dispatchEvent(new CustomEvent(CLICK_EVENT, {}));
+        this.dispatchEvent(new CustomEvent(CLICKED_EVENT, {}));
     }
 
     handleSelect(event) {
         const {value} = event.currentTarget;
-        this.dispatchEvent(new CustomEvent(CHANGE_EVENT, {
+        this.dispatchEvent(new CustomEvent(CHANGED_EVENT, {
             detail: {value}
         }));
     }

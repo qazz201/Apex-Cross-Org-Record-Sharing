@@ -8,10 +8,16 @@ import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.
 //Labels
 import noDataToDisplay from '@salesforce/label/c.SourceOrg_Lbl_NoDataToDisplay';
 import sourceOrgRecords from '@salesforce/label/c.SourceOrg_Lbl_Records';
+import {showToastNotification, WARNING_TITLE, WARNING_VARIANT} from "c/toastMessage";
 
 //Constants
 const DEFAULT_VISIBLE_RECORDS = 20;
 const DEFAULT_VISIBLE_COLUMNS = 8;
+const CAN_NOT_COPY_OBJ_ERROR = 'not supported for copy';
+
+//Events
+// const RECORD_SELECTED_EVENT = 'recordselected';
+const COPY_EVENT = 'copy';
 
 export default class DatatableContainer extends LightningElement {
     @api records = [];
@@ -32,17 +38,21 @@ export default class DatatableContainer extends LightningElement {
     @api set objectName(value) {
         if (isEmptyString(value)) return;
         this._objectName = value;
+        this.columns = [];
+        this.records = [];
         this.getData(); //TODO: add throttling
     };
 
+    @api getSelectedRecordIds() {
+        return this.selectedRows.map(record => record?.Id);
+    }
+
     getData() {
         if (isEmptyString(this.objectName)) return;
-        this.columns = [];
-        this.records = [];
         this.showSpinner = true;
 
         getDatatableDataConfig({
-            objectName: this.objectName, //'Contact', //TODO: DELETE HARDCODE
+            objectName: this.objectName,
             visibleRecords: this.visibleRecordsCount,
             visibleColumns: this.visibleColumnsCount,
         }).then(response => {
@@ -50,8 +60,7 @@ export default class DatatableContainer extends LightningElement {
             this.columns = columns;
             this.records = data;
         }).catch(err => {
-            console.error('SourceOrgRecords Error: ', err);
-            this.showToastNotification('Error', err?.body?.message?.replaceAll(/[{}]/gi,''), 'error');
+            this.handleErrorMessage(err);
         }).finally(() => this.showSpinner = false);
     }
 
@@ -63,33 +72,38 @@ export default class DatatableContainer extends LightningElement {
             this.forbidRecordsCopyAction = true;
             return;
         }
-
         this.forbidRecordsCopyAction = false;
 
-        console.log(JSON.stringify(event.detail));
         console.log(JSON.stringify(this.selectedRows));
     }
 
     handleVisibleRecordsChange(event) {
-        console.log('AAAAA_', event.detail.value);
         this.visibleRecordsCount = event.detail.value;
         this.getData();
     }
 
-    handleVisibleColumnsChange(event) {
-        console.log(event.detail.value, 'COLUMNS')
-        this.visibleColumnsCount = event.detail.value;
-        this.getData()
+    handleCopyEvent() {
+        this.dispatchEvent(new CustomEvent(COPY_EVENT, {details: {}}));
     }
 
-    showToastNotification(title = '', message = '', variant = 'info') {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant,
-            })
-        );
+    handleVisibleColumnsChange(event) {
+        this.visibleColumnsCount = event.detail.value;
+        this.getData();
+    }
+
+    handleErrorMessage(error = {}) {
+        console.error('SourceOrgRecords Error: ', error);
+
+        const {message} = error?.body;
+        let title = '';
+        let variant = '';
+
+        if (message?.toLowerCase()?.includes(CAN_NOT_COPY_OBJ_ERROR.toLowerCase())) {
+            title = WARNING_TITLE;
+            variant = WARNING_VARIANT;
+        }
+
+        showToastNotification(title, message, variant);
     }
 
     get objectName() {

@@ -2,15 +2,16 @@
     <div class="slds-is-relative">
         <template if:true={showContainer}>
             <!--Source Object Select-->
-            <c-select-object-container options={options}
-                                       label={labels.selectCustomObject}
-                                       onchange={handleSelectObjectName}>
+            <c-select-object-container label={labels.selectCustomObject}
+                                       onchangename={handleSelectObjectName}>
             </c-select-object-container>
 
             <!--Records Related List-->
             <template if:true={selectedObjectName}>
                 <c-datatable-container class="slds-p-around_medium"
-                                       object-name={selectedObjectName}>
+                                       object-name={selectedObjectName}
+                                       oncopy={handleCopyEvent}
+                                       >
                 </c-datatable-container>
             </template>
         </template>

@@ -1,8 +1,8 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
 
     @AuraEnabled
-    public static Boolean checkIfUserAuthenticated() {
-        return hadUserAlreadyAuthenticated();
+    public static UserAuthData checkIfUserAuthenticated() {
+        return new UserAuthData(hadUserAlreadyAuthenticated(), 'TestName', 'TestURL');
     }
 
     @AuraEnabled
@@ -58,6 +58,21 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         public CalloutParams(String endpoint, String accessToken) {
             this.endpoint = endpoint;
             this.accessToken = accessToken;
+        }
+    }
+
+    public class UserAuthData {
+        @AuraEnabled
+        public Boolean userAuthenticated { get; set; }
+        @AuraEnabled
+        public String userName { get; set; }
+        @AuraEnabled
+        public String userOrgUrl { get; set; }
+
+        public UserAuthData(Boolean userAuthenticated, String userName, String userOrgUrl) {
+            this.userAuthenticated = userAuthenticated;
+            this.userName = userName;
+            this.userOrgUrl = userOrgUrl;
         }
     }
 }
