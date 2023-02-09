@@ -1,4 +1,10 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
+    private static SourceOrgApi sourceOrgApi {
+        get {
+            return sourceOrgApi == null ? sourceOrgApi = new SourceOrgApi(new SfWebFlowAuthProvider(getCalloutClient())) : sourceOrgApi;
+        }
+        set;
+    }
 
     @AuraEnabled
     public static UserAuthData checkIfUserAuthenticated() {
@@ -13,15 +19,15 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         List<String> customObjectNames = new List<String>();
 
         try {
-            customObjectNames = new SourceOrgApi(new SfWebFlowAuthProvider(getCalloutClient())).getCustomObjectNames();
+            customObjectNames = sourceOrgApi.getCustomObjectNames();
         } catch (Exception ex) {
-            System.debug('ERROR_SourceOrgDataContainerController.getSourceOrgCustomObjectNames(): ' + ex.getStackTraceString());
+            System.debug(ex.getStackTraceString());
             throw new AuraHandledException(ex.getMessage());
         }
 
         return customObjectNames;
     }
-    
+
     @AuraEnabled
     public static List<String> getStandardObjectNames() {
         if (!hadUserAlreadyAuthenticated()) {
@@ -31,14 +37,23 @@ public with sharing class SourceOrgDataContainerController extends Controller {
 
         for (Schema.SObjectType typ : Schema.getGlobalDescribe().values()) {
             String sobjName = String.valueOf(typ);
-            if (!sobjName.contains('__c')) {
-                standardObjectNames.add(sobjName);
-            }
+            if (sobjName.contains('__c') || sobjName.contains('__x')) continue;
+            standardObjectNames.add(sobjName);
         }
         standardObjectNames.sort();
         return standardObjectNames;
     }
 
+    @AuraEnabled
+    public static void copyRecordsByIds(String objectName, List<Id>recordIds) {
+        try {
+            List<SObject> records = sourceOrgApi.transferRecordsFromSourceToCurrentOrg(objectName, new Set<Id>(recordIds));
+            System.debug('TO SAVE_________' + records);
+        } catch (Exception ex) {
+            System.debug(ex.getStackTraceString());
+            throw new AuraHandledException(ex.getMessage());
+        }
+    }
 
     private static Boolean hadUserAlreadyAuthenticated() {
         return String.isNotBlank(getAuthDefaultSetting(RecordTransferSettings__c.AuthorizationCode__c))

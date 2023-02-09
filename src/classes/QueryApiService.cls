@@ -82,6 +82,7 @@ public with sharing class QueryApiService extends Api {
     * @description 
     */
     public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount) {
+        // TODO: CHECK CACHE??????
         HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
         return this.parseQueryObjectResponseAndCacheIt(response);
     }
@@ -104,7 +105,13 @@ public with sharing class QueryApiService extends Api {
     private List<SObject> generateSObjects(String sObjectName, List<Map<String, Object>> listFieldNameToValue) {
         List<SObject> result = new List<SObject>();
         SObjectType recordSObjectType = Schema.getGlobalDescribe().get(sObjectName);
-        if (recordSObjectType == null) return result; //TODO: THROW ERROR THAT OBJ NOT EXIST ON CURRENT ORG!!!!!!!!!!!!!
+
+        if (recordSObjectType == null) {
+            System.debug('ERROR____: record ' + sObjectName + 'does not exist on the current org');
+            throw new QueryApiServiceException(String.format(Label.Api_Lbl_ObjectDoesNotExistOnCurrentOrg, new List<String>{
+                    sObjectName
+            }));
+        }
 
         Map<String, Schema.SObjectField> sobjectFieldName = recordSObjectType.getDescribe().fields.getMap(); // the object should exist on current org!
 
@@ -161,7 +168,7 @@ public with sharing class QueryApiService extends Api {
         if (String.isBlank(fieldValue)) return; // TODO: remove for record update??
         String fieldTypeName = objectField.getDescribe().getType().name();
 
-        System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
+        // System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
 
         if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) {
             System.debug('Can not update: ' + fieldName);

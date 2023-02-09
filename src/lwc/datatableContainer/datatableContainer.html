@@ -5,11 +5,11 @@
             <c-datatable-header-panel
                     visible-records-count={visibleRecordsCount}
                     visible-columns-count={visibleColumnsCount}
-                    oncopy={handleCopyEvent}
-                    forbid-records-copy-action={forbidRecordsCopyAction}
-                    forbid-search={areRecordsEmpty}
+                    allow-records-copy-action={allowRecordsCopyAction}
                     onvisiblerecordschange={handleVisibleRecordsChange}
-                    onvisiblecolumnschange={handleVisibleColumnsChange}>
+                    onvisiblecolumnschange={handleVisibleColumnsChange}
+                    allow-search={areRecordsEmpty}
+                    oncopy={handleCopyEvent}>
             </c-datatable-header-panel>
         </div>
 

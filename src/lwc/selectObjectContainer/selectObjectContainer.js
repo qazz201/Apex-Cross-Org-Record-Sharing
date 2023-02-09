@@ -1,6 +1,6 @@
 import {LightningElement, api} from 'lwc';
 import {isEmptyArray} from "c/commons";
-import {showToastNotification, ERROR_VARIANT, ERROR_TITLE, WARNING_VARIANT, WARNING_TITLE} from "c/toastMessage";
+import {showToastNotification, WARNING_VARIANT, WARNING_TITLE} from "c/toastMessage";
 
 //Apex
 import getSourceOrgCustomObjectNames
@@ -59,12 +59,11 @@ export default class SelectObjectContainer extends LightningElement {
         let title = '';
         let variant = '';
 
-        if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {
+        if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {//
             title = WARNING_TITLE;
             variant = WARNING_VARIANT;
         }
-
-        showToastNotification(title, message, variant);
+        showToastNotification(title, error, variant);
     }
 
     createOptions(values = []) {

@@ -23,14 +23,14 @@
         <!--Copy Records Button-->
         <div class="slds-col slds-p-around_small slds-align-bottom slds-text-align_center slds-size_1-of-8">
             <button class="slds-button slds-button_success"
-                    onclick={handleCopyAction}
-                    disabled={forbidRecordsCopyAction}>
+                    disabled={isDisableRecordsCopyAction}
+                    onclick={handleCopyAction}>
                 {labels.copySelectedRecords}
             </button>
         </div>
         <!--Search-->
         <div class="slds-col slds-p-around_small slds-align-bottom slds-size_3-of-8">
-            <lightning-input placeholder="Search" type="search" disabled={forbidSearch}></lightning-input>
+            <lightning-input placeholder="Search" type="search" disabled={allowSearch}></lightning-input>
         </div>
     </div>
 </template>

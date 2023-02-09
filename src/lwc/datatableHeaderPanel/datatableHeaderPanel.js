@@ -18,8 +18,8 @@ const VISIBLE_COLUMNS_CHANGE = 'visiblecolumnschange';
 const COPY = 'copy';
 
 export default class DatatableHeaderPanel extends LightningElement {
-    @api forbidRecordsCopyAction = false;
-    @api forbidSearch = false;
+    @api allowRecordsCopyAction = false;
+    @api allowSearch = false;
 
     _visibleRecordsCount = DEFAULT_VISIBLE_RECORDS;
     _visibleColumnsCount = DEFAULT_VISIBLE_COLUMNS;
@@ -67,6 +67,10 @@ export default class DatatableHeaderPanel extends LightningElement {
 
     get visibleColumnsCount() {
         return this._visibleColumnsCount;
+    }
+
+    get isDisableRecordsCopyAction() {
+        return !this.allowRecordsCopyAction;
     }
 
     get visibleRecordsDiapasonOptions() {

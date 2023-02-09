@@ -22,11 +22,11 @@ const COPY_EVENT = 'copy';
 export default class DatatableContainer extends LightningElement {
     @api records = [];
     @api columns = [];
+    @api allowRecordsCopyAction = false;
 
     visibleRecordsCount = DEFAULT_VISIBLE_RECORDS;
     visibleColumnsCount = DEFAULT_VISIBLE_COLUMNS;
     showSpinner = false;
-    forbidRecordsCopyAction = true;
 
     selectedRows = [];
     _objectName = '';
@@ -69,10 +69,10 @@ export default class DatatableContainer extends LightningElement {
         this.selectedRows = selectedRows;
 
         if (isEmptyArray(selectedRows)) {
-            this.forbidRecordsCopyAction = true;
+            this.allowRecordsCopyAction = false;
             return;
         }
-        this.forbidRecordsCopyAction = false;
+        this.allowRecordsCopyAction = true;
 
         console.log(JSON.stringify(this.selectedRows));
     }
@@ -103,7 +103,7 @@ export default class DatatableContainer extends LightningElement {
             variant = WARNING_VARIANT;
         }
 
-        showToastNotification(title, message, variant);
+        showToastNotification(title, error, variant);
     }
 
     get objectName() {

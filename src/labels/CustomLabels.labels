@@ -96,4 +96,12 @@
         <shortDescription>The object can not be copied</shortDescription>
         <value>Object type {0} is not supported for copy</value>
     </labels>
+    <labels>
+        <fullName>Api_Lbl_ObjectDoesNotExistOnCurrentOrg</fullName>
+        <categories>Api</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The object does not exist on the current org</shortDescription>
+        <value>The object {0} does not exist on the current org</value>
+    </labels>
 </CustomLabels>

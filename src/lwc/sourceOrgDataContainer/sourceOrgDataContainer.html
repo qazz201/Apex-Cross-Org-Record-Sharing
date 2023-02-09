@@ -10,8 +10,9 @@
             <template if:true={selectedObjectName}>
                 <c-datatable-container class="slds-p-around_medium"
                                        object-name={selectedObjectName}
+                                       allow-records-copy-action={allowRecordsCopyAction}
                                        oncopy={handleCopyEvent}
-                                       >
+                >
                 </c-datatable-container>
             </template>
         </template>

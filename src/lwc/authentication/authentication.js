@@ -2,6 +2,12 @@ import {LightningElement, api, wire} from 'lwc';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import {CurrentPageReference} from 'lightning/navigation';
 
+import {
+    showToastNotification,
+    ERROR_TITLE,
+    ERROR_VARIANT,
+    SUCCESS_VARIANT
+} from "c/toastMessage";
 import {isEmptyString, isEmptyArray} from 'c/commons';
 import {fireEvent} from 'c/pubsub';
 
@@ -48,7 +54,7 @@ export default class Authentication extends LightningElement {
             this.trackWindowClose();
         } catch (error) {
             console.error(error.stack);
-            this.showToastNotification('Error', error.message, 'error');
+            showToastNotification(ERROR_TITLE, error, ERROR_VARIANT);
         }
     }
 
@@ -81,18 +87,18 @@ export default class Authentication extends LightningElement {
 
             fireEvent(this.pageRef, AUTH_EVENT, eventParams);
             this.dispatchAuthorizationEvent(eventParams);
-            this.showToastNotification(this.labels?.authenticationSuccessful, '', 'success');
-        }).catch(exception => {
-            this.handleFailedAuthentication(exception?.body?.message)
+            showToastNotification(this.labels?.authenticationSuccessful, {}, SUCCESS_VARIANT);
+        }).catch(error => {
+            this.handleFailedAuthentication(error);
         })
     }
 
-    handleFailedAuthentication(errorMessage = '') {
-        console.error('Failed Authentication error: ', errorMessage);
+    handleFailedAuthentication(error = {}) {
+        console.error('Failed Authentication error: ', error);
 
         this.dispatchAuthorizationEvent(this.defaultAuthEventDetail);
         fireEvent(this.pageRef, AUTH_EVENT, this.defaultAuthEventDetail);
-        errorMessage && this.showToastNotification('Error', errorMessage, 'error');
+        error && showToastNotification(ERROR_TITLE, error, ERROR_VARIANT);
     }
 
     handleChangeWindowLocation(urlSearchParams = '') {
@@ -137,15 +143,6 @@ export default class Authentication extends LightningElement {
     validateEnvironmentUrl() {
         if (this.environmentUrl.endsWith('/')) return;
         this.environmentUrl = `${this.environmentUrl}/`;
-    }
-
-    showToastNotification(title = '', message = '', variant = 'info') {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant,
-            }));
     }
 
     get authorizationUrl() {
