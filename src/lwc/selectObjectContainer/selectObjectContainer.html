@@ -3,7 +3,7 @@
         <!--Select Standard Object-->
         <div class="slds-col slds-p-around_small slds-size_2-of-12">
             <c-custom-select label="Select Standard Object"
-                             onclicked={handleGetStandardObjectNames}
+                             onfocused={handleGetStandardObjectNames}
                              onchanged={handleChangeObjectName}
                              options={standardObjectOptions}>
             </c-custom-select>
@@ -12,7 +12,7 @@
         <!--Select Custom Object-->
         <div class="slds-col slds-p-around_small slds-size_2-of-12">
             <c-custom-select label="Select Custom Object"
-                             onclicked={handleGetCustomObjectNames}
+                             onfocused={handleGetCustomObjectNames}
                              onchanged={handleChangeObjectName}
                              options={customObjectOptions}>
             </c-custom-select>

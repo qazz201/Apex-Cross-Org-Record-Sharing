@@ -4,15 +4,15 @@ import {LightningElement, api} from 'lwc';
 // import getFieldLabel from '@salesforce/apex/PicklistController.getFieldLabel';
 
 const CHANGED_EVENT = 'changed';
-const CLICKED_EVENT = 'clicked';
+const FOCUSED_EVENT = 'focused';
 
 export default class CustomSelect extends LightningElement {
     @api label = '';
     @api options = [];
 
-    handleClick() {
-        console.log('CLICK');
-        this.dispatchEvent(new CustomEvent(CLICKED_EVENT, {}));
+    handleFocus() {
+        console.log('FOCUSED');
+        this.dispatchEvent(new CustomEvent(FOCUSED_EVENT, {}));
     }
 
     handleSelect(event) {
@@ -22,6 +22,7 @@ export default class CustomSelect extends LightningElement {
         }));
     }
 
+    //TODO: REMOVE??
     get isPicklistDisabled() {
         return false
         // return !this.options?.length

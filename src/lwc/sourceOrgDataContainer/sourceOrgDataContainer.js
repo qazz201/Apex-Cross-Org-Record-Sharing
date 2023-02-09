@@ -63,8 +63,7 @@ export default class SourceOrgDataContainer extends LightningElement {
             const {userAuthenticated} = await checkIfUserAuthenticated();
             this.showContainer = userAuthenticated;
         } catch (error) {
-            console.log(error.stack);
-            showToastNotification(ERROR_TITLE, error, ERROR_VARIANT);
+            this.handleError(error);
         }
         this.showSpinner = false;
     }
@@ -73,7 +72,7 @@ export default class SourceOrgDataContainer extends LightningElement {
         try {
             this.allowRecordsCopyAction = false;
             const recordIds = this.domDatatableContainer?.getSelectedRecordIds();
-            
+
             await copyRecordsByIds({
                 objectName: this.selectedObjectName,
                 recordIds
@@ -82,8 +81,7 @@ export default class SourceOrgDataContainer extends LightningElement {
             showToastNotification(SUCCESS_TITLE, {}, SUCCESS_VARIANT);
             console.log(JSON.stringify(recordIds));
         } catch (error) {
-            console.error(error.stack);
-            showToastNotification(ERROR_TITLE, error, ERROR_VARIANT);
+            this.handleError(error);
         }
         this.allowRecordsCopyAction = true;
     }
@@ -97,6 +95,21 @@ export default class SourceOrgDataContainer extends LightningElement {
         const {success} = params;
         if (success) this.showContainer = true;
     }
+
+    handleError(error = {}) {
+        console.error('SourceOrgDataContainer ERROR: ', error?.stack);
+
+        const {message} = error?.body;
+        let title = ERROR_TITLE;
+        let variant = ERROR_VARIANT;
+
+        if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {//
+            title = WARNING_TITLE;
+            variant = WARNING_VARIANT;
+        }
+        showToastNotification(title, error, variant);
+    }
+
 
     get showAuthorizationText() {
         return this.showContainer && !this.showSpinner;

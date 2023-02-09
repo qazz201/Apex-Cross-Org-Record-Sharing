@@ -1,6 +1,6 @@
 import {LightningElement, api} from 'lwc';
 import {isEmptyArray} from "c/commons";
-import {showToastNotification, WARNING_VARIANT, WARNING_TITLE} from "c/toastMessage";
+import {showToastNotification, WARNING_VARIANT, WARNING_TITLE, ERROR_TITLE, ERROR_VARIANT} from "c/toastMessage";
 
 //Apex
 import getSourceOrgCustomObjectNames
@@ -53,11 +53,11 @@ export default class SelectObjectContainer extends LightningElement {
     }
 
     handleGetObjectNamesError(error = {}) {
-        console.error('SourceOrgDataContainer ERROR: ', error);
+        console.error('SelectObjectContainer ERROR: ', error);
 
         const {message} = error?.body;
-        let title = '';
-        let variant = '';
+        let title = ERROR_TITLE;
+        let variant = ERROR_VARIANT;
 
         if (message?.toLowerCase()?.includes(this.labels?.authenticationRequired.toLowerCase())) {//
             title = WARNING_TITLE;

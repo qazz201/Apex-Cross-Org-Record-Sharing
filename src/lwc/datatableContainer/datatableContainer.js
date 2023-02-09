@@ -1,6 +1,5 @@
 import {LightningElement, api} from 'lwc';
 import {isEmptyArray, isEmptyString} from "c/commons";
-import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 
 //Apex
 import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.getDatatableDataConfig';
@@ -8,7 +7,7 @@ import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.
 //Labels
 import noDataToDisplay from '@salesforce/label/c.SourceOrg_Lbl_NoDataToDisplay';
 import sourceOrgRecords from '@salesforce/label/c.SourceOrg_Lbl_Records';
-import {showToastNotification, WARNING_TITLE, WARNING_VARIANT} from "c/toastMessage";
+import {showToastNotification, ERROR_TITLE, ERROR_VARIANT, WARNING_TITLE, WARNING_VARIANT} from "c/toastMessage";
 
 //Constants
 const DEFAULT_VISIBLE_RECORDS = 20;
@@ -16,7 +15,6 @@ const DEFAULT_VISIBLE_COLUMNS = 8;
 const CAN_NOT_COPY_OBJ_ERROR = 'not supported for copy';
 
 //Events
-// const RECORD_SELECTED_EVENT = 'recordselected';
 const COPY_EVENT = 'copy';
 
 export default class DatatableContainer extends LightningElement {
@@ -95,8 +93,8 @@ export default class DatatableContainer extends LightningElement {
         console.error('SourceOrgRecords Error: ', error);
 
         const {message} = error?.body;
-        let title = '';
-        let variant = '';
+        let title = ERROR_TITLE;
+        let variant = ERROR_VARIANT;
 
         if (message?.toLowerCase()?.includes(CAN_NOT_COPY_OBJ_ERROR.toLowerCase())) {
             title = WARNING_TITLE;
