@@ -35,7 +35,7 @@ export default class AuthenticationContainer extends LightningElement {
     }
 
     @api closeAuthorizationModal() {
-        this.template.querySelector('c-modal-window')?.closeModal();
+        this.template.querySelector('c-modal-window')?.closeModal();// todo: USE VARIABLE
     }
 
     handleAuthentication(params = {}) {

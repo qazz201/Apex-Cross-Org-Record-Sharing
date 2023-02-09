@@ -4,20 +4,33 @@
                  class="slds-modal slds-fade-in-open slds-modal_medium">
             <div class="slds-modal__container">
                 <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
-                        onclick={closeModal}>
+                        onclick={handleModalClose}>
                     x
                 </button>
+                <!--Header-->
                 <div if:true={showHeader}
                      class="slds-modal__header">
                     <h1 class="slds-modal__title slds-hyphenate">{modalHeader}</h1>
                 </div>
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+                <!--Slot Content-->
+                <div style="min-height: 5rem; max-height: 30rem;" class="slds-modal__content slds-p-around_medium slds-is-relative">
                     <slot></slot>
+
+                    <!--Spinner-->
+                    <template if:true={showSpinner}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
                 </div>
+
+                <!--Footer-->
                 <div if:true={showFooter}
                      class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close">Cancel</button>
-                    <button class="slds-button slds-button_brand">Save</button>
+                    <button class="slds-button slds-button_neutral"
+                            aria-label="Cancel and close"
+                            onclick={handleModalClose}>
+                        Close
+                    </button>
                 </div>
             </div>
         </section>

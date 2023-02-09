@@ -11,11 +11,31 @@
                 <c-datatable-container class="slds-p-around_medium"
                                        object-name={selectedObjectName}
                                        allow-records-copy-action={allowRecordsCopyAction}
-                                       oncopy={handleCopyEvent}
-                >
+                                       oncopy={handleCopyRecords}>
                 </c-datatable-container>
             </template>
         </template>
+
+        <!--Saved records list modal window-->
+        <c-modal-window show-footer show-spinner={showModalSpinner} onclosed={handleModalClose}>
+            <div>
+                <p class="slds-text-heading_small slds-text-align_center">
+                    Saved Records
+                </p>
+                
+                <!--URLS-->
+                <template for:each={savedRecordsData} for:item="record">
+                    <p key={record.recordId}>
+                        <lightning-formatted-url value="https://salesforce.com"
+                                                 label={record.recordName}
+                                                 data-record-id={record.recordId}
+                                                 target="_blank"
+                                                 onclick={handleSavedRecordNavigate}>
+                        </lightning-formatted-url>
+                    </p>
+                </template>
+            </div>
+        </c-modal-window>
 
         <!--Spinner-->
         <template if:true={showSpinner}>

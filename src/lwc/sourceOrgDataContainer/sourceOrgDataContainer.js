@@ -1,5 +1,5 @@
 import {LightningElement, api, wire} from 'lwc';
-import {CurrentPageReference} from 'lightning/navigation';
+import {CurrentPageReference, NavigationMixin} from 'lightning/navigation';
 
 import {registerListener, unregisterListener} from 'c/pubsub';
 import {
@@ -10,7 +10,6 @@ import {
     WARNING_TITLE,
     SUCCESS_VARIANT, SUCCESS_TITLE
 } from "c/toastMessage";
-import {isEmptyArray} from 'c/commons';
 
 //Apex
 import checkIfUserAuthenticated from '@salesforce/apex/SourceOrgDataContainerController.checkIfUserAuthenticated';
@@ -23,15 +22,17 @@ import selectCustomObject from '@salesforce/label/c.SourceOrg_Lbl_SelectCustomOb
 
 const AUTH_EVENT = 'authenticate';
 
-export default class SourceOrgDataContainer extends LightningElement {
+export default class SourceOrgDataContainer extends NavigationMixin(LightningElement) {
     @api showContainer = false;
     @wire(CurrentPageReference) pageRef; // Required by pubsub
 
     //_options = [];
     selectedObjectName = '';
     showSpinner = false;
+    showModalSpinner = false;
     domDatatableContainer = '';
     allowRecordsCopyAction;
+    savedRecordsData = [];
 
     labels = {
         authenticationRequired,
@@ -68,21 +69,27 @@ export default class SourceOrgDataContainer extends LightningElement {
         this.showSpinner = false;
     }
 
-    async handleCopyEvent() {
+    async handleCopyRecords() {
         try {
+            this.showModalSpinner = true;
+            this.$modalWindow?.openModal();
             this.allowRecordsCopyAction = false;
             const recordIds = this.domDatatableContainer?.getSelectedRecordIds();
 
-            await copyRecordsByIds({
+            this.savedRecordsData = await copyRecordsByIds({
                 objectName: this.selectedObjectName,
                 recordIds
             });
+
+            this.showModalSpinner = false;
+            console.log('RRRESSS__', JSON.stringify(this.savedRecordsData))
 
             showToastNotification(SUCCESS_TITLE, {}, SUCCESS_VARIANT);
             console.log(JSON.stringify(recordIds));
         } catch (error) {
             this.handleError(error);
         }
+
         this.allowRecordsCopyAction = true;
     }
 
@@ -96,8 +103,27 @@ export default class SourceOrgDataContainer extends LightningElement {
         if (success) this.showContainer = true;
     }
 
+    handleSavedRecordNavigate(event) {
+        event.preventDefault();
+        const recordId = event.currentTarget.dataset?.recordId;
+        if (!recordId) return;
+
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId,
+                objectApiName: this.selectedObjectName,
+                actionName: 'view'
+            }
+        });
+    }
+
+    handleModalClose() {
+        this.savedRecordsData = [];
+    }
+
     handleError(error = {}) {
-        console.error('SourceOrgDataContainer ERROR: ', error?.stack);
+        console.error('SourceOrgDataContainer ERROR: ', error);
 
         const {message} = error?.body;
         let title = ERROR_TITLE;
@@ -108,10 +134,15 @@ export default class SourceOrgDataContainer extends LightningElement {
             variant = WARNING_VARIANT;
         }
         showToastNotification(title, error, variant);
+        this.$modalWindow?.closeModal();
+        this.showModalSpinner = false;
     }
-
 
     get showAuthorizationText() {
         return this.showContainer && !this.showSpinner;
+    }
+
+    get $modalWindow() {
+        return this.template.querySelector('c-modal-window');
     }
 }

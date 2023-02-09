@@ -45,14 +45,31 @@ public with sharing class SourceOrgDataContainerController extends Controller {
     }
 
     @AuraEnabled
-    public static void copyRecordsByIds(String objectName, List<Id>recordIds) {
+    public static List<SavedRecordData> copyRecordsByIds(String objectName, List<Id>recordIds) {
+        List<SavedRecordData> result = new List<SavedRecordData>();
+
         try {
-            List<SObject> records = sourceOrgApi.transferRecordsFromSourceToCurrentOrg(objectName, new Set<Id>(recordIds));
-            System.debug('TO SAVE_________' + records);
+            List<SObject> savedRecords = sourceOrgApi.transferRecordsFromSourceToCurrentOrg(objectName, new Set<Id>(recordIds));
+
+            if (Lists.isEmpty(savedRecords)) return result;
+            SObjectField sObjectNameField = Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().get(Constants.Query.NAME_FIELD);
+
+            for (SObject record : savedRecords) {
+                String nameValue = record.Id;
+
+                if (sObjectNameField != null) {
+                    nameValue = (String) record.get(Constants.Query.NAME_FIELD);
+                }
+
+                result.add(new SavedRecordData('0036800000I674KAAR', nameValue));
+            }
+
+            System.debug('TO SAVE_________' + savedRecords);
         } catch (Exception ex) {
-            System.debug(ex.getStackTraceString());
+            System.debug( ex.getStackTraceString());
             throw new AuraHandledException(ex.getMessage());
         }
+        return result;
     }
 
     private static Boolean hadUserAlreadyAuthenticated() {
@@ -88,6 +105,18 @@ public with sharing class SourceOrgDataContainerController extends Controller {
             this.userAuthenticated = userAuthenticated;
             this.userName = userName;
             this.userOrgUrl = userOrgUrl;
+        }
+    }
+
+    public class SavedRecordData {
+        @AuraEnabled
+        public String recordId { get; set; }
+        @AuraEnabled
+        public String recordName { get; set; }
+
+        public SavedRecordData(String recordId, String recordName) {
+            this.recordId = recordId;
+            this.recordName = String.isBlank(recordName) ? recordId : recordName;
         }
     }
 }
