@@ -55,7 +55,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
             SObjectField sObjectNameField = Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().get(Constants.Query.NAME_FIELD);
 
             for (SObject record : savedRecords) {
-                String nameValue = record.Id;
+                String nameValue = null;
 
                 if (sObjectNameField != null) {
                     nameValue = (String) record.get(Constants.Query.NAME_FIELD);
@@ -66,7 +66,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
 
             System.debug('TO SAVE_________' + savedRecords);
         } catch (Exception ex) {
-            System.debug( ex.getStackTraceString());
+            System.debug(ex.getStackTraceString());
             throw new AuraHandledException(ex.getMessage());
         }
         return result;

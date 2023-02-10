@@ -68,11 +68,15 @@ public with sharing class Constants {
         public final String SELECT_TEMPLATE = 'SELECT+{0}+FROM+{1}';
         public final String WHERE_TEMPLATE = 'WHERE+{0}';
         public final String LIMIT_TEMPLATE = 'LIMIT+{0}';
+        public final String OFFSET_TEMPLATE = 'OFFSET+{0}';
+        public final String ORDER_BY_TEMPLATE = 'ORDER+BY+{0}+{1}';
         public final String QUOTES_TEMPLATE = '({0})';
         public final String PLUS_SIGN = '+';
         public final String LOGICAL_AND = 'AND';
         public final String LOGICAL_OR = 'OR';
         public final String OPERATOR_IN = 'IN';
+        public final String DESC_SORT = 'DESC';
+        public final String ASC_SORT = 'ASC';
     }
 
     public class Datatable {
@@ -100,5 +104,6 @@ public with sharing class Constants {
         public final String CREATED_BY_ID_FIELD = 'CreatedById';
         public final String LAST_MODIFIED_BY_ID_FIELD = 'LastModifiedById';
         public final String SYSTEM_MODSTAMP_FIELD = 'SystemModstamp';
+        public final String CREATED_DATE_FIELD = 'CreatedDate';
     }
 }

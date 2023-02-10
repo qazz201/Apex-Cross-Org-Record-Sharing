@@ -3,6 +3,8 @@ public with sharing class RestQueryBuilder {
     private List<String> restQueryFields;
     private String whereCondition = '';
     private String limitCondition = '';
+    private String offsetCondition = '';
+    private String orderByCondition = '';
 
     public RestQueryBuilder(String sObjectName, List<String>queryFields) {
         this.sObjectName = sObjectName;
@@ -22,7 +24,7 @@ public with sharing class RestQueryBuilder {
     public String toRestSoql() {
         String selectClause = this.formSelectTemplate();
         String whereClause = this.formWhereTemplate();
-        return selectClause + whereClause + this.limitCondition;
+        return selectClause + whereClause + this.orderByCondition + this.limitCondition + this.offsetCondition;
     }
 
     /**
@@ -74,10 +76,33 @@ public with sharing class RestQueryBuilder {
     /**
      * @description 
     */
+    public RestQueryBuilder addOrderBy(String field, String order) {
+        if (String.isBlank(field)) return this;
+        if (String.isBlank(order)) order = '';
+        this.orderByCondition = Constants.RestQueryBuilder.PLUS_SIGN + String.format(Constants.RestQueryBuilder.ORDER_BY_TEMPLATE, new List<String>{
+                field, order
+        });
+        return this;
+    }
+
+    /**
+  * @description 
+ */
     public RestQueryBuilder addLimit(Integer limitValue) {
-        if (limitValue == 0 || limitValue == null) return this; // todo:add default limit
+        if (limitValue == 0 || limitValue == null) return this;
         this.limitCondition = Constants.RestQueryBuilder.PLUS_SIGN + String.format(Constants.RestQueryBuilder.LIMIT_TEMPLATE, new List<Integer>{
                 limitValue
+        });
+        return this;
+    }
+
+    /**
+ * @description 
+*/
+    public RestQueryBuilder addOffset(Integer offsetValue) {
+        if (offsetValue == 0 || offsetValue == null) return this;
+        this.offsetCondition = Constants.RestQueryBuilder.PLUS_SIGN + String.format(Constants.RestQueryBuilder.OFFSET_TEMPLATE, new List<Integer>{
+                offsetValue
         });
         return this;
     }

@@ -43,9 +43,10 @@ export default class AuthenticationContainer extends LightningElement {
         console.log('AUTHORIZE_SUCCESS??_ ', success);
         console.log('PUBSUB CATCH EVENT??_ ', JSON.stringify(params));
 
-        if (success === true) {
-            this.closeAuthorizationModal();
-        }
+        success && this.closeAuthorizationModal();
+        // if (success === true) {
+        //     this.closeAuthorizationModal();
+        // }
     }
 
     get $modalWindow() {

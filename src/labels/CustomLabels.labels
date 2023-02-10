@@ -104,4 +104,12 @@
         <shortDescription>The object does not exist on the current org</shortDescription>
         <value>The object {0} does not exist on the current org</value>
     </labels>
+    <labels>
+        <fullName>Api_Lbl_NotSupported</fullName>
+        <categories>Api</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>not supported</shortDescription>
+        <value>not supported</value>
+    </labels>
 </CustomLabels>

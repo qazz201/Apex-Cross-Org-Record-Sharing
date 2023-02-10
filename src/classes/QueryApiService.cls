@@ -49,7 +49,7 @@ public with sharing class QueryApiService extends Api {
             limitCount = this.DEFAULT_QUERY_LIMIT;
         }
 
-        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
+        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount, null));
         return this.generateSObjects(objectName, this.parseQueryObjectResponseAndCacheIt(response));
     }
 
@@ -83,7 +83,16 @@ public with sharing class QueryApiService extends Api {
     */
     public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount) {
         // TODO: CHECK CACHE??????
-        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
+//        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
+//        return this.parseQueryObjectResponseAndCacheIt(response);
+        return this.getResponseRecords(objectName, limitCount, null);
+    }
+
+    /**
+  * @description 
+  */
+    public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount, Integer offsetValue) {
+        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount, offsetValue));
         return this.parseQueryObjectResponseAndCacheIt(response);
     }
 
@@ -190,9 +199,19 @@ public with sharing class QueryApiService extends Api {
         sObjectToFill.put(fieldName, fieldValue);
     }
 
-    private String getFormattedQueryPathWithAllFields(String objectName, Integer limitCount) {
+//    private String getFormattedQueryPathWithAllFields(String objectName, Integer limitCount) {
+//        RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);
+//        queryBuilder.addLimit(limitCount);
+//        return this.getEndpointPath(queryBuilder.toRestSoql());
+//    }
+
+    private String getFormattedQueryPathWithAllFields(String objectName, Integer limitCount, Integer offsetValue) {
+        if (offsetValue == null) offsetValue = 0;
+
         RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);
-        queryBuilder.addLimit(limitCount);
+        queryBuilder.addLimit(limitCount)
+                .addOrderBy(Constants.Query.CREATED_DATE_FIELD, Constants.RestQueryBuilder.DESC_SORT)
+                .addOffset(offsetValue);
         return this.getEndpointPath(queryBuilder.toRestSoql());
     }
 

@@ -2,7 +2,7 @@ import {LightningElement, api} from 'lwc';
 import {isEmptyArray, isEmptyString} from "c/commons";
 
 //Apex
-import getDatatableDataConfig from '@salesforce/apex/SourceOrgRecordsController.getDatatableDataConfig';
+import getDatatableDataConfig from '@salesforce/apex/DatatableContainerController.getDatatableDataConfig';
 
 //Labels
 import noDataToDisplay from '@salesforce/label/c.SourceOrg_Lbl_NoDataToDisplay';
@@ -15,16 +15,18 @@ const DEFAULT_VISIBLE_COLUMNS = 8;
 const CAN_NOT_COPY_OBJ_ERROR = 'not supported for copy';
 
 //Events
-const COPY_EVENT = 'copy';
+const RECORD_COPY_EVENT = 'recordcopy';
 
 export default class DatatableContainer extends LightningElement {
     @api records = [];
     @api columns = [];
     @api allowRecordsCopyAction = false;
 
+    recordsOffset = 0;
     visibleRecordsCount = DEFAULT_VISIBLE_RECORDS;
     visibleColumnsCount = DEFAULT_VISIBLE_COLUMNS;
     showSpinner = false;
+    loadedDataExists = false;
 
     selectedRows = [];
     _objectName = '';
@@ -36,8 +38,8 @@ export default class DatatableContainer extends LightningElement {
     @api set objectName(value) {
         if (isEmptyString(value)) return;
         this._objectName = value;
-        this.columns = [];
-        this.records = [];
+
+        this.clearTableData();
         this.getData(); //TODO: add throttling
     };
 
@@ -45,47 +47,66 @@ export default class DatatableContainer extends LightningElement {
         return this.selectedRows.map(record => record?.Id);
     }
 
+    clearTableData() {
+        this.columns = [];
+        this.records = [];
+        this.recordsOffset = 0;
+        this.selectedRows = [];
+        this.allowRecordsCopyAction = false;
+    }
+
     getData() {
         if (isEmptyString(this.objectName)) return;
         this.showSpinner = true;
+        this.$loadMoreDataBtn?.setAttribute('disabled', true);
 
         getDatatableDataConfig({
             objectName: this.objectName,
             visibleRecords: this.visibleRecordsCount,
             visibleColumns: this.visibleColumnsCount,
+            offsetValue: this.recordsOffset,
         }).then(response => {
             const {columns, data} = response;
+            if (!data?.length) {
+                this.loadedDataExists = false;
+                return;
+            }
+
             this.columns = columns;
-            this.records = data;
+            this.records = [...this.records, ...data];
+            this.loadedDataExists = true;
         }).catch(err => {
             this.handleErrorMessage(err);
-        }).finally(() => this.showSpinner = false);
+        }).finally(() => {
+            this.showSpinner = false;
+            this.loadedDataExists && this.$loadMoreDataBtn?.removeAttribute('disabled');
+        });
     }
 
     handleRowSelection(event) {
         const {selectedRows} = event?.detail;
         this.selectedRows = selectedRows;
-
-        if (isEmptyArray(selectedRows)) {
-            this.allowRecordsCopyAction = false;
-            return;
-        }
-        this.allowRecordsCopyAction = true;
-
-        console.log(JSON.stringify(this.selectedRows));
+        this.allowRecordsCopyAction = !isEmptyArray(selectedRows);
     }
 
     handleVisibleRecordsChange(event) {
-        this.visibleRecordsCount = event.detail.value;
+        this.clearTableData();
+        this.visibleRecordsCount = parseInt(event.detail.value);
         this.getData();
     }
 
-    handleCopyEvent() {
-        this.dispatchEvent(new CustomEvent(COPY_EVENT, {details: {}}));
+    handleVisibleColumnsChange(event) {
+        this.clearTableData();
+        this.visibleColumnsCount = event.detail.value;
+        this.getData();
     }
 
-    handleVisibleColumnsChange(event) {
-        this.visibleColumnsCount = event.detail.value;
+    handleCopy() {
+        this.dispatchEvent(new CustomEvent(RECORD_COPY_EVENT, {details: {}}));
+    }
+
+    handleLoadMoreData() {
+        this.recordsOffset += this.visibleRecordsCount;
         this.getData();
     }
 
@@ -110,5 +131,13 @@ export default class DatatableContainer extends LightningElement {
 
     get areRecordsEmpty() {
         return !this.records?.length;
+    }
+
+    get selectedRecordsCount() {
+        return this.selectedRows.length;
+    }
+
+    get $loadMoreDataBtn() {
+        return this.template.querySelector('.load-more-data');
     }
 }

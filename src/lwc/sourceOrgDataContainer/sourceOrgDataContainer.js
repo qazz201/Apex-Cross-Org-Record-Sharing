@@ -30,7 +30,7 @@ export default class SourceOrgDataContainer extends NavigationMixin(LightningEle
     selectedObjectName = '';
     showSpinner = false;
     showModalSpinner = false;
-    domDatatableContainer = '';
+    domDatatableContainer;
     allowRecordsCopyAction;
     savedRecordsData = [];
 
@@ -100,7 +100,8 @@ export default class SourceOrgDataContainer extends NavigationMixin(LightningEle
 
     handleAuthEvent(params = {}) {
         const {success} = params;
-        if (success) this.showContainer = true;
+        // if (success) this.showContainer = true;
+        this.showContainer = success;
     }
 
     handleSavedRecordNavigate(event) {

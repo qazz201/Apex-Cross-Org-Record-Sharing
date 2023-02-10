@@ -9,19 +9,39 @@
                     onvisiblerecordschange={handleVisibleRecordsChange}
                     onvisiblecolumnschange={handleVisibleColumnsChange}
                     allow-search={areRecordsEmpty}
-                    oncopy={handleCopyEvent}>
+                    onrecordcopy={handleCopy}>
             </c-datatable-header-panel>
         </div>
 
         <!--Table-->
-        <div class="slds-is-relative slds-p-around_medium">
-            <lightning-datatable
-                    key-field="id"
-                    data={records}
-                    columns={columns}
-                    show-row-number-column
-                    onrowselection={handleRowSelection}>
-            </lightning-datatable>
+        <div class="slds-gutters slds-p-around_medium">
+            <div if:false={areRecordsEmpty} class="datatable-container slds-is-relative">
+                <div class="datatable-container__table">
+                    <lightning-datatable
+                            key-field="id"
+                            data={records}
+                            columns={columns}
+                            show-row-number-column
+                            onrowselection={handleRowSelection}>
+                    </lightning-datatable>
+                </div>
+
+                <!--Table Footer-->
+                <div class="slds-grid slds-gutters slds-p-around_small">
+                    <div class="slds-col slds-size_2-of-12">
+                        <span class="slds-text-color_weak">
+                            Selected: {selectedRecordsCount}
+                        </span>
+                    </div>
+                    <div class="slds-col slds-size_8-of-12">
+                        <button class="load-more-data slds-button slds-button_brand"
+                                onclick={handleLoadMoreData}>
+                            Load More Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!--Table Spinner-->
             <template if:true={showSpinner}>
                 <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>

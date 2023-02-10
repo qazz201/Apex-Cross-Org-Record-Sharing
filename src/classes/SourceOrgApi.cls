@@ -32,8 +32,8 @@ public with sharing class SourceOrgApi {
         return this.queryApiService.getRecordsByObjectName(objectName, limitCount);
     }
 
-    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns) {
-        List<Map<String, Object>> recordsAsMap = this.queryApiService.getResponseRecords(objectName, limitCount);
+    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns, Integer offsetValue) {
+        List<Map<String, Object>> recordsAsMap = this.queryApiService.getResponseRecords(objectName, limitCount, offsetValue);
         return new DataTable(recordsAsMap, visibleColumns).build();
     }
 }
