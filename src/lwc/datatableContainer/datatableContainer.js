@@ -1,5 +1,6 @@
 import {LightningElement, api} from 'lwc';
 import {isEmptyArray, isEmptyString} from "c/commons";
+import {showToastNotification, ERROR_TITLE, ERROR_VARIANT, WARNING_TITLE, WARNING_VARIANT} from "c/toastMessage";
 
 //Apex
 import getDatatableDataConfig from '@salesforce/apex/DatatableContainerController.getDatatableDataConfig';
@@ -7,12 +8,11 @@ import getDatatableDataConfig from '@salesforce/apex/DatatableContainerControlle
 //Labels
 import noDataToDisplay from '@salesforce/label/c.SourceOrg_Lbl_NoDataToDisplay';
 import sourceOrgRecords from '@salesforce/label/c.SourceOrg_Lbl_Records';
-import {showToastNotification, ERROR_TITLE, ERROR_VARIANT, WARNING_TITLE, WARNING_VARIANT} from "c/toastMessage";
+import notSupported from '@salesforce/label/c.Api_Lbl_NotSupported';
 
 //Constants
 const DEFAULT_VISIBLE_RECORDS = 20;
 const DEFAULT_VISIBLE_COLUMNS = 8;
-const CAN_NOT_COPY_OBJ_ERROR = 'not supported for copy';
 
 //Events
 const RECORD_COPY_EVENT = 'recordcopy';
@@ -32,7 +32,8 @@ export default class DatatableContainer extends LightningElement {
     _objectName = '';
     labels = {
         noDataToDisplay,
-        sourceOrgRecords
+        sourceOrgRecords,
+        notSupported,
     }
 
     @api set objectName(value) {
@@ -117,7 +118,7 @@ export default class DatatableContainer extends LightningElement {
         let title = ERROR_TITLE;
         let variant = ERROR_VARIANT;
 
-        if (message?.toLowerCase()?.includes(CAN_NOT_COPY_OBJ_ERROR.toLowerCase())) {
+        if (message?.toLowerCase()?.includes(this.labels?.notSupported.toLowerCase())) {
             title = WARNING_TITLE;
             variant = WARNING_VARIANT;
         }

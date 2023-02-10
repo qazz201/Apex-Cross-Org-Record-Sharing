@@ -210,7 +210,7 @@ public with sharing class QueryApiService extends Api {
 
         RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);
         queryBuilder.addLimit(limitCount)
-                .addOrderBy(Constants.Query.CREATED_DATE_FIELD, Constants.RestQueryBuilder.DESC_SORT)
+                .addOrderBy(Constants.Query.CREATED_DATE_FIELD, Constants.RestQueryBuilder.DESC_SORT) //TODO:Does not work properly for ACCOUNT 1111!!!!!!!!!!!!
                 .addOffset(offsetValue);
         return this.getEndpointPath(queryBuilder.toRestSoql());
     }
