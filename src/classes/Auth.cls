@@ -4,10 +4,10 @@ public abstract with sharing class Auth {
     protected AuthorizationParams authorizationParams = new AuthorizationParams();
     protected AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
 
-    public Auth(String authorizationCode, ICallout calloutClient) {
-        this.authorizationParams.authorizationCode = authorizationCode;
-        this.calloutClient = calloutClient;
-    }
+//    public Auth(String authorizationCode, ICallout calloutClient) {
+//        this.authorizationParams.authorizationCode = authorizationCode;
+//        this.calloutClient = calloutClient;
+//    }
 
     public Auth(AuthorizationParams authorizationParams, ICallout calloutClient) {
         this.authorizationParams = authorizationParams;
@@ -20,6 +20,7 @@ public abstract with sharing class Auth {
 
     protected abstract String getAccessTokenEndpoint();
     protected abstract String getRefreshTokenEndpoint();
+    protected abstract String getUserInfoEndpoint();
 
     /**
     *  @description authorize via params from custom settings (by using clientId and clientSecret and authCode) or passed auth params
@@ -40,6 +41,7 @@ public abstract with sharing class Auth {
         }
 
         this.accessTokenResponse = this.parseAccessTokenResponse(response.getBody());
+        this.saveUserInfoInCustomSetting(this.getUserInfo());
         this.saveAuthParamsInCustomSetting();
 
         System.debug(this.accessTokenResponse);
@@ -61,9 +63,29 @@ public abstract with sharing class Auth {
         return this.parseRefreshTokenResponse(response.getBody());
     }
 
-//    public virtual void setCalloutClient(ICallout calloutClient) {
-//        this.calloutClient = calloutClient;
-//    }
+    public virtual UserInfoResponse getUserInfo() {
+        String userInfoEndpoint = this.getUserInfoEndpoint();
+        if (String.isBlank(userInfoEndpoint) || this.doesUserInfoExist()) return null;
+
+        calloutClient.setEndpoint(userInfoEndpoint);
+        calloutClient.clearAllHeaders();
+        calloutClient.setHeader(
+                Constants.Auth.AUTHORIZATION_HEADER,
+                Constants.Auth.BEARER_HEADER + this.getAccessToken()
+        );
+
+        HttpResponse response = calloutClient.post();
+        System.debug('USER INFOOO== ' + response);
+        return this.parseUserInfoResponse(response.getBody());
+    }
+
+    protected virtual void reauthorize() { // TODO:Add counter for Reauth
+        RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
+        this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
+        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
+
+        System.debug('__reauthorize_accessTokenResponse__ ' + this.accessTokenResponse);
+    }
 
     public virtual ICallout getCalloutClient() {
         return this.calloutClient;
@@ -104,12 +126,9 @@ public abstract with sharing class Auth {
         return String.isNotBlank(currentCallbackUrl) ? currentCallbackUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.RedirectUri__c;
     }
 
-    protected virtual void reauthorize() { // TODO:Add counter for Reauth
-        RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
-        this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
-        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
-
-        System.debug('__reauthorize_accessTokenResponse__ ' + this.accessTokenResponse);
+    public virtual String getEnvironmentUrl() {
+        String currentEnvironmentUrl = this.authorizationParams?.environmentUrl;
+        return String.isNotBlank(currentEnvironmentUrl) ? currentEnvironmentUrl : RecordTransferCustomSettingService.getOrgDefaultSetting()?.EnvironmentUrl__c;
     }
 
     protected virtual void saveAuthParamsInCustomSetting() {
@@ -120,8 +139,25 @@ public abstract with sharing class Auth {
                 RecordTransferSettings__c.RedirectUri__c => this.getCallbackUrl(),
                 RecordTransferSettings__c.AccessToken__c => this.getAccessToken(),
                 RecordTransferSettings__c.Refresh_Token__c => this.getRefreshToken(),
-                RecordTransferSettings__c.Instance_Url__c => this.getInstanceUrl()
+                RecordTransferSettings__c.Instance_Url__c => this.getInstanceUrl(),
+                RecordTransferSettings__c.EnvironmentUrl__c => this.getEnvironmentUrl()
         });
+    }
+
+    protected virtual void saveUserInfoInCustomSetting(UserInfoResponse userInfo) {
+        if (userInfo == null) return;
+        
+        RecordTransferCustomSettingService.setOrgDefaultSetting(new Map<SObjectField, String>{
+                RecordTransferSettings__c.UserEmail__c => userInfo.email,
+                RecordTransferSettings__c.UserName__c => userInfo.name,
+                RecordTransferSettings__c.PreferredUsername__c => userInfo.preferred_username
+        });
+    }
+
+    private Boolean doesUserInfoExist() {
+        return String.isNotBlank(RecordTransferCustomSettingService.getOrgDefaultSettingValueByName(RecordTransferSettings__c.UserEmail__c))
+                || String.isNotBlank(RecordTransferCustomSettingService.getOrgDefaultSettingValueByName(RecordTransferSettings__c.UserName__c))
+                || String.isNotBlank(RecordTransferCustomSettingService.getOrgDefaultSettingValueByName(RecordTransferSettings__c.PreferredUsername__c));
     }
 
     protected AccessTokenResponse parseAccessTokenResponse(String responseBody) {
@@ -130,6 +166,10 @@ public abstract with sharing class Auth {
 
     protected RefreshTokenResponse parseRefreshTokenResponse(String responseBody) {
         return (RefreshTokenResponse) JSON.deserialize(responseBody, RefreshTokenResponse.class);
+    }
+
+    protected UserInfoResponse parseUserInfoResponse(String responseBody) {
+        return (UserInfoResponse) JSON.deserialize(responseBody, UserInfoResponse.class);
     }
 
     public class RefreshTokenResponse {
@@ -143,20 +183,32 @@ public abstract with sharing class Auth {
         public String instance_url;
     }
 
+    public class UserInfoResponse {
+        public String preferred_username;
+        public String name;
+        public String email;
+    }
+
     public class AuthorizationParams {
         String authorizationCode;
         String clientId;
         String clientSecret;
         String callbackUrl;
+        String environmentUrl;
 
         public AuthorizationParams() {
         }
 
-        public AuthorizationParams(String authorizationCode, String clientId, String clientSecret, String callbackUrl) {
+        public AuthorizationParams(String authorizationCode,
+                String clientId,
+                String clientSecret,
+                String callbackUrl,
+                String environmentUrl) {
             this.authorizationCode = authorizationCode;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
             this.callbackUrl = callbackUrl;
+            this.environmentUrl = environmentUrl;
         }
     }
 

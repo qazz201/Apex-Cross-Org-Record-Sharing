@@ -1,8 +1,8 @@
 public with sharing class SfWebFlowAuthProvider extends Auth {
 
-    public SfWebFlowAuthProvider(String authorizationCode, ICallout calloutClient) {
-        super(authorizationCode, calloutClient);
-    }
+//    public SfWebFlowAuthProvider(String authorizationCode, ICallout calloutClient) {
+//        super(authorizationCode, calloutClient);
+//    }
 
     public SfWebFlowAuthProvider(AuthorizationParams authorizationParams, ICallout calloutClient) {
         super(authorizationParams, calloutClient);
@@ -42,6 +42,12 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         );
     }
 
+    protected override String getUserInfoEndpoint() {
+        return String.format(Constants.Auth.USER_INFO_ENDPOINT, new List<String>{
+                this.getEnvironmentUrl()
+        });
+    }
+
     private Map<String, String> getTokenUrlParams(Map<String, String> specificUrlParams) {
         Map<String, String> defaultTokenUrlParams = new Map<String, String>{
                 Constants.Auth.QUESTION_SIGN
@@ -65,7 +71,11 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
         for (String urlKey : urlParams.keySet()) {
             combinedUrlParams += urlKey + urlParams.get(urlKey);
         }
-        return Constants.Auth.TOKEN_ENDPOINT + combinedUrlParams;
+
+        String tokenEndpoint = String.format(Constants.Auth.TOKEN_ENDPOINT, new List<String>{
+                this.getEnvironmentUrl()
+        });
+        return tokenEndpoint + combinedUrlParams;
     }
 
     public class SfWebFlowAuthProviderException extends Exception {

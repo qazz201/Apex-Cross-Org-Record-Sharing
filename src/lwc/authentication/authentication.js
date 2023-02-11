@@ -81,6 +81,7 @@ export default class Authentication extends LightningElement {
             clientId: this.clientId,
             clientSecret: this.clientSecret,
             callbackUrl: this.callbackUrl,
+            environmentUrl:this.environmentUrl,
         }).then(() => {
             console.log('Connected app data saved!')
             const eventParams = {...this.defaultAuthEventDetail, success: true};
@@ -94,7 +95,7 @@ export default class Authentication extends LightningElement {
     }
 
     handleFailedAuthentication(error = {}) {
-        console.error('Failed Authentication error: ', error);
+        console.error('Failed Authentication error: ', JSON.stringify(error));
 
         this.dispatchAuthorizationEvent(this.defaultAuthEventDetail);
         fireEvent(this.pageRef, AUTH_EVENT, this.defaultAuthEventDetail);

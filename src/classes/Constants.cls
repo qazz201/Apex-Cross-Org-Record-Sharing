@@ -38,7 +38,9 @@ public with sharing class Constants {
     public class Auth {
         private Auth() {
         }
-        public final String TOKEN_ENDPOINT = 'https://login.salesforce.com/services/oauth2/token';
+        public final String OAUTH_ROOT = '{0}/services/oauth2'; // {0} - login.salesforce or test.salesforce
+        public final String TOKEN_ENDPOINT = OAUTH_ROOT + '/token';
+        public final String USER_INFO_ENDPOINT = OAUTH_ROOT + '/userinfo';
         public final String AUTHORIZATION_HEADER = 'Authorization';
         public final String BEARER_HEADER = 'Bearer ';
         public final String AMPERSAND_SIGN = '&';
@@ -56,8 +58,9 @@ public with sharing class Constants {
     public class Api {
         private Api() {
         }
-        public final String TOOLING_API_ROOT_PATH = '/services/data/v56.0/tooling/';
-        public final String QUERY_API_ROOT_PATH = '/services/data/v56.0/query/?q=';
+        public final String SERVICES_DATA_ROOT = '/services/data/v56.0';
+        public final String TOOLING_API_ROOT_PATH = SERVICES_DATA_ROOT + '/tooling/';
+        public final String QUERY_API_ROOT_PATH = SERVICES_DATA_ROOT + '/query/?q=';
         public final String QUERY_PATH = 'query/?q=';
         public final String RECORDS = 'records';
     }

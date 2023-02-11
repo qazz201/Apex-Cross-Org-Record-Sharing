@@ -43,12 +43,30 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>EnvironmentUrl__c</fullName>
+        <externalId>false</externalId>
+        <label>Environment Url</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Url</type>
+    </fields>
+    <fields>
         <fullName>Instance_Url__c</fullName>
         <externalId>false</externalId>
         <label>Instance Url</label>
         <required>false</required>
         <trackTrending>false</trackTrending>
         <type>Url</type>
+    </fields>
+    <fields>
+        <fullName>PreferredUsername__c</fullName>
+        <externalId>false</externalId>
+        <label>Preferred Username</label>
+        <length>100</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>RedirectUri__c</fullName>
@@ -63,6 +81,25 @@
         <externalId>false</externalId>
         <label>Refresh Token</label>
         <length>150</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>UserEmail__c</fullName>
+        <externalId>false</externalId>
+        <label>User Email</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>UserName__c</fullName>
+        <externalId>false</externalId>
+        <label>User Name</label>
+        <length>100</length>
         <required>false</required>
         <trackTrending>false</trackTrending>
         <type>Text</type>
