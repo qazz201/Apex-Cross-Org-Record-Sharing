@@ -2,7 +2,9 @@
     <div class="slds-grid slds-grid_pull-padded-medium slds-align_absolute-center">
         <!--Select Standard Object-->
         <div class="slds-col slds-p-around_small slds-size_2-of-12">
-            <c-custom-select label="Select Standard Object"
+            <c-custom-select class="standard-object-select"
+                             label="Select Standard Object"
+                             data-object-name={objects.standard}
                              onfocused={handleGetStandardObjectNames}
                              onchanged={handleChangeObjectName}
                              options={standardObjectOptions}>
@@ -11,7 +13,9 @@
 
         <!--Select Custom Object-->
         <div class="slds-col slds-p-around_small slds-size_2-of-12">
-            <c-custom-select label="Select Custom Object"
+            <c-custom-select class="custom-object-select"
+                             label="Select Custom Object"
+                             data-object-name={objects.custom}
                              onfocused={handleGetCustomObjectNames}
                              onchanged={handleChangeObjectName}
                              options={customObjectOptions}>

@@ -1,8 +1,5 @@
 import {LightningElement, api} from 'lwc';
 
-// import getPickListValues from '@salesforce/apex/PicklistController.getPickListValues';
-// import getFieldLabel from '@salesforce/apex/PicklistController.getFieldLabel';
-
 const CHANGED_EVENT = 'changed';
 const FOCUSED_EVENT = 'focused';
 
@@ -10,8 +7,18 @@ export default class CustomSelect extends LightningElement {
     @api label = '';
     @api options = [];
 
+    domSelect;
+
+    renderedCallback() {
+        if (this.domSelect) return;
+        this.domSelect = this.template.querySelector('select');
+    }
+
+    @api resetSelection() {
+        this.domSelect.selectedIndex = 0;
+    }
+
     handleFocus() {
-        console.log('FOCUSED');
         this.dispatchEvent(new CustomEvent(FOCUSED_EVENT, {}));
     }
 

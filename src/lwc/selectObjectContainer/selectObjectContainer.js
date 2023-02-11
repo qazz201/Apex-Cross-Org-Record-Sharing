@@ -8,6 +8,8 @@ import getSourceOrgCustomObjectNames
 import getStandardObjectNames from '@salesforce/apex/SourceOrgDataContainerController.getStandardObjectNames';
 
 const CHANGE_NAME_EVENT = 'changename';
+const CUSTOM_OBJ = 'customObject';
+const STANDARD_OBJ = 'standardObject';
 
 export default class SelectObjectContainer extends LightningElement {
     @api standardObjectOptions = [];
@@ -15,26 +17,28 @@ export default class SelectObjectContainer extends LightningElement {
     @api label = '';
 
     selectedObjectName = '';
-
-    async handleGetStandardObjectNames() {
-        if (!isEmptyArray(this.standardObjectOptions)) return;
-        await this.getStandardObjectNames();
-    }
-
-    async handleGetCustomObjectNames() {
-        if (!isEmptyArray(this.customObjectOptions)) return;
-        await this.getCustomObjectNames();
+    objects = {
+        custom: CUSTOM_OBJ,
+        standard: STANDARD_OBJ,
     }
 
     handleChangeObjectName(event) {
-        const {detail} = event;
+        const {detail, currentTarget} = event;
         this.dispatchEvent(new CustomEvent(CHANGE_NAME_EVENT, {detail}));
         this.selectedObjectName = detail?.value;
+
+        const dataSetObjName = currentTarget.dataset?.objectName;
+        if (dataSetObjName === this.objects.standard) {
+            this.$customObjSelect?.resetSelection();
+        } else if (dataSetObjName === this.objects.custom) {
+            this.$standardObjSelect?.resetSelection();
+        }
     }
 
-    async getStandardObjectNames() {
+    async handleGetStandardObjectNames() {
         console.log('GET STAND OBJ');
         try {
+            if (!isEmptyArray(this.standardObjectOptions)) return;
             const objNames = await getStandardObjectNames();
             this.standardObjectOptions = this.createOptions(objNames);
         } catch (error) {
@@ -42,9 +46,10 @@ export default class SelectObjectContainer extends LightningElement {
         }
     }
 
-    async getCustomObjectNames() {
+    async handleGetCustomObjectNames() {
         console.log('GET CCCOOBJ');
         try {
+            if (!isEmptyArray(this.customObjectOptions)) return;
             const objNames = await getSourceOrgCustomObjectNames();
             this.customObjectOptions = this.createOptions(objNames);
         } catch (error) {
@@ -71,5 +76,13 @@ export default class SelectObjectContainer extends LightningElement {
         return values.map(objectName => {
             return {label: objectName, value: objectName};
         });
+    }
+
+    get $customObjSelect() {
+        return this.template.querySelector('.custom-object-select');
+    }
+
+    get $standardObjSelect() {
+        return this.template.querySelector('.standard-object-select');
     }
 }
