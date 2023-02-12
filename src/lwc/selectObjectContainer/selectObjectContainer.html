@@ -25,8 +25,8 @@
 
     <template if:true={selectedObjectName}>
         <p>
-            <span class="slds-text-font_monospace slds-text-title_bold slds-text-color_error">Selected object: </span>
-            <lightning-pill label={selectedObjectName}></lightning-pill>
+            <span class="slds-text-font_monospace slds-text-title_bold ">Selected object: </span>
+            <span style="color: white;" class="slds-badge slds-theme_warning">{selectedObjectName}</span>
         </p>
     </template>
 </template>

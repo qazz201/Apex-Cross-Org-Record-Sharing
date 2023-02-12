@@ -1,5 +1,11 @@
 <!-- Authorization -->
 <template>
+    <!--Auth User Info-->
+    <c-message-container if:true={authUserMessage}
+                         message={authUserMessage}
+                         url-link={authUserData.userOrgUrl}>
+    </c-message-container>
+
     <div class="slds-is-relative slds-box slds-color__background_gray-1">
         <!-- Authentication-->
         <c-authentication-container enable-silent-mode></c-authentication-container>
@@ -21,7 +27,7 @@
                     </lightning-menu-item>
                 </lightning-button-menu>
             </div>
-            
+
             <div class="slds-col slds-size_11-of-12 slds-p-right_xx-large">
                 <div class="slds-text-heading_medium slds-text-align_center">Transfer Records</div>
             </div>
@@ -29,7 +35,7 @@
 
         <!--Data-->
         <div class="slds-p-top_large">
-            <c-source-org-data-container></c-source-org-data-container>
+            <c-source-org-data-container onauthuserdata={handleAuthUserData}></c-source-org-data-container>
         </div>
     </div>
 </template>

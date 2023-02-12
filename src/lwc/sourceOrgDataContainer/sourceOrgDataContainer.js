@@ -21,6 +21,7 @@ import pleaseAuthenticate from '@salesforce/label/c.Auth_Lbl_PleaseAuthenticate'
 import selectCustomObject from '@salesforce/label/c.SourceOrg_Lbl_SelectCustomObject';
 
 const AUTH_EVENT = 'authenticate';
+const AUTH_USER_DATA_EVENT = 'authuserdata';
 
 export default class SourceOrgDataContainer extends NavigationMixin(LightningElement) {
     @api showContainer = false;
@@ -61,8 +62,9 @@ export default class SourceOrgDataContainer extends NavigationMixin(LightningEle
     async checkIfUserAuthenticated() {
         try {
             this.showSpinner = true;
-            const {userAuthenticated} = await checkIfUserAuthenticated();
-            this.showContainer = userAuthenticated;
+            const authData = await checkIfUserAuthenticated();
+            this.showContainer = authData?.userAuthenticated;
+            this.eventDispatcher(AUTH_USER_DATA_EVENT, authData);
         } catch (error) {
             this.handleError(error);
         }
@@ -117,6 +119,10 @@ export default class SourceOrgDataContainer extends NavigationMixin(LightningEle
                 actionName: 'view'
             }
         });
+    }
+
+    eventDispatcher(evName = '', detail = {}) {
+        this.dispatchEvent(new CustomEvent(evName, {detail}));
     }
 
     handleModalClose() {

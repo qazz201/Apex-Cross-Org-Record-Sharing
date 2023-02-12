@@ -1,6 +1,4 @@
-import {LightningElement, wire} from 'lwc';
-// import {CurrentPageReference} from 'lightning/navigation';
-// import {registerListener, unregisterListener} from 'c/pubsub';
+import {LightningElement} from 'lwc';
 
 //Labels
 import authenticateOrChangeAuthData from '@salesforce/label/c.Auth_Lbl_AuthenticateOrChangeAuthData';
@@ -11,6 +9,8 @@ const RUN_AUTH_FLOW_ACTION = 'runAuthFlow';
 const RE_AUTHENTICATION_REQUIRED_ACTION = 'reAuthenticationRequired';
 
 export default class RecordTransferContainer extends LightningElement {
+    authUserData = {};
+    authUserMessage = '';
 
     labels = {
         authenticateOrChangeAuthData,
@@ -31,6 +31,12 @@ export default class RecordTransferContainer extends LightningElement {
         } else if (actionName === this.menuActions.reAuthenticationRequired) {
             console.log('Action: ', RE_AUTHENTICATION_REQUIRED_ACTION);
         }
+    }
+
+    handleAuthUserData(event) {
+        const {userName, userEmail} = event.detail;
+        this.authUserMessage = `Authenticated as: ${userName}(${userEmail}) - Org URL: `;
+        this.authUserData = event.detail;
     }
 
     get $authenticationContainer() {

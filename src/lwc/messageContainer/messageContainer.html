@@ -1,0 +1,11 @@
+<template>
+    <div class="slds-notify slds-notify_alert" role="alert">
+        <span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small"
+              title="Description of icon when needed">
+            <lightning-icon size="xx-small" icon-name="action:user" alternative-text="User" title="User"></lightning-icon>
+        </span>
+        <h2>{message}
+            <a style="color: #65cae4;" if:true={urlLink} href={urlLink} target="_blank">{urlLink}</a>
+        </h2>
+    </div>
+</template>

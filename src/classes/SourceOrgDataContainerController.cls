@@ -8,7 +8,11 @@ public with sharing class SourceOrgDataContainerController extends Controller {
 
     @AuraEnabled
     public static UserAuthData checkIfUserAuthenticated() {
-        return new UserAuthData(hadUserAlreadyAuthenticated(), 'TestName', 'TestURL');
+        return new UserAuthData(hadUserAlreadyAuthenticated(),
+                getAuthDefaultSetting(RecordTransferSettings__c.UserName__c),
+                getAuthDefaultSetting(RecordTransferSettings__c.UserEmail__c),
+                getAuthDefaultSetting(RecordTransferSettings__c.Instance_Url__c)
+        );
     }
 
     @AuraEnabled
@@ -99,11 +103,14 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         @AuraEnabled
         public String userName { get; set; }
         @AuraEnabled
+        public String userEmail { get; set; }
+        @AuraEnabled
         public String userOrgUrl { get; set; }
 
-        public UserAuthData(Boolean userAuthenticated, String userName, String userOrgUrl) {
+        public UserAuthData(Boolean userAuthenticated, String userName, String userEmail, String userOrgUrl) {
             this.userAuthenticated = userAuthenticated;
             this.userName = userName;
+            this.userEmail = userEmail;
             this.userOrgUrl = userOrgUrl;
         }
     }
