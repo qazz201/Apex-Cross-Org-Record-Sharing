@@ -34,8 +34,8 @@ export default class RecordTransferContainer extends LightningElement {
     }
 
     handleAuthUserData(event) {
-        const {userName, userEmail} = event.detail;
-        this.authUserMessage = `Authenticated as: ${userName}(${userEmail}) - Org URL: `;
+        const {userAuthenticated, userName, userEmail} = event.detail;
+        userAuthenticated && (this.authUserMessage = `Authenticated as: ${userName}(${userEmail}) - Org URL: `);
         this.authUserData = event.detail;
     }
 
