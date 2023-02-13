@@ -82,9 +82,6 @@ public with sharing class QueryApiService extends Api {
     * @description 
     */
     public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount) {
-        // TODO: CHECK CACHE??????
-//        HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount));
-//        return this.parseQueryObjectResponseAndCacheIt(response);
         return this.getResponseRecords(objectName, limitCount, null);
     }
 

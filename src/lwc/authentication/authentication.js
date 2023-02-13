@@ -26,8 +26,8 @@ export default class Authentication extends LightningElement {
     //authUrl = 'https://login.salesforce.com/services/oauth2/authorize?client_id=3MVG9vvlaB0y1YsLh_esB2JsdW0GXbrlIkGLkYDI51JVZ8s2zdsSOjnhh3ubBeI0qLO1La.MJiwD6uj88vUeX&response_type=code&redirect_uri=https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/TransferRecordsFromAnotherOrg';
     @api clientId = '';
     @api clientSecret = '';
-    @api callbackUrl = 'https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/TransferRecordsFromAnotherOrg';
-    @api environmentUrl = 'https://login.salesforce.com'; // production or sandbox
+    @api callbackUrl = '';
+    @api environmentUrl = ''; // production or sandbox
 
     // @api autoLaunchAuthorization = false;
     // /**

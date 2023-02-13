@@ -37,15 +37,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         if (!hadUserAlreadyAuthenticated()) {
             throw new AuraHandledException(Label.Auth_Lbl_AuthenticationRequired);
         }
-        List<String> standardObjectNames = new List<String>();
-
-        for (Schema.SObjectType typ : Schema.getGlobalDescribe().values()) {
-            String sobjName = String.valueOf(typ);
-            if (sobjName.contains('__c') || sobjName.contains('__x')) continue;
-            standardObjectNames.add(sobjName);
-        }
-        standardObjectNames.sort();
-        return standardObjectNames;
+        return sourceOrgApi.getStandardObjectNames();
     }
 
     @AuraEnabled
@@ -55,7 +47,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
         try {
             List<SObject> savedRecords = sourceOrgApi.transferRecordsFromSourceToCurrentOrg(objectName, new Set<Id>(recordIds));
 
-            if (Lists.isEmpty(savedRecords)) return result;
+            if (Lists.isEmpty(savedRecords)) return null;
             SObjectField sObjectNameField = Schema.getGlobalDescribe().get(objectName).getDescribe().fields.getMap().get(Constants.Query.NAME_FIELD);
 
             for (SObject record : savedRecords) {
@@ -65,7 +57,7 @@ public with sharing class SourceOrgDataContainerController extends Controller {
                     nameValue = (String) record.get(Constants.Query.NAME_FIELD);
                 }
 
-                result.add(new SavedRecordData('0036800000I674KAAR', nameValue));
+                result.add(new SavedRecordData(record.Id, nameValue));
             }
 
             System.debug('TO SAVE_________' + savedRecords);

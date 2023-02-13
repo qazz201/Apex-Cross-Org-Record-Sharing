@@ -22,9 +22,21 @@ public with sharing class SourceOrgApi {
         return this.toolingApiService.getCustomObjectNames();
     }
 
+    public List<String> getStandardObjectNames() {
+        List<String> standardObjectNames = new List<String>();
+
+        for (Schema.SObjectType typ : Schema.getGlobalDescribe().values()) {
+            String sobjName = String.valueOf(typ);
+            if (sobjName.contains('__c') || sobjName.contains('__x')) continue;
+            standardObjectNames.add(sobjName);
+        }
+        standardObjectNames.sort();
+        return standardObjectNames;
+    }
+
     public List<SObject> transferRecordsFromSourceToCurrentOrg(String objectName, Set<Id> sourceOrgRecordIds) {
         List<SObject> records = this.queryApiService.getRecordsByObjectNameAndIds(objectName, sourceOrgRecordIds);
-        // Database.insert(records,false); //TODO: uncomment
+        insert records;
         return records;
     }
 
@@ -37,17 +49,3 @@ public with sharing class SourceOrgApi {
         return new DataTable(recordsAsMap, visibleColumns).build();
     }
 }
-
-
-// /services/data/v56.0/tooling/sobjects/CustomObject/describe/     //'/services/data/v56.0/query/?q=SELECT+name+from+MyCustomObject__c' // /services/data/v56.0/sobjects/
-//'/services/data/v56.0/sobjects/Contact/0036800000G0E5KAAV' // /services/data/v56.0/ui-api/record-defaults/clone/0036800000G0E5KAAV
-// services/data/v56.0/sobjects/MyCustomObject__c/describe -get info about object
-// https://host/services/data/vXX.0/metadata/deployRequest  https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_rest_deploy.htm
-
-////        while (res.getStatusCode() == 302) {
-////            req.setEndpoint(res.getHeader('Location'));
-////            res = new Http().send(req);
-////         
-////        }
-// req.setHeader('Content-Type', 'application/json');
-//req.setBody('{"hello":true}');
