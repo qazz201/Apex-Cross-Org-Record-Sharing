@@ -112,4 +112,12 @@
         <shortDescription>not support</shortDescription>
         <value>not support</value>
     </labels>
+    <labels>
+        <fullName>Api_Lbl_ForbiddenChars</fullName>
+        <categories>SearchApiService</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The following characters cannot be used during the search</shortDescription>
+        <value>The following characters cannot be used during the search: {0}</value>
+    </labels>
 </CustomLabels>

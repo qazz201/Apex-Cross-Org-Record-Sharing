@@ -36,8 +36,13 @@ public with sharing class SearchApiService extends Api {
     */
     public List<Map<String, Object>> searchRecordsRaw(String sObjectName, String searchReq) {
         if (String.isBlank(sObjectName) || String.isBlank(searchReq)) return null;
-        
-        String pathSearchQuery = this.getEndpointPath(String.format(Constants.Query.SOSL_SEARCH_TEMPLATE, new List<String>{
+        if (searchReq.containsAny(Constants.Sosl.SPECIAL_CHARS)) {
+            throw new SearchApiServiceException(String.format(Label.Api_Lbl_ForbiddenChars, new List<String>{
+                    Constants.Sosl.SPECIAL_CHARS
+            }));
+        }
+
+        String pathSearchQuery = this.getEndpointPath(String.format(Constants.Sosl.SOSL_SEARCH_TEMPLATE, new List<String>{
                 searchReq, sObjectName
         }));
         HttpResponse response = this.executeGetCallout(pathSearchQuery);
@@ -54,6 +59,9 @@ public with sharing class SearchApiService extends Api {
             result.add(objValueToFieldName);
         }
         return result;
+    }
+
+    public class SearchApiServiceException extends Exception {
     }
 
 }

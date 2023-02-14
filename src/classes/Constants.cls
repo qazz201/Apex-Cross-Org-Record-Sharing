@@ -35,6 +35,13 @@ public with sharing class Constants {
         set;
     }
 
+    public static Sosl Sosl {
+        get {
+            return Sosl == null ? Sosl = new Sosl() : Sosl;
+        }
+        set;
+    }
+
     public class Auth {
         private Auth() {
         }
@@ -99,7 +106,6 @@ public with sharing class Constants {
     public class Query {
         private Query() {
         }
-        public final String SOSL_SEARCH_TEMPLATE = 'FIND+\'{\'{0}\'}\'+IN+ALL+FIELDS+RETURNING+{1}+(FIELDS(ALL)+Limit+200)'; //FIND :searchText IN ALL FIELDS RETURNING Account(Id ORDER BY CreatedDate LIMIT 10)
         public final String DEVELOPER_NAME_FIELD = 'DeveloperName';
         public final String CUSTOM_OBJECT_SOBJECT = 'CustomObject';
         public final String ALL_FIELDS = 'FIELDS(ALL)';
@@ -111,5 +117,12 @@ public with sharing class Constants {
         public final String LAST_MODIFIED_BY_ID_FIELD = 'LastModifiedById';
         public final String SYSTEM_MODSTAMP_FIELD = 'SystemModstamp';
         public final String CREATED_DATE_FIELD = 'CreatedDate';
+    }
+
+    public class Sosl {
+        private Sosl() {
+        }
+        public final String SOSL_SEARCH_TEMPLATE = 'FIND+\'{\'{0}*\'}\'+IN+ALL+FIELDS+RETURNING+{1}+(FIELDS(ALL)+Limit+200)';
+        public final String SPECIAL_CHARS ='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\'';
     }
 }
