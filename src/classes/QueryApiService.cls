@@ -1,8 +1,12 @@
 public with sharing class QueryApiService extends Api {
     private static QueryApiService instance;
-    private SObjectService sObjectService = new SObjectService();//TODO: SObjectService.getInstance()
- 
-
+    private SObjectService sObjectService {
+        get {
+            return sObjectService == null ? sObjectService = new SObjectService() : sObjectService;
+        }
+        set;
+    }
+    
     private Integer DEFAULT_QUERY_LIMIT = 200;
     private static Map<Id, Object> responseRecordsCache = new Map<Id, Object>();
 

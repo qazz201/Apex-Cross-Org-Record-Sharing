@@ -1,6 +1,10 @@
 public virtual with sharing class Controller {
     private static ICallout calloutClient = new CalloutClient();
 
+    public static SfWebFlowAuthProvider getSfWebFlowAuthProvider() {
+        return new SfWebFlowAuthProvider(getCalloutClient());
+    }
+
     public static ICallout getCalloutClient() {
         calloutClient.setEndpoint(
                 RecordTransferCustomSettingService.getOrgDefaultSettingValueByName(RecordTransferSettings__c.Instance_Url__c)

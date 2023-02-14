@@ -1,5 +1,5 @@
 public with sharing class DatatableContainerController extends Controller {
-    private static SourceOrgApi sourceOrgApi = new SourceOrgApi(new SfWebFlowAuthProvider(getCalloutClient()));
+    private static SourceOrgApi sourceOrgApi = new SourceOrgApi(getSfWebFlowAuthProvider());
 
     @AuraEnabled
     public static DataTable.Table getDatatableDataConfig(String objectName,
@@ -9,7 +9,7 @@ public with sharing class DatatableContainerController extends Controller {
             String searchQuery) {
 
         DataTable.Table table = new DataTable.Table();
-        // if (visibleRecords == null || visibleColumns == null) return table;
+
         try {
             List<Map<String, Object>> rawRecords = new List<Map<String, Object>>();
 
@@ -29,7 +29,7 @@ public with sharing class DatatableContainerController extends Controller {
     private static void exceptionHandler(Exception ex, String objectName) {
         System.debug('SourceOrgRecordsController ERROR: ' + ex.getStackTraceString());
         String message = ex.getMessage();
-        
+
         if (message.contains(Label.Api_Lbl_NotSupported) || message.contains(Constants.Query.CREATED_DATE_FIELD)) {
             throw new AuraHandledException(String.format(Label.SourceOrg_Lbl_ObjectCanNotBeCopied,
                     new List<String>{

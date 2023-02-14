@@ -1,6 +1,11 @@
 public with sharing class SearchApiService extends Api {
     private static SearchApiService instance;
-    private SObjectService sObjectService = new SObjectService();//TODO: SObjectService.getInstance()
+    private SObjectService sObjectService {
+        get {
+            return sObjectService == null ? sObjectService = new SObjectService() : sObjectService;
+        }
+        set;
+    }
 
     public SearchApiService(ICallout calloutClient) {
         super(calloutClient);

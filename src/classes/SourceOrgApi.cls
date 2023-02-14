@@ -65,9 +65,5 @@ public with sharing class SourceOrgApi {
     public List<Map<String, Object>> getResponseRecordsRaw(String objectName, Integer limitCount, Integer offsetValue) {
         return this.queryApiService.getResponseRecordsRaw(objectName, limitCount, offsetValue);
     }
-
-//    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns, Integer offsetValue) {
-//        List<Map<String, Object>> recordsAsMap = this.queryApiService.getResponseRecordsRaw(objectName, limitCount, offsetValue);
-//        return new DataTable(recordsAsMap, visibleColumns).build();
-//    }
+    
 }

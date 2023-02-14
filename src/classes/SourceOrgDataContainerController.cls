@@ -1,10 +1,5 @@
 public with sharing class SourceOrgDataContainerController extends Controller {
-    private static SourceOrgApi sourceOrgApi {
-        get {
-            return sourceOrgApi == null ? sourceOrgApi = new SourceOrgApi(new SfWebFlowAuthProvider(getCalloutClient())) : sourceOrgApi;
-        }
-        set;
-    }
+    private static SourceOrgApi sourceOrgApi = new SourceOrgApi(getSfWebFlowAuthProvider());
 
     @AuraEnabled
     public static UserAuthData checkIfUserAuthenticated() {
@@ -59,8 +54,6 @@ public with sharing class SourceOrgDataContainerController extends Controller {
 
                 result.add(new SavedRecordData(record.Id, nameValue));
             }
-
-            System.debug('TO SAVE_________' + savedRecords);
         } catch (Exception ex) {
             System.debug(ex.getStackTraceString());
             throw new AuraHandledException(ex.getMessage());
