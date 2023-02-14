@@ -14,10 +14,18 @@ public with sharing class SourceOrgApi {
         set;
     }
 
+    private SearchApiService searchApiService {
+        get {
+            return searchApiService == null ? this.restApiManager.searchApi() : searchApiService;
+        }
+        set;
+    }
+
     public SourceOrgApi(Auth authProvider) {
         this.restApiManager = new RestApiManager(authProvider);
     }
 
+    //Tooling Api
     public List<String> getCustomObjectNames() {
         return this.toolingApiService.getCustomObjectNames();
     }
@@ -34,6 +42,16 @@ public with sharing class SourceOrgApi {
         return standardObjectNames;
     }
 
+    //Search Api
+    public List<SObject> searchRecords(String objectName, String searchReq) {
+        return this.searchApiService.searchRecords(objectName, searchReq);
+    }
+
+    public List<Map<String, Object>> searchRecordsRaw(String objectName, String searchReq) {
+        return this.searchApiService.searchRecordsRaw(objectName, searchReq);
+    }
+
+    //Query Api
     public List<SObject> transferRecordsFromSourceToCurrentOrg(String objectName, Set<Id> sourceOrgRecordIds) {
         List<SObject> records = this.queryApiService.getRecordsByObjectNameAndIds(objectName, sourceOrgRecordIds);
         insert records;
@@ -44,8 +62,12 @@ public with sharing class SourceOrgApi {
         return this.queryApiService.getRecordsByObjectName(objectName, limitCount);
     }
 
-    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns, Integer offsetValue) {
-        List<Map<String, Object>> recordsAsMap = this.queryApiService.getResponseRecords(objectName, limitCount, offsetValue);
-        return new DataTable(recordsAsMap, visibleColumns).build();
+    public List<Map<String, Object>> getResponseRecordsRaw(String objectName, Integer limitCount, Integer offsetValue) {
+        return this.queryApiService.getResponseRecordsRaw(objectName, limitCount, offsetValue);
     }
+
+//    public DataTable.Table buildLwcTableData(String objectName, Integer limitCount, Integer visibleColumns, Integer offsetValue) {
+//        List<Map<String, Object>> recordsAsMap = this.queryApiService.getResponseRecordsRaw(objectName, limitCount, offsetValue);
+//        return new DataTable(recordsAsMap, visibleColumns).build();
+//    }
 }

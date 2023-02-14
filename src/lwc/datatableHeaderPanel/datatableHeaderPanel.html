@@ -30,7 +30,13 @@
         </div>
         <!--Search-->
         <div class="slds-col slds-p-around_small slds-align-bottom slds-size_3-of-8">
-            <lightning-input placeholder="Search" type="search" disabled={allowSearch}></lightning-input>
+            <lightning-input class="search-input"
+                             value={searchQuery}
+                             placeholder="Type at least 3 symbols"
+                             type="search"
+                             disabled={allowSearch}
+                             onchange={handleSearchInputChange}>
+            </lightning-input>
         </div>
     </div>
 </template>

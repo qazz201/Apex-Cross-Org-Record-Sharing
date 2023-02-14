@@ -1,5 +1,7 @@
 public with sharing class QueryApiService extends Api {
     private static QueryApiService instance;
+    private SObjectService sObjectService = new SObjectService();//TODO: SObjectService.getInstance()
+ 
 
     private Integer DEFAULT_QUERY_LIMIT = 200;
     private static Map<Id, Object> responseRecordsCache = new Map<Id, Object>();
@@ -50,7 +52,7 @@ public with sharing class QueryApiService extends Api {
         }
 
         HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount, null));
-        return this.generateSObjects(objectName, this.parseQueryObjectResponseAndCacheIt(response));
+        return this.sObjectService.generateSObjects(objectName, this.parseQueryObjectResponseAndCacheIt(response));
     }
 
 
@@ -75,20 +77,20 @@ public with sharing class QueryApiService extends Api {
         }
         restRecordsForSobjects.addAll(parsedResponse);
 
-        return this.generateSObjects(objectName, restRecordsForSobjects);
+        return this.sObjectService.generateSObjects(objectName, restRecordsForSobjects);
     }
 
     /**
     * @description 
     */
-    public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount) {
-        return this.getResponseRecords(objectName, limitCount, null);
+    public List<Map<String, Object>> getResponseRecordsRaw(String objectName, Integer limitCount) {
+        return this.getResponseRecordsRaw(objectName, limitCount, null);
     }
 
     /**
-  * @description 
-  */
-    public List<Map<String, Object>> getResponseRecords(String objectName, Integer limitCount, Integer offsetValue) {
+    * @description 
+    */
+    public List<Map<String, Object>> getResponseRecordsRaw(String objectName, Integer limitCount, Integer offsetValue) {
         HttpResponse response = this.executeGetCallout(this.getFormattedQueryPathWithAllFields(objectName, limitCount, offsetValue));
         return this.parseQueryObjectResponseAndCacheIt(response);
     }
@@ -108,45 +110,45 @@ public with sharing class QueryApiService extends Api {
         System.debug('Records Ids Cache: ' + responseRecordsCache.keySet());
     }
 
-    private List<SObject> generateSObjects(String sObjectName, List<Map<String, Object>> listFieldNameToValue) {
-        List<SObject> result = new List<SObject>();
-        SObjectType recordSObjectType = Schema.getGlobalDescribe().get(sObjectName);
-
-        if (recordSObjectType == null) {
-            System.debug('ERROR____: record ' + sObjectName + 'does not exist on the current org');
-            throw new QueryApiServiceException(String.format(Label.Api_Lbl_ObjectDoesNotExistOnCurrentOrg, new List<String>{
-                    sObjectName
-            }));
-        }
-
-        Map<String, Schema.SObjectField> sobjectFieldName = recordSObjectType.getDescribe().fields.getMap(); // the object should exist on current org!
-
-        for (Map<String, Object> parsedObj : listFieldNameToValue) {
-            SObject dynamicSObject = recordSObjectType.newSObject();
-
-            for (String fieldName : parsedObj.keySet()) {
-                Schema.SObjectField objectField = sobjectFieldName.get(fieldName);
-                if (objectField == null) continue;
-
-                this.setSObjectFieldValue(
-                        dynamicSObject,
-                        objectField,
-                        fieldName,
-                        parsedObj.get(fieldName)
-                );
-            }
-            result.add(dynamicSObject);
-        }
-
-        // TODO:!!!!
-        if (Lists.isEmpty(result)) {
-            throw new QueryApiServiceException(String.format(Label.SourceOrg_Lbl_ObjectCanNotBeCopied,
-                    new List<String>{
-                            sObjectName
-                    }));
-        }
-        return result;
-    }
+//    private List<SObject> generateSObjects(String sObjectName, List<Map<String, Object>> listFieldNameToValue) {
+//        List<SObject> result = new List<SObject>();
+//        SObjectType recordSObjectType = Schema.getGlobalDescribe().get(sObjectName);
+//
+//        if (recordSObjectType == null) {
+//            System.debug('ERROR____: record ' + sObjectName + 'does not exist on the current org');
+//            throw new QueryApiServiceException(String.format(Label.Api_Lbl_ObjectDoesNotExistOnCurrentOrg, new List<String>{
+//                    sObjectName
+//            }));
+//        }
+//
+//        Map<String, Schema.SObjectField> sobjectFieldName = recordSObjectType.getDescribe().fields.getMap(); // the object should exist on current org!
+//
+//        for (Map<String, Object> parsedObj : listFieldNameToValue) {
+//            SObject dynamicSObject = recordSObjectType.newSObject();
+//
+//            for (String fieldName : parsedObj.keySet()) {
+//                Schema.SObjectField objectField = sobjectFieldName.get(fieldName);
+//                if (objectField == null) continue;
+//
+//                this.setSObjectFieldValue(
+//                        dynamicSObject,
+//                        objectField,
+//                        fieldName,
+//                        parsedObj.get(fieldName)
+//                );
+//            }
+//            result.add(dynamicSObject);
+//        }
+//
+//        // TODO:!!!!
+//        if (Lists.isEmpty(result)) {
+//            throw new QueryApiServiceException(String.format(Label.SourceOrg_Lbl_ObjectCanNotBeCopied,
+//                    new List<String>{
+//                            sObjectName
+//                    }));
+//        }
+//        return result;
+//    }
 
     private List<Map<String, Object>> parseQueryObjectResponseAndCacheIt(HttpResponse response) {
         // map of field name to value
@@ -164,37 +166,37 @@ public with sharing class QueryApiService extends Api {
         return result;
     }
 
-    private void setSObjectFieldValue(
-            SObject sObjectToFill,
-            Schema.SObjectField objectField,
-            String fieldName,
-            Object fieldValueObj) {
-
-        String fieldValue = String.valueOf(fieldValueObj);
-        if (String.isBlank(fieldValue)) return; // TODO: remove for record update??
-        String fieldTypeName = objectField.getDescribe().getType().name();
-
-        // System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
-
-        if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) {
-            System.debug('Can not update: ' + fieldName);
-            return;
-        } else if (Dates.isDate(fieldValue)) {
-            sObjectToFill.put(fieldName, Dates.getValue(fieldValue));
-            return;
-        } else if (fieldTypeName == String.valueOf(DisplayType.STRING) && Numbers.isDecimal(fieldValue)) {
-            sObjectToFill.put(fieldName, String.ValueOf(fieldValue));
-            return;
-        } else if (fieldTypeName != String.valueOf(DisplayType.STRING) && Numbers.isDecimal(fieldValue)) {
-            sObjectToFill.put(fieldName, Integer.valueOf(Numbers.getDecimalValue(fieldValue)));
-            return;
-        } else if (fieldTypeName == String.valueOf(DisplayType.BOOLEAN)) {
-            sObjectToFill.put(fieldName, Boolean.valueOf(fieldValue));
-            return;
-        }
-
-        sObjectToFill.put(fieldName, fieldValue);
-    }
+//    private void setSObjectFieldValue(
+//            SObject sObjectToFill,
+//            Schema.SObjectField objectField,
+//            String fieldName,
+//            Object fieldValueObj) {
+//
+//        String fieldValue = String.valueOf(fieldValueObj);
+//        if (String.isBlank(fieldValue)) return; // TODO: remove for record update??
+//        String fieldTypeName = objectField.getDescribe().getType().name();
+//
+//        // System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
+//
+//        if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) {
+//            System.debug('Can not update: ' + fieldName);
+//            return;
+//        } else if (Dates.isDate(fieldValue)) {
+//            sObjectToFill.put(fieldName, Dates.getValue(fieldValue));
+//            return;
+//        } else if (fieldTypeName == String.valueOf(DisplayType.STRING) && Numbers.isDecimal(fieldValue)) {
+//            sObjectToFill.put(fieldName, String.ValueOf(fieldValue));
+//            return;
+//        } else if (fieldTypeName != String.valueOf(DisplayType.STRING) && Numbers.isDecimal(fieldValue)) {
+//            sObjectToFill.put(fieldName, Integer.valueOf(Numbers.getDecimalValue(fieldValue)));
+//            return;
+//        } else if (fieldTypeName == String.valueOf(DisplayType.BOOLEAN)) {
+//            sObjectToFill.put(fieldName, Boolean.valueOf(fieldValue));
+//            return;
+//        }
+//
+//        sObjectToFill.put(fieldName, fieldValue);
+//    }
 
 //    private String getFormattedQueryPathWithAllFields(String objectName, Integer limitCount) {
 //        RestQueryBuilder queryBuilder = new RestQueryBuilder(objectName, Constants.Query.ALL_FIELDS);

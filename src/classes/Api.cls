@@ -31,6 +31,10 @@ public abstract with sharing class Api {
         return this.endpointApiUrl + apiResource;
     }
 
+    protected virtual Object parseQueryResponse(String body, Type parseType) {
+        return JSON.deserialize(body, parseType);
+    }
+
     private HttpResponse handleCalloutResponseByStatusCode(HttpResponse response, String resourceEndpoint) {
         if (this.authProvider == null) return response;
         HttpResponse newResponse = response;

@@ -23,10 +23,11 @@ export default class DatatableContainer extends LightningElement {
     @api allowRecordsCopyAction = false;
 
     recordsOffset = 0;
+    searchQuery = '';
     visibleRecordsCount = DEFAULT_VISIBLE_RECORDS;
     visibleColumnsCount = DEFAULT_VISIBLE_COLUMNS;
     showSpinner = false;
-    loadedDataExists = false;
+    allowLoadMore = false;
 
     selectedRows = [];
     _objectName = '';
@@ -39,6 +40,8 @@ export default class DatatableContainer extends LightningElement {
     @api set objectName(value) {
         if (isEmptyString(value)) return;
         this._objectName = value;
+        this.searchQuery = '';
+        this.$datatableHeaderPanel?.clearSearchInput();
 
         this.clearTableData();
         this.getData(); //TODO: add throttling
@@ -59,35 +62,58 @@ export default class DatatableContainer extends LightningElement {
     getData() {
         if (isEmptyString(this.objectName)) return;
         this.showSpinner = true;
-        this.$loadMoreDataBtn?.setAttribute('disabled', true);
+        this.deactivateLoadMoreButton(true);
 
         getDatatableDataConfig({
             objectName: this.objectName,
             visibleRecords: this.visibleRecordsCount,
             visibleColumns: this.visibleColumnsCount,
             offsetValue: this.recordsOffset,
+            searchQuery: this.searchQuery,
         }).then(response => {
-            const {columns, data} = response;
-            if (!data?.length) {
-                this.loadedDataExists = false;
+            if (!isEmptyString(this.searchQuery)) {
+                this.parseSearchRecords(response);
                 return;
             }
 
-            this.columns = columns;
-            this.records = [...this.records, ...data];
-            this.loadedDataExists = true;
+            this.parseGotRecords(response);
         }).catch(err => {
             this.handleErrorMessage(err);
+            this.allowLoadMore = false;
         }).finally(() => {
             this.showSpinner = false;
-            this.loadedDataExists && this.$loadMoreDataBtn?.removeAttribute('disabled');
+            this.allowLoadMore && this.deactivateLoadMoreButton(false);
         });
+    }
+
+    parseGotRecords(response) {
+        const {columns, data} = response;
+        if (!data?.length) {
+            this.allowLoadMore = false;
+            return;
+        }
+        this.columns = columns;
+        this.records = [...this.records, ...data];
+        this.allowLoadMore = true;
+    }
+
+    parseSearchRecords(response) {
+        const {columns, data} = response;
+        this.columns = columns;
+        this.records = data;
+        this.allowLoadMore = false;
     }
 
     handleRowSelection(event) {
         const {selectedRows} = event?.detail;
         this.selectedRows = selectedRows;
         this.allowRecordsCopyAction = !isEmptyArray(selectedRows);
+    }
+
+    handleRecordSearch(event) {
+        this.searchQuery = event.detail?.value;
+        this.showSpinner = true;
+        this.getData();
     }
 
     handleVisibleRecordsChange(event) {
@@ -126,12 +152,25 @@ export default class DatatableContainer extends LightningElement {
         showToastNotification(title, error, variant);
     }
 
+    deactivateLoadMoreButton(isDisabled) {
+        if (isDisabled) {
+            this.$loadMoreDataBtn?.setAttribute('disabled', true);
+
+        } else {
+            this.$loadMoreDataBtn?.removeAttribute('disabled');
+        }
+    }
+
     get objectName() {
         return this._objectName;
     }
 
-    get areRecordsEmpty() {
-        return !this.records?.length;
+    get isSearchAvailable() {
+        return !this.areRecordsExist && !this.searchQuery;
+    }
+
+    get areRecordsExist() {
+        return this.records?.length;
     }
 
     get selectedRecordsCount() {
@@ -140,5 +179,9 @@ export default class DatatableContainer extends LightningElement {
 
     get $loadMoreDataBtn() {
         return this.template.querySelector('.load-more-data');
+    }
+
+    get $datatableHeaderPanel() {
+        return this.template.querySelector('c-datatable-header-panel');
     }
 }

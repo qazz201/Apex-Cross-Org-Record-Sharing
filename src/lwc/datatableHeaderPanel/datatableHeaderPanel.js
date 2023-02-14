@@ -1,5 +1,5 @@
 import {LightningElement, api} from 'lwc';
-import {isEmptyArray} from 'c/commons';
+import {isEmptyArray, debounce} from 'c/commons';
 
 //Labels
 import copySelectedRecords from '@salesforce/label/c.SourceOrg_Lbl_CopySelectedRecords';
@@ -16,6 +16,7 @@ const DEFAULT_VISIBLE_COLUMNS = '8';
 const VISIBLE_RECORDS_CHANGE = 'visiblerecordschange';
 const VISIBLE_COLUMNS_CHANGE = 'visiblecolumnschange';
 const COPY_RECORD = 'recordcopy';
+const SEARCH_RECORD = 'recordsearch';
 
 export default class DatatableHeaderPanel extends LightningElement {
     @api allowRecordsCopyAction = false;
@@ -24,11 +25,15 @@ export default class DatatableHeaderPanel extends LightningElement {
     _visibleRecordsCount = DEFAULT_VISIBLE_RECORDS;
     _visibleColumnsCount = DEFAULT_VISIBLE_COLUMNS;
 
+    debounceEventDispatcher = debounce(this.eventDispatcher.bind(this), 450);
+
     labels = {
         copySelectedRecords,
         selectRows,
         selectColumns,
     };
+    minCharCountSearch = 3;
+    searchQuery = '';
 
     @api set visibleRecordsCount(value) {
         this._visibleRecordsCount = `${value}`;
@@ -36,6 +41,11 @@ export default class DatatableHeaderPanel extends LightningElement {
 
     @api set visibleColumnsCount(value) {
         this._visibleColumnsCount = `${value}`;
+    }
+
+    @api clearSearchInput() {
+        console.log('CLEAR INPUTTT')
+        this.searchQuery = '';
     }
 
     handleVisibleRecordsChange(event) {
@@ -48,6 +58,14 @@ export default class DatatableHeaderPanel extends LightningElement {
 
     handleCopyAction(event) {
         this.eventDispatcher(COPY_RECORD, event.detail);
+    }
+
+    handleSearchInputChange(event) {
+        const {value} = event.detail;
+        this.searchQuery = value;
+        if (value?.length != 0 && value.length < this.minCharCountSearch) return;
+
+        this.debounceEventDispatcher(SEARCH_RECORD, event.detail);
     }
 
     eventDispatcher(eventName = '', detail = {}) {

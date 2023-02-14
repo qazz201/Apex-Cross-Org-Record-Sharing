@@ -61,8 +61,10 @@ public with sharing class Constants {
         public final String SERVICES_DATA_ROOT = '/services/data/v56.0';
         public final String TOOLING_API_ROOT_PATH = SERVICES_DATA_ROOT + '/tooling/';
         public final String QUERY_API_ROOT_PATH = SERVICES_DATA_ROOT + '/query/?q=';
+        public final String SEARCH_API_ROOT_PATH = SERVICES_DATA_ROOT + '/search/?q=';
         public final String QUERY_PATH = 'query/?q=';
         public final String RECORDS = 'records';
+        public final String SEARCH_RECORDS = 'searchRecords';
     }
 
     public class RestQueryBuilder {
@@ -97,6 +99,7 @@ public with sharing class Constants {
     public class Query {
         private Query() {
         }
+        public final String SOSL_SEARCH_TEMPLATE = 'FIND+\'{\'{0}\'}\'+IN+ALL+FIELDS+RETURNING+{1}+(FIELDS(ALL)+Limit+200)'; //FIND :searchText IN ALL FIELDS RETURNING Account(Id ORDER BY CreatedDate LIMIT 10)
         public final String DEVELOPER_NAME_FIELD = 'DeveloperName';
         public final String CUSTOM_OBJECT_SOBJECT = 'CustomObject';
         public final String ALL_FIELDS = 'FIELDS(ALL)';

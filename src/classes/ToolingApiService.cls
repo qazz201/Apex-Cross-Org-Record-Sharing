@@ -38,8 +38,10 @@ public with sharing class ToolingApiService extends Api {
         } else if (response.getStatusCode() != 200) {
             throw new ApiException(String.valueOf(response.getBody()));
         }
+        
+        ToolingQueryResponse toolingQueryResponse = (ToolingQueryResponse) this.parseQueryResponse(response.getBody(), ToolingQueryResponse.class);
 
-        for (Records record : this.parseCustomObjectQueryResponse(response.getBody())?.records) {
+        for (Records record : toolingQueryResponse?.records) {
             if (record.DeveloperName.contains(this.CUSTOM_FIELD_POSTFIX)) continue;
             names.add(record.DeveloperName + this.CUSTOM_FIELD_POSTFIX);
         }
@@ -47,9 +49,9 @@ public with sharing class ToolingApiService extends Api {
         return names;
     }
 
-    public ToolingQueryResponse parseCustomObjectQueryResponse(String body) {
-        return (ToolingQueryResponse) JSON.deserialize(body, ToolingQueryResponse.class);
-    }
+//    public ToolingQueryResponse parseCustomObjectQueryResponse(String body) {
+//        return (ToolingQueryResponse) JSON.deserialize(body, ToolingQueryResponse.class);
+//    }
 
     public class ToolingQueryResponse {
         public List<Records>records;

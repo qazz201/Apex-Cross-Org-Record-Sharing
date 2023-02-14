@@ -12,4 +12,8 @@ public with sharing class RestApiManager {
     public QueryApiService queryApi() {
         return QueryApiService.getInstance(this.authProvider);
     }
+
+    public SearchApiService searchApi() {
+        return SearchApiService.getInstance(this.authProvider);
+    }
 }
