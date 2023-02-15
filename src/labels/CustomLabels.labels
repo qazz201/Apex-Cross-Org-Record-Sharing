@@ -7,6 +7,14 @@
         <protected>true</protected>
         <shortDescription>Authentication required</shortDescription>
         <value>Authentication required!</value>
+    </labels>    
+    <labels>
+        <fullName>Auth_Lbl_Authenticate</fullName>
+        <categories>Auth</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Authenticate</shortDescription>
+        <value>Authenticate</value>
     </labels>
     <labels>
         <fullName>Auth_Lbl_AuthenticationError</fullName>

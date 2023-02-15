@@ -1,5 +1,4 @@
 import {LightningElement, api, wire} from 'lwc';
-import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import {CurrentPageReference} from 'lightning/navigation';
 
 import {
@@ -16,6 +15,7 @@ import tryToAuthorize from '@salesforce/apex/AuthenticationController.authorize'
 
 //Labels
 import authenticationSuccessful from '@salesforce/label/c.Auth_Lbl_AuthenticationSuccessful';
+import authenticate from '@salesforce/label/c.Auth_Lbl_Authenticate';
 
 const AUTH_CODE = 'code';
 const AUTH_EVENT = 'authenticate';
@@ -23,23 +23,16 @@ const AUTHORIZATION_PATH = 'services/oauth2/authorize';
 
 export default class Authentication extends LightningElement {
     @wire(CurrentPageReference) pageRef; // Required by pubsub
-    //authUrl = 'https://login.salesforce.com/services/oauth2/authorize?client_id=3MVG9vvlaB0y1YsLh_esB2JsdW0GXbrlIkGLkYDI51JVZ8s2zdsSOjnhh3ubBeI0qLO1La.MJiwD6uj88vUeX&response_type=code&redirect_uri=https://empathetic-shark-ve6ud3-dev-ed.trailblaze.lightning.force.com/lightning/n/TransferRecordsFromAnotherOrg';
     @api clientId = '';
     @api clientSecret = '';
     @api callbackUrl = '';
     @api environmentUrl = ''; // production or sandbox
 
-    // @api autoLaunchAuthorization = false;
-    // /**
-    //  * @description To silently get new auth code(if needed) and also check if user already authorized
-    //  */ 
-    // @api silentAuthorization = false;
-
     authCode = ''; //extracted from url
     authWindow;
     intervalIds = [];
     defaultAuthEventDetail = {success: false};
-    labels = {authenticationSuccessful,};
+    labels = {authenticationSuccessful, authenticate};
 
     disconnectedCallback() {
         if (isEmptyArray(this.intervalIds)) return;
@@ -48,7 +41,6 @@ export default class Authentication extends LightningElement {
 
     openAuthWindow() {
         try {
-            console.log('RESULT AUTH URL ', this.authorizationUrl)
             this.authWindow = window.open(this.authorizationUrl, "MsgWindow", "width=500,height=500,left=500");
             this.trackWindowLocationChange();
             this.trackWindowClose();
@@ -64,7 +56,6 @@ export default class Authentication extends LightningElement {
     }
 
     handleAuthWindowClose = () => {
-        console.log(this.authCode, 'AUTH CODE')
         this.clearIntervals();
 
         if (!this.authCode || isEmptyString(this.authCode)) {
@@ -81,7 +72,7 @@ export default class Authentication extends LightningElement {
             clientId: this.clientId,
             clientSecret: this.clientSecret,
             callbackUrl: this.callbackUrl,
-            environmentUrl:this.environmentUrl,
+            environmentUrl: this.environmentUrl,
         }).then(() => {
             console.log('Connected app data saved!')
             const eventParams = {...this.defaultAuthEventDetail, success: true};

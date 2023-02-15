@@ -92,15 +92,15 @@
     <processType>Flow</processType>
     <screens>
         <name>AuthWindow</name>
-        <label>Authentication Window</label>
+        <label>Authorization Window</label>
         <locationX>176</locationX>
         <locationY>518</locationY>
         <allowBack>true</allowBack>
         <allowFinish>false</allowFinish>
         <allowPause>false</allowPause>
         <fields>
-            <name>AuthorizeComponent</name>
-            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;Try to authorize lwc component&lt;/p&gt;&lt;p&gt;{!clientId}&lt;/p&gt;&lt;p&gt;{!clientSecret}&lt;/p&gt;&lt;p&gt;{!callbackUrl}&lt;/p&gt;&lt;p&gt;{!SelectedEnvironment}&lt;/p&gt;</fieldText>
+            <name>AuthenticationHeader</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong style=&quot;background-color: rgb(255, 255, 255); font-size: 16px; color: rgb(86, 84, 84);&quot;&gt;Authentication&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
@@ -135,6 +135,37 @@
             <isRequired>true</isRequired>
             <storeOutputAutomatically>true</storeOutputAutomatically>
         </fields>
+        <fields>
+            <name>AuthErrorDescription</name>
+            <fieldText>&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;em&gt;If you have created a connected app (or updated client id/secret) and seen an error like on the image then you should wait up to 10 min before your connected app changes are saved.&lt;/em&gt;&lt;/p&gt;&lt;p&gt;&lt;em&gt;Or check if you pointed out the correct Connected app information from the previous screen.&lt;/em&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>AuthErrorImg</name>
+            <extensionName>flowruntime:image</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>imageName</name>
+                <value>
+                    <stringValue>AuthError</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>imageWidth</name>
+                <value>
+                    <stringValue>400px</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>imageAlt</name>
+                <value>
+                    <stringValue>Auth Error </stringValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
         <showFooter>true</showFooter>
         <showHeader>false</showHeader>
     </screens>
@@ -150,8 +181,13 @@
             <targetReference>Assign_user_connected_app_data</targetReference>
         </connector>
         <fields>
+            <name>GetConnectedAppDataHeader</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong style=&quot;font-size: 16px; color: rgb(86, 84, 84);&quot;&gt;Get Connected App Data&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
             <name>ConnectedappWasCreatedText</name>
-            <fieldText>&lt;p&gt;When the Connected app was created on Parent org then copy some information here &lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;When the Connected app was created on Parent org then copy some information here:&lt;/p&gt;&lt;p&gt;&lt;strong style=&quot;font-size: 10.3376px; font-family: Helvetica; color: rgb(74, 74, 86);&quot;&gt;*Open &lt;/strong&gt;&lt;strong style=&quot;font-size: 10.3376px; font-family: Helvetica; color: rgb(154, 8, 8);&quot;&gt;Consumer Key and Secret&lt;/strong&gt;&lt;strong style=&quot;font-size: 10.3376px; font-family: Helvetica; color: rgb(74, 74, 86);&quot;&gt; from the connected app&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
@@ -181,7 +217,7 @@
             <inputParameters>
                 <name>label</name>
                 <value>
-                    <stringValue>Callback URL</stringValue>
+                    <stringValue>Callback URL (same as you pointed out in the connected app)</stringValue>
                 </value>
             </inputParameters>
             <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
@@ -213,12 +249,43 @@
             <targetReference>ConnectedAppParams</targetReference>
         </connector>
         <fields>
-            <name>CreateConnectedApp</name>
-            <fieldText>&lt;p&gt;Create a Connected App on Parent org (org from where you want to copy records)&lt;/p&gt;</fieldText>
+            <name>ConnectedAppHeader</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong style=&quot;font-size: 16px; color: rgb(86, 84, 84);&quot;&gt;Create Connected App&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
         </fields>
+        <fields>
+            <name>CreateConnectedApp</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 14px;&quot;&gt;Create a Connected App on Source org (org from where you want to copy records) and fill in the next fields :&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;strong style=&quot;color: rgb(154, 8, 8);&quot;&gt;Selected OAuth Scopes&lt;/strong&gt;:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Full access (full)&lt;/li&gt;&lt;li&gt;Perform requests at any time (refresh_token, offline_access)&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;strong style=&quot;color: rgb(154, 8, 8);&quot;&gt;Callback URL:&lt;/strong&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;https:&lt;strong style=&quot;color: rgb(154, 8, 8);&quot;&gt;&lt;em&gt;&lt;u&gt;your.org.url&lt;/u&gt;&lt;/em&gt;&lt;/strong&gt;/lightning/n/TransferRecordsFromAnotherOrg &lt;em&gt;&lt;u&gt;(you can copy it from the URL bar)&lt;/u&gt;&lt;/em&gt;&lt;/li&gt;&lt;/ul&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>ConnectedAppSettingsPic</name>
+            <extensionName>flowruntime:image</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>imageName</name>
+                <value>
+                    <stringValue>ConnectedAppSettings</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>imageAlt</name>
+                <value>
+                    <stringValue>Connected App Settings </stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>imageHeight</name>
+                <value>
+                    <stringValue>300px</stringValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
         <showFooter>true</showFooter>
-        <showHeader>true</showHeader>
+        <showHeader>false</showHeader>
     </screens>
     <start>
         <locationX>50</locationX>
