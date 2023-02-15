@@ -4,6 +4,7 @@ public abstract with sharing class Api {
     protected String endpointApiUrl;
 
     protected final String CUSTOM_FIELD_POSTFIX = '__c';
+    private static Integer RETRY_TIMES = 0;
 
     public Api(ICallout calloutClient) {
         this.calloutClient = calloutClient;
@@ -23,7 +24,6 @@ public abstract with sharing class Api {
         HttpResponse response = this.calloutClient.get();
         System.debug('CALLOUT URL: ' + resourceEndpoint);
         response = this.handleCalloutResponseByStatusCode(response, resourceEndpoint);
-        System.debug('RESPONSE__: ' + response.getBody());
         return response;
     }
 
@@ -40,32 +40,31 @@ public abstract with sharing class Api {
         HttpResponse newResponse = response;
 
         if (response.getStatusCode() == 400) {
-            //400 "expired access/refresh token"
             System.debug('HANDLE STATUS CODE_ CODE=400');
             throw new ApiException(response.getBody());
-            //TODO: create handler
         } else if (response.getStatusCode() == 401) {
             //401 {"message":"Session expired or invalid","errorCode":"INVALID_SESSION_ID"}
             System.debug('HANDLE STATUS CODE_ CODE=401');
-            newResponse = this.calloutGetWithRefreshedAccessToken(resourceEndpoint);
+            HttpResponse responseWithNewToken = this.calloutGetWithRefreshedAccessToken(resourceEndpoint);
+            if (responseWithNewToken != null) newResponse = responseWithNewToken;
         }
 
         return newResponse;
     }
-
-    //TODO: Add retry counter( may be infinite call if status code=400 or 401)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
     private HttpResponse calloutGetWithRefreshedAccessToken(String resourceEndpoint) {
+        if (RETRY_TIMES >= Constants.Api.MAX_RETRY_TIMES) return null;
+
+        RETRY_TIMES++;
         Auth.RefreshTokenResponse refreshedToken = this.authProvider.getNewAccessToken();
 
         this.calloutClient.clearAllHeaders();
         this.calloutClient.setHeader(Constants.Auth.AUTHORIZATION_HEADER, Constants.Auth.BEARER_HEADER + refreshedToken.access_token);
         HttpResponse response = this.executeGetCallout(resourceEndpoint);
 
-        //TODO: add save method in AuthProvider!!!!
         //update access_token after callout
-        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshedToken.access_token);
-        System.debug('NEW TOKEN: calloutWithRefreshedAccessToken__ ' + refreshedToken);
-
+        this.authProvider.saveAccessToken(refreshedToken.access_token);
+        RETRY_TIMES = 0;
         return response;
     }
 

@@ -9,6 +9,14 @@
         <value>Authentication required!</value>
     </labels>
     <labels>
+        <fullName>Auth_Lbl_AuthenticationError</fullName>
+        <categories>Auth</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Something went wrong during authentication. Please try again later.</shortDescription>
+        <value>Something went wrong during authentication. Please try again later.</value>
+    </labels>
+    <labels>
         <fullName>Auth_Lbl_AuthenticationSuccessful</fullName>
         <categories>Auth</categories>
         <language>en_US</language>

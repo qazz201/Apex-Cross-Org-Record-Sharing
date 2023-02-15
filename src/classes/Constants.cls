@@ -72,6 +72,7 @@ public with sharing class Constants {
         public final String QUERY_PATH = 'query/?q=';
         public final String RECORDS = 'records';
         public final String SEARCH_RECORDS = 'searchRecords';
+        public final Integer MAX_RETRY_TIMES = 3;
     }
 
     public class RestQueryBuilder {
@@ -123,6 +124,6 @@ public with sharing class Constants {
         private Sosl() {
         }
         public final String SOSL_SEARCH_TEMPLATE = 'FIND+\'{\'{0}*\'}\'+IN+ALL+FIELDS+RETURNING+{1}+(FIELDS(ALL)+Limit+200)';
-        public final String SPECIAL_CHARS ='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\'';
+        public final String SPECIAL_CHARS = '!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\'';
     }
 }

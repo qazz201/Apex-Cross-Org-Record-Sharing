@@ -4,11 +4,6 @@ public abstract with sharing class Auth {
     protected AuthorizationParams authorizationParams = new AuthorizationParams();
     protected AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
 
-//    public Auth(String authorizationCode, ICallout calloutClient) {
-//        this.authorizationParams.authorizationCode = authorizationCode;
-//        this.calloutClient = calloutClient;
-//    }
-
     public Auth(AuthorizationParams authorizationParams, ICallout calloutClient) {
         this.authorizationParams = authorizationParams;
         this.calloutClient = calloutClient;
@@ -31,8 +26,7 @@ public abstract with sharing class Auth {
         calloutClient.setEndpoint(this.getAccessTokenEndpoint());
         HttpResponse response = calloutClient.post();
 
-        System.debug(response.getBody());
-        System.debug('AUTH Response code___ ' + response.getStatusCode());
+        System.debug('AUTH Response code: ' + response.getStatusCode());
 
         if (response.getStatusCode() >= 400) {
             System.debug('Reauthorization...');
@@ -55,7 +49,7 @@ public abstract with sharing class Auth {
         this.calloutClient.setEndpoint(this.getRefreshTokenEndpoint());
         HttpResponse response = calloutClient.post();
 
-        System.debug('getNewAccessToken__ ' + response.getBody());
+        System.debug('GetNewAccessToken: ' + response.getBody());
         if (response.getStatusCode() != 200) {
             throw new AuthException('Reauthorization Error: ' + response.getBody());
         }
@@ -63,6 +57,16 @@ public abstract with sharing class Auth {
         return this.parseRefreshTokenResponse(response.getBody());
     }
 
+    /**
+     * @description 
+    */
+    public virtual void saveAccessToken(String access_token) {
+        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, access_token);
+    }
+
+    /**
+     * @description 
+    */
     public virtual UserInfoResponse getUserInfo() {
         String userInfoEndpoint = this.getUserInfoEndpoint();
         if (String.isBlank(userInfoEndpoint) || this.doesUserInfoExist()) return null;
@@ -75,15 +79,13 @@ public abstract with sharing class Auth {
         );
 
         HttpResponse response = calloutClient.post();
-        System.debug('USER INFOOO== ' + response);
         return this.parseUserInfoResponse(response.getBody());
     }
 
     protected virtual void reauthorize() { // TODO:Add counter for Reauth
         RefreshTokenResponse refreshTokenResponse = this.getNewAccessToken();
         this.accessTokenResponse.access_token = refreshTokenResponse?.access_token;
-        RecordTransferCustomSettingService.setOrgDefaultSetting(RecordTransferSettings__c.AccessToken__c, refreshTokenResponse?.access_token);
-
+        this.saveAccessToken(refreshTokenResponse?.access_token);
         System.debug('__reauthorize_accessTokenResponse__ ' + this.accessTokenResponse);
     }
 

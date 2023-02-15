@@ -27,7 +27,7 @@ public with sharing class DatatableContainerController extends Controller {
     }
 
     private static void exceptionHandler(Exception ex, String objectName) {
-        System.debug('SourceOrgRecordsController ERROR: ' + ex.getStackTraceString());
+        System.debug(ex.getStackTraceString());
         String message = ex.getMessage();
 
         if (message.contains(Label.Api_Lbl_NotSupported) || message.contains(Constants.Query.CREATED_DATE_FIELD)) {

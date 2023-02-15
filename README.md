@@ -1,13 +1,8 @@
 # Apex-Cross-Org-Record-Sharing
 
-### Example:
+The main objective of this app is to copy records from one org to another.<br/>
+The record can be successfully copied if both org have the same SObject.<br/>
 
-To get all Custom object names from target org:
+The org where this app is installed is the org where you want to copy records from the source org( in which you should authenticate via the button "Authenticate or Change Auth Data").<br/> 
 
-```javascript
-ICallout calloutClient = new CalloutClient();
-calloutClient.setEndpoint( RecordTransferCustomSettingService.getOrgDefaultSetting().Instance_Url__c);
-calloutClient.setHeader('Authorization', 'Bearer ' +   RecordTransferCustomSettingService.getOrgDefaultSetting().AccessToken__c);
-
-System.debug(new SourceOrgApi(calloutClient).getCustomObjectNames());
-```
+<img width="1791" alt="image" src="https://user-images.githubusercontent.com/39721136/219019074-216ced8e-ce97-4b69-b4d7-1b414c9dfa62.png">

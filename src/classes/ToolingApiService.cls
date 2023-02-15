@@ -26,7 +26,7 @@ public with sharing class ToolingApiService extends Api {
     /**
     * @description 
     */
-    public List<String> getCustomObjectNames() {
+    public List<String> getCustomObjectNames() { // TODO: add limit
         List<String> names = new List<String>();
         RestQueryBuilder queryBuilder = new RestQueryBuilder(Constants.Query.CUSTOM_OBJECT_SOBJECT, Constants.Query.DEVELOPER_NAME_FIELD);
 
@@ -38,7 +38,7 @@ public with sharing class ToolingApiService extends Api {
         } else if (response.getStatusCode() != 200) {
             throw new ApiException(String.valueOf(response.getBody()));
         }
-        
+
         ToolingQueryResponse toolingQueryResponse = (ToolingQueryResponse) this.parseQueryResponse(response.getBody(), ToolingQueryResponse.class);
 
         for (Records record : toolingQueryResponse?.records) {
@@ -48,10 +48,6 @@ public with sharing class ToolingApiService extends Api {
 
         return names;
     }
-
-//    public ToolingQueryResponse parseCustomObjectQueryResponse(String body) {
-//        return (ToolingQueryResponse) JSON.deserialize(body, ToolingQueryResponse.class);
-//    }
 
     public class ToolingQueryResponse {
         public List<Records>records;

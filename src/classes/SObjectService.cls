@@ -14,15 +14,16 @@ public with sharing class SObjectService {
         return instance;
     }
 
+    /**
+    * @description 
+    */
     public List<SObject> generateSObjects(String sObjectName, List<Map<String, Object>> listFieldNameToValue) {
         List<SObject> result = new List<SObject>();
         if (Lists.isEmpty(listFieldNameToValue)) return result;
-        
+
         SObjectType recordSObjectType = Schema.getGlobalDescribe().get(sObjectName);
 
         if (recordSObjectType == null) {
-            System.debug('ERROR____: record ' + sObjectName + 'does not exist on the current org');
-
             throw new SObjectServiceException(String.format(Label.Api_Lbl_ObjectDoesNotExistOnCurrentOrg, new List<String>{
                     sObjectName
             }));
@@ -47,7 +48,6 @@ public with sharing class SObjectService {
             result.add(dynamicSObject);
         }
 
-        // TODO:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (Lists.isEmpty(result)) {
             throw new SObjectServiceException(String.format(Label.SourceOrg_Lbl_ObjectCanNotBeCopied,
                     new List<String>{
@@ -64,10 +64,8 @@ public with sharing class SObjectService {
             Object fieldValueObj) {
 
         String fieldValue = String.valueOf(fieldValueObj);
-        if (String.isBlank(fieldValue)) return; // TODO: remove for record update??
+        if (String.isBlank(fieldValue)) return;
         String fieldTypeName = objectField.getDescribe().getType().name();
-
-        // System.debug(fieldName + ' __Type=__' + objectField.getDescribe().getType().name());
 
         if (objectField == null || Ids.isId(fieldValue) || !objectField?.getDescribe().isUpdateable()) {
             System.debug('Can not update: ' + fieldName);

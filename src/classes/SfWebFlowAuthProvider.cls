@@ -1,9 +1,5 @@
 public with sharing class SfWebFlowAuthProvider extends Auth {
 
-//    public SfWebFlowAuthProvider(String authorizationCode, ICallout calloutClient) {
-//        super(authorizationCode, calloutClient);
-//    }
-
     public SfWebFlowAuthProvider(AuthorizationParams authorizationParams, ICallout calloutClient) {
         super(authorizationParams, calloutClient);
     }
@@ -21,7 +17,7 @@ public with sharing class SfWebFlowAuthProvider extends Auth {
                                         + Constants.Auth.EQUAL_SIGN => Constants.Auth.AUTHORIZATION_CODE,//'&grant_type='this.GRANT_TYPE_AUTH_CODE,
                                 Constants.Auth.AMPERSAND_SIGN
                                         + Constants.Auth.CODE
-                                        + Constants.Auth.EQUAL_SIGN => this.getAuthorizationCode() //'&code='// TODO: CHANGE getAuthorizationCode to authentication
+                                        + Constants.Auth.EQUAL_SIGN => this.getAuthorizationCode() //'&code='
                         }
                 )
         );
