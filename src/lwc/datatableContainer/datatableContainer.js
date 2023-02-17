@@ -112,6 +112,7 @@ export default class DatatableContainer extends LightningElement {
 
     handleRecordSearch(event) {
         this.searchQuery = event.detail?.value;
+        if (isEmptyString(this.searchQuery)) this.records = [];
         this.showSpinner = true;
         this.getData();
     }
